@@ -1,0 +1,18 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  name      String
+  wechat    String
+  message   String?
+  service   String?
+  spec      String?
+  createdAt DateTime @default(now())
+}

@@ -6,7 +6,9 @@ export default function Hero() {
   return (
     <div className="mx-auto max-w-6xl px-4 pt-1 flex flex-col gap-20 min-h-screen  relative">
       <div className="flex flex-col items-center gap-5 mt-20">
-        <h1 className="text-3xl font-bold">Tiktok shop跨境电商服务平台</h1>
+        <h2 className="mt-2 text-2xl font-bold text-black md:text-3xl">
+          Tiktok shop跨境电商服务平台
+        </h2>
         <div className="text-center text-base font-normal space-y-3 text-neutral-600">
           专注跨境电商领域3年，累计服务
           <span className="font-bold text-black">1000+跨境卖家</span>

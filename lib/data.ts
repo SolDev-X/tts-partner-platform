@@ -1,37 +1,18 @@
 export const services = [
   {
-    href: "/",
+    href: "/services/onboarding",
     label: "定邀/普招代入驻",
     description:
       "协助店铺完成定向邀约邀请码入驻/普招入驻申请流程，覆盖多站点，按平台规范提交资料。",
   },
   {
-    href: "/",
+    href: "/services/whitelist",
     label: "本土/跨境类目报白",
     description:
       "协助本土及跨境类目报白申请，资料整理与提交流程指导，按平台审核要求规范办理。",
   },
   {
-    href: "/",
-    label: "开通全类目&一品多仓",
-    description:
-      "协助开通全类目权限及一品多仓模式，支持直邮与海外仓混发布局，适合多市场运营卖家。",
-  },
-
-  {
-    href: "/",
-    label: "开通全类目&一品多仓",
-    description:
-      "协助开通全类目权限及一品多仓模式，支持直邮与海外仓混发布局，适合多市场运营卖家。",
-  },
-  {
-    href: "/",
-    label: "开通全类目&一品多仓",
-    description:
-      "协助开通全类目权限及一品多仓模式，支持直邮与海外仓混发布局，适合多市场运营卖家。",
-  },
-  {
-    href: "/",
+    href: "/services/permissions",
     label: "开通全类目&一品多仓",
     description:
       "协助开通全类目权限及一品多仓模式，支持直邮与海外仓混发布局，适合多市场运营卖家。",
@@ -40,7 +21,7 @@ export const services = [
 
 export const navLinks = [
   {href: "/about", label: "关于我们"},
-  {href: "/#social-contact", label: "联系我们"},
+  {href: "/contact", label: "联系我们"},
 ];
 
 export const faqs = [
@@ -66,4 +47,23 @@ export const faqs = [
     answer:
       "仅支持跨境直邮商家升级为海外仓混发模式，欧盟/英国站点需具备仓储国VAT，日本站点无此要求。",
   },
+];
+
+export const sites = [
+  {id: "us", name: "美国", directMailRule: "invite-only"},
+  {id: "jp", name: "日本", directMailRule: "both"},
+  {id: "uk", name: "英国", directMailRule: "invite-only"},
+  {id: "eu", name: "欧盟", directMailRule: "invite-only"},
+  {id: "sea", name: "东南亚", directMailRule: "both"},
+  {id: "mx", name: "墨西哥", directMailRule: "invite-only"},
+];
+
+export const onboardingTypes = [
+  {id: "pop", name: "POP"},
+  {id: "direct", name: "直邮"},
+];
+
+export const inviteTypes = [
+  {id: "invite", name: "定邀"},
+  {id: "public", name: "普招"},
 ];

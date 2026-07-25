@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -29,13 +28,15 @@ export default function Header() {
     <header
       className={`
       flex items-center justify-between mx-auto max-w-6xl w-full p-4 sticky top-0 z-50
-       ${scrolled ? "bg-white" : ""}`}
+       ${scrolled ? "bg-white/70 backdrop-blur-md rounded-b-lg" : ""}`}
     >
-      <Link href="/" className="flex gap-1.5 items-center">
-        <SiTiktok size={20} />
-        <span className="font-black  text-2xl">TTS</span>
-        <span className="font-bold text-xl">跨境服务</span>
-      </Link>
+      <h1>
+        <Link href="/" className="flex gap-1.5 items-center">
+          <SiTiktok size={20} />
+          <span className="font-black  text-2xl">TTS</span>
+          <span className="font-bold text-xl">跨境服务</span>
+        </Link>
+      </h1>
 
       <nav className="flex items-center gap-14">
         <NavigationMenu>
