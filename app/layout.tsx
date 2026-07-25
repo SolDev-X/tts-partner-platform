@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "跨境服务平台",
   description:
-    "TikTok Shop跨境电商服务商，覆盖美国、日本、英国、欧盟十二国、东南亚、墨西哥等站点，提供邀请码代申请、店铺代入驻、本土/跨境类目报白等服务，流程规范，资料真实有效。",
+    "TikTok Shop跨境电商服务平台，覆盖美国、日本、英国、欧盟十二国、东南亚、墨西哥等站点，提供邀请码代申请、店铺代入驻、本土/跨境类目报白等服务，流程规范，资料真实有效。",
 };
 
 export default function RootLayout({
@@ -30,9 +30,11 @@ export default function RootLayout({
       lang="zh-CN"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <Header />
-      <body className="min-h-full flex flex-col">{children}</body>
-      <Footer />
+      <body className="min-h-full flex flex-col">
+        <Header />
+        <main className="flex-1">{children}</main>
+        <Footer />
+      </body>
     </html>
   );
 }
