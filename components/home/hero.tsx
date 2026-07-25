@@ -1,12 +1,13 @@
 import Link from "next/link";
 import {buttonVariants} from "@/components/ui/button";
+import {ChevronDown} from "lucide-react";
 
 export default function Hero() {
   return (
-    <div className="mx-auto max-w-6xl px-4">
-      <div className="flex flex-col items-center my-20 gap-5">
+    <div className="mx-auto max-w-6xl px-4 pt-1 flex flex-col gap-20 min-h-screen  relative">
+      <div className="flex flex-col items-center gap-5 mt-20">
         <h1 className="text-3xl font-bold">Tiktok shop跨境电商服务平台</h1>
-        <div className="text-center text-base font-normal mt-6 space-y-3 text-neutral-600">
+        <div className="text-center text-base font-normal space-y-3 text-neutral-600">
           专注跨境电商领域3年，累计服务
           <span className="font-bold text-black">1000+跨境卖家</span>
           ，深谙平台规则与风控逻辑，第一时间掌握官方政策动态，确保每一步操作合规可控。
@@ -20,7 +21,7 @@ export default function Hero() {
         </div>
       </div>
 
-      <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+      <div className="flex flex-col items-center justify-center gap-10 sm:flex-row">
         <Link
           href="/contact"
           className={buttonVariants({
@@ -40,6 +41,10 @@ export default function Hero() {
         >
           查看服务
         </Link>
+      </div>
+
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 mb-20 animate-bounce">
+        <ChevronDown className="h-6 w-6 text-neutral-400" />
       </div>
     </div>
   );

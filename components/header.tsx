@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -8,38 +10,33 @@ import {
   NavigationMenuContent,
   NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
-
-const services = [
-  {
-    href: "/",
-    label: "定邀/普招代入驻",
-  },
-  {
-    href: "/",
-    label: "本土/跨境类目报白",
-  },
-  {
-    href: "/",
-    label: "开通全类目&一品多仓",
-  },
-];
-
-const navLinks = [
-  {href: "/about", label: "关于我们"},
-  {href: "/contact", label: "联系我们"},
-];
+import {services, navLinks} from "@/lib/data";
+import {useState, useEffect} from "react";
+import {SiTiktok} from "@icons-pack/react-simple-icons";
 
 export default function Header() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <div className="flex items-center justify-between mx-auto max-w-6xl w-full p-4">
-      <Link href="/">
-        <Image
-          src="/next.svg"
-          alt="Tiktok shop跨境服务"
-          width={100}
-          height={24}
-        ></Image>
+    <header
+      className={`
+      flex items-center justify-between mx-auto max-w-6xl w-full p-4 sticky top-0 z-50
+       ${scrolled ? "bg-white" : ""}`}
+    >
+      <Link href="/" className="flex gap-1.5 items-center">
+        <SiTiktok size={20} />
+        <span className="font-black  text-2xl">TTS</span>
+        <span className="font-bold text-xl">跨境服务</span>
       </Link>
+
       <nav className="flex items-center gap-14">
         <NavigationMenu>
           <NavigationMenuList>
@@ -72,6 +69,6 @@ export default function Header() {
           </Link>
         ))}
       </nav>
-    </div>
+    </header>
   );
 }

@@ -12,7 +12,7 @@ export default function Footer() {
   return (
     <div className="flex items-center justify-between text-[14px] mx-auto max-w-6xl w-full px-4 py-6 border-t border-black">
       <p>© 2026 跨境服务. 所有资料需真实有效，结果以平台最终审核为准。</p>
-      <ul className="flex gap-4 items-center">
+      <div className="flex gap-4 items-center" id="social-contact">
         <HoverCard>
           <HoverCardTrigger>
             <SiWechat size={20} />
@@ -56,7 +56,7 @@ export default function Footer() {
         <Link href="wenyao.dev@gmail.com">
           <Mail size={20} />
         </Link>
-      </ul>
+      </div>
     </div>
   );
 }
