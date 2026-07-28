@@ -2,7 +2,7 @@ import {Service} from "./types";
 
 export const navLinks = [
   {href: "/about", label: "关于我们"},
-  {href: "#contact", label: "联系我们"},
+  {href: "/contact", label: "联系我们"},
 ];
 
 export const faqs = [

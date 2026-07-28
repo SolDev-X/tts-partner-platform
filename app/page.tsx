@@ -1,15 +1,13 @@
-import Hero from "@/components/home/hero";
-import Faq from "@/components/home/faq";
-import CTA from "@/components/home/cta";
-import ContactPage from "@/components/home/contact";
+import HeroSection from "@/components/home/hero";
+import {Services} from "@/components/home/services";
+import FAQs from "@/components/home/faqs";
 
 export default function Home() {
   return (
     <>
-      <Hero />
-      <Faq />
-      <CTA />
-      <ContactPage />
+      <HeroSection />
+      <Services />
+      <FAQs />
     </>
   );
 }
