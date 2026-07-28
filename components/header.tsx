@@ -9,10 +9,15 @@ import {
   NavigationMenuContent,
   NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
-import {services, navLinks} from "@/lib/data";
+import {services} from "@/lib/data";
 import {useState, useEffect} from "react";
 import {SiTiktok} from "@icons-pack/react-simple-icons";
 import {ModeToggle} from "./mode-toggle";
+
+const navLinks = [
+  {href: "/about", label: "关于我们"},
+  {href: "/contact", label: "联系我们"},
+];
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);

@@ -1,35 +1,5 @@
 import {Service} from "./types";
 
-export const navLinks = [
-  {href: "/about", label: "关于我们"},
-  {href: "/contact", label: "联系我们"},
-];
-
-export const faqs = [
-  {
-    question: "审核不通过怎么办？",
-    answer: "审核未通过将全额退款，无需承担额外费用。",
-  },
-  {
-    question: "需要提供哪些资料？",
-    answer:
-      "根据服务类型不同，可能需要店铺主体名称、ShopID、邀请码等信息，具体会在提交申请时说明。",
-  },
-  {
-    question: "大概多久能出审核结果？",
-    answer: "提交后一般约7个工作日显示结果，具体以平台审核为准。",
-  },
-  {
-    question: "支持哪些国家/站点？",
-    answer: "覆盖美国、日本、英国、欧盟十二国、东南亚、墨西哥等站点。",
-  },
-  {
-    question: "已有店铺可以升级为混发模式吗？",
-    answer:
-      "仅支持跨境直邮商家升级为海外仓混发模式，欧盟/英国站点需具备仓储国VAT，日本站点无此要求。",
-  },
-];
-
 export const services: Service[] = [
   {
     id: "onboarding",
