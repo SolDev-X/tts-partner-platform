@@ -14,23 +14,23 @@ const links = [
     group: "服务",
     items: [
       {
-        title: "定邀&普招代入驻",
+        title: "代下码",
         href: "#",
       },
       {
-        title: "本土&跨境类目报白",
+        title: "代入住",
         href: "#",
       },
       {
-        title: "开通全类目&一品多仓",
+        title: "全类目",
         href: "#",
       },
       {
-        title: "开通全类目&一品多仓",
+        title: "一品多仓",
         href: "#",
       },
       {
-        title: "开通全类目&一品多仓",
+        title: "类目报白",
         href: "#",
       },
     ],
@@ -70,17 +70,17 @@ const links = [
 export default function Footer() {
   return (
     <footer className="bg-background border-b pt-10">
-      <div className="mx-auto max-w-5xl px-6">
-        <div className="grid gap-12 md:grid-cols-5">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="flex flex-col md:flex-row md:m-4 justify-between items-center">
           <div className="md:col-span-2 flex flex-col gap-5">
             <Link
               href="/"
               aria-label="go home"
-              className="block size-fit flex gap-1.5 items-center"
+              className="block size-fit flex gap-1.5 items-center pl-3"
             >
-              <SiTiktok size={25} />
-              <span className="font-black  text-3xl">TTS</span>
-              <span className="font-bold text-2xl">跨境服务</span>
+              <SiTiktok className="w-5 h-5 md:w-7 md:h-7" />
+              <span className="font-black text-xl md:text-3xl">TTS</span>
+              <span className="font-bold text-base md:text-2xl">跨境服务</span>
             </Link>
             <div className="flex gap-5 ml-2 ">
               <Image
@@ -100,7 +100,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="col-span-3 grid grid-cols-3 gap-6">
+          <div className="flex flex-row gap-20 mt-5">
             {links.map((link, index) => (
               <div key={index} className="space-y-4">
                 <span className="block font-medium">{link.group}</span>
@@ -121,7 +121,7 @@ export default function Footer() {
           <span className="text-muted-foreground order-last block text-center text-sm md:order-first">
             © {2026} 跨境服务. 所有资料需真实有效，结果以平台最终审核为准。
           </span>
-          <div className="order-first flex flex-wrap justify-center gap-6 text-sm md:order-last">
+          <div className="order-first flex flex-wrap justify-center gap-6 text-sm md:order-last items-center">
             <HoverCard>
               <HoverCardTrigger>
                 <SiWechat size={20} />
