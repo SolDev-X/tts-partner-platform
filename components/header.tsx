@@ -25,51 +25,50 @@ export default function Header() {
   }, []);
 
   return (
-    <header
-      className={`
-      flex items-center justify-between mx-auto max-w-6xl w-full p-4 sticky top-0 z-50
-       ${scrolled ? "bg-white/70 backdrop-blur-md rounded-b-lg" : ""}`}
+    <div
+      className={`sticky top-0 z-50
+       ${scrolled ? "bg-white/70 backdrop-blur-md rounded-b-lg" : ""} `}
     >
-      <h1>
-        <Link href="/" className="flex gap-1.5 items-center">
-          <SiTiktok size={20} />
-          <span className="font-black  text-2xl">TTS</span>
-          <span className="font-bold text-xl">跨境服务</span>
-        </Link>
-      </h1>
-
-      <nav className="flex items-center gap-14">
-        <NavigationMenu>
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-[16px] font-medium hover:opacity-70">
-                服务
-              </NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid w-[300px] gap-1 p-1">
-                  {services.map((s) => (
-                    <li key={s.href}>
-                      <NavigationMenuLink href={s.href}>
-                        <div className="font-medium">{s.label}</div>
-                      </NavigationMenuLink>
-                    </li>
-                  ))}
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
-
-        {navLinks.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className="text-[16px] font-medium hover:opacity-70"
-          >
-            {link.label}
+      <header className="flex items-center justify-between mx-auto max-w-6xl w-full p-4">
+        <h1>
+          <Link href="/" className="flex gap-1.5 items-center">
+            <SiTiktok size={20} />
+            <span className="font-black  text-2xl">TTS</span>
+            <span className="font-bold text-xl">跨境服务</span>
           </Link>
-        ))}
-      </nav>
-    </header>
+        </h1>
+
+        <nav className="flex items-center gap-14">
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>服务</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[300px] gap-1 p-1">
+                    {services.map((s) => (
+                      <li key={s.id}>
+                        <NavigationMenuLink href={`/services/${s.id}`}>
+                          <div className="font-medium">{s.label}</div>
+                        </NavigationMenuLink>
+                      </li>
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-[14px] font-medium hover:opacity-70"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+      </header>
+    </div>
   );
 }

@@ -12,10 +12,17 @@ export type OptionGroup = {
   options: OptionItem[];
 };
 
+export type ServiceCase = {
+  id: string;
+  imageUrl: string;
+  title: string;
+  tag?: string;
+};
+
 export type Service = {
   id: string;
-  href?: string;
   label: string;
   description: string;
   optionGroups?: OptionGroup[];
+  cases?: ServiceCase[];
 };

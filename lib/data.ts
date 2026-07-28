@@ -49,6 +49,7 @@ export const services: Service[] = [
           {id: "mx", name: "墨西哥", directMailRule: "invite-only"},
         ],
       },
+
       {
         key: "shopType",
         title: "店铺类型",
@@ -64,6 +65,20 @@ export const services: Service[] = [
           {id: "invite", name: "定邀"},
           {id: "public", name: "普招"},
         ],
+      },
+    ],
+    cases: [
+      {
+        id: "case1",
+        imageUrl: "/cases/onboarding/1.jpg",
+        title: "日区店铺定邀入驻成功",
+        tag: "日区 · 定邀",
+      },
+      {
+        id: "case2",
+        imageUrl: "/cases/onboarding/1.jpg",
+        title: "美区POP入驻案例",
+        tag: "美区 · POP",
       },
     ],
   },
@@ -120,6 +135,20 @@ export const services: Service[] = [
         ],
       },
     ],
+    cases: [
+      {
+        id: "case1",
+        imageUrl: "/cases/onboarding/1.jpg",
+        title: "日区店铺定邀入驻成功",
+        tag: "日区 · 定邀",
+      },
+      {
+        id: "case2",
+        imageUrl: "/cases/onboarding/1.jpg",
+        title: "美区POP入驻案例",
+        tag: "美区 · POP",
+      },
+    ],
   },
 
   {
@@ -144,6 +173,61 @@ export const services: Service[] = [
           {id: "category", name: "全类目"},
           {id: "multiWarehouse", name: "一品多仓"},
         ],
+      },
+    ],
+
+    cases: [
+      {
+        id: "case1",
+        imageUrl: "/cases/onboarding/1.jpg",
+        title: "日区店铺定邀入驻成功",
+        tag: "日区 · 定邀",
+      },
+      {
+        id: "case2",
+        imageUrl: "/cases/onboarding/1.jpg",
+        title: "美区POP入驻案例",
+        tag: "美区 · POP",
+      },
+    ],
+  },
+  {
+    id: "permissions",
+    label: "开通全类目&一品多仓",
+    description:
+      "协助开通全类目权限及一品多仓模式，支持直邮与海外仓混发布局，适合多市场运营卖家。",
+    optionGroups: [
+      {
+        key: "sites",
+        title: "站点",
+        options: [
+          {id: "jp", name: "日区"},
+          {id: "uk", name: "英区"},
+          {id: "eu", name: "欧盟"},
+        ],
+      },
+      {
+        key: "mode",
+        title: "开通模式",
+        options: [
+          {id: "category", name: "全类目"},
+          {id: "multiWarehouse", name: "一品多仓"},
+        ],
+      },
+    ],
+
+    cases: [
+      {
+        id: "case1",
+        imageUrl: "/cases/onboarding/1.jpg",
+        title: "日区店铺定邀入驻成功",
+        tag: "日区 · 定邀",
+      },
+      {
+        id: "case2",
+        imageUrl: "/cases/onboarding/1.jpg",
+        title: "美区POP入驻案例",
+        tag: "美区 · POP",
       },
     ],
   },

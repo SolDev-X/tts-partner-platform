@@ -23,17 +23,7 @@ export default function OptionSelector({
   const selectedCount = Object.keys(selections).length;
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-10">
-      {/* 页面标题区 */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900">
-          {service.label}
-        </h1>
-        <p className="mt-2 text-sm text-gray-500 leading-relaxed">
-          {service.description}
-        </p>
-      </div>
-
+    <div className="max-w-3xl mx-auto px-6">
       {/* 选项组列表 */}
       <div className="space-y-6">
         {service.optionGroups?.map((group) => {
