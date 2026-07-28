@@ -41,9 +41,9 @@ export default function FAQs() {
 
   return (
     <section className="py-16 md:py-24">
-      <div className="mx-auto max-w-2xl px-6">
+      <div className="mx-auto max-w-4xl px-6">
         <div className="space-y-12">
-          <h2 className="text-foreground text-center text-4xl font-semibold">
+          <h2 className="text-foreground text-center md:text-4xl text-3xl font-semibold">
             常见问题
           </h2>
 
@@ -58,7 +58,7 @@ export default function FAQs() {
                     {item.question}
                   </AccordionTrigger>
                   <AccordionContent>
-                    <p className="text-base">{item.answer}</p>
+                    <p className="md:text-base text-sm">{item.answer}</p>
                   </AccordionContent>
                 </AccordionItem>
                 <hr className="mx-5 -mb-px group-last:hidden peer-data-[state=open]:opacity-0 md:mx-7" />
@@ -66,7 +66,7 @@ export default function FAQs() {
             ))}
           </Accordion>
 
-          <p className="text-muted-foreground text-center">
+          <p className="text-muted-foreground text-center md:text-[14px] text-[12px]">
             找不到您要找的内容？请联系我们的{" "}
             <Link
               href="/contact"

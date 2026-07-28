@@ -31,21 +31,19 @@ export default function RootLayout({
       lang="zh-CN"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <Header />
-        <main className="flex-1 relative">
-          {/* <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          > */}
-          {children}
-          {/* </ThemeProvider> */}
-        </main>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <body className="min-h-full flex flex-col">
+          <Header />
+          <main className="flex-1 relative">{children}</main>
 
-        <Footer />
-      </body>
+          <Footer />
+        </body>
+      </ThemeProvider>
     </html>
   );
 }

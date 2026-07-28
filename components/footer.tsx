@@ -18,7 +18,7 @@ const links = [
         href: "#",
       },
       {
-        title: "代入住",
+        title: "代入驻",
         href: "#",
       },
       {
@@ -100,7 +100,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="flex flex-row gap-20 mt-5">
+          <div className="flex flex-row md:gap-20 gap-18 mt-5 text-[14px]">
             {links.map((link, index) => (
               <div key={index} className="space-y-4">
                 <span className="block font-medium">{link.group}</span>
@@ -118,7 +118,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-12 flex flex-wrap items-end justify-between gap-6 border-t py-6">
-          <span className="text-muted-foreground order-last block text-center text-sm md:order-first">
+          <span className="text-muted-foreground order-last block text-center text-[12px] md:order-first">
             © {2026} 跨境服务. 所有资料需真实有效，结果以平台最终审核为准。
           </span>
           <div className="order-first flex flex-wrap justify-center gap-6 text-sm md:order-last items-center">

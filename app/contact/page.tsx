@@ -7,9 +7,9 @@ import Link from "next/link";
 
 export default function Contact() {
   return (
-    <section className="bg-background @container py-24">
+    <section className="bg-background @container py-24 h-screen grid items-center">
       <div className="mx-auto max-w-3xl px-6">
-        <div>
+        <div className="flex flex-col text-center">
           <h1 className="text-balance font-serif text-4xl font-medium sm:text-5xl">
             联系我们
           </h1>

@@ -6,15 +6,15 @@ import {ChevronDown} from "lucide-react";
 
 export default function HeroSection() {
   return (
-    <section className="py-20">
+    <section className="py-20 md:h-screen">
       <div className="relative z-10 mx-auto w-full max-w-2xl px-6 lg:px-0">
         <div className="relative text-center">
           <SiTiktok className="mx-auto" />
-          <h1 className="mx-auto mt-16 max-w-xl text-balance text-5xl font-medium">
+          <h1 className="mx-auto mt-16 max-w-xl text-balance text-3xl font-[900] md:text-5xl">
             Tiktok shop跨境服务平台
           </h1>
 
-          <p className="text-muted-foreground mx-auto mb-6 mt-4 text-balance text-xl">
+          <p className="text-muted-foreground mx-auto mb-6 mt-4 text-balance text-base md:text-xl">
             一站式跨境电商解决方案
           </p>
 
@@ -22,7 +22,7 @@ export default function HeroSection() {
             <Button
               nativeButton={false}
               render={
-                <Link href="#link">
+                <Link href="/contact">
                   <span className="text-nowrap">立即咨询</span>
                 </Link>
               }
@@ -32,7 +32,7 @@ export default function HeroSection() {
               nativeButton={false}
               variant="ghost"
               render={
-                <Link href="#link">
+                <Link href="#services">
                   <span className="text-nowrap">查看服务</span>
                 </Link>
               }
@@ -43,16 +43,13 @@ export default function HeroSection() {
         <div className="relative mt-12 overflow-hidden rounded-3xl bg-black/10 md:mt-16">
           <div className="bg-background rounded-(--radius) relative m-4 overflow-hidden border border-transparent shadow-xl shadow-black/15 ring-1 ring-black/10 sm:m-8 md:m-12">
             <Image
-              src="/cases/onboarding"
-              alt="app screen"
+              src="/public/cases/onboarding"
+              alt=""
               width="2880"
               height="1842"
               className="object-top-left size-full object-cover"
             />
           </div>
-        </div>
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <ChevronDown className="h-6 w-6 text-neutral-400" />
         </div>
       </div>
     </section>

@@ -30,12 +30,12 @@ export default function Header() {
       <h1>
         <Link href="/" className="flex gap-1.5 items-center">
           <SiTiktok size={20} />
-          <span className="font-black  text-2xl">TTS</span>
-          <span className="font-bold text-xl">跨境服务</span>
+          <span className="font-black text-xl md:text-2xl">TTS</span>
+          <span className="font-bold text-base md:text-xl">跨境服务</span>
         </Link>
       </h1>
 
-      <nav className="flex items-center gap-14 text-black">
+      <nav className="flex items-center gap-14">
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
@@ -59,7 +59,7 @@ export default function Header() {
           <Link
             key={link.href}
             href={link.href}
-            className="text-[14px] font-medium hover:opacity-70"
+            className="text-[14px] font-medium hover:opacity-70 "
           >
             {link.label}
           </Link>
