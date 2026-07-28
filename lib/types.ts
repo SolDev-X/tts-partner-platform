@@ -25,4 +25,6 @@ export type Service = {
   description: string;
   optionGroups?: OptionGroup[];
   cases?: ServiceCase[];
+  details?: string; // 新增：服务详细说明
+  afterSalesRule?: string; // 新增：售后规则说明
 };

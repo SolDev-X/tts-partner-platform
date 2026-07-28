@@ -2,7 +2,7 @@ import {Service} from "./types";
 
 export const navLinks = [
   {href: "/about", label: "关于我们"},
-  {href: "/contact", label: "联系我们"},
+  {href: "#contact", label: "联系我们"},
 ];
 
 export const faqs = [
@@ -81,6 +81,9 @@ export const services: Service[] = [
         tag: "美区 · POP",
       },
     ],
+    details: "1. 提交入驻申请\n2. 顾问核实资料\n3. 平台审核\n4. 完成入驻",
+    afterSalesRule:
+      "审核未通过全额退款；服务过程中如遇平台政策调整，将及时同步处理方案。",
   },
 
   {

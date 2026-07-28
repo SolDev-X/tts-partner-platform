@@ -8,8 +8,8 @@ import {faqs} from "@/lib/data";
 
 export default function Faq() {
   return (
-    <section className="mt-30">
-      <div className="mx-auto max-w-4xl px-4 py-20">
+    <section className="mt-25">
+      <div className="mx-auto max-w-4xl px-4 py-25 flex flex-col gap-20">
         <div className="text-center">
           <p className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
             常见问题

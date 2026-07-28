@@ -4,6 +4,9 @@ import {useState} from "react";
 import type {Service} from "@/lib/types";
 import OptionSelector from "@/components/services/OptionSelector";
 import CaseShowcase from "@/components/services/CaseShowcase";
+import ServiceInfo from "@/components/services/ServiceInfo";
+import Link from "next/link";
+import {buttonVariants} from "@/components/ui/button";
 
 export default function ServiceClient({service}: {service: Service}) {
   const [selections, setSelections] = useState<Record<string, string>>({});
@@ -21,28 +24,52 @@ export default function ServiceClient({service}: {service: Service}) {
           </p>
         </div>
 
-        <div className="flex gap-4 items-center">
-          {service.cases && <CaseShowcase cases={service.cases} />}
-          <div className="w-3xl mx-auto px-6 py-10">
-            <OptionSelector
-              service={service}
-              selections={selections}
-              onSelect={(groupKey, optionId) =>
-                setSelections((prev) => ({...prev, [groupKey]: optionId}))
-              }
-            />
+        <div>
+          <div className="flex gap-4 items-center">
+            <div className="w-3xl mx-auto px-6 py-10">
+              <OptionSelector
+                service={service}
+                selections={selections}
+                onSelect={(groupKey, optionId) =>
+                  setSelections((prev) => ({...prev, [groupKey]: optionId}))
+                }
+              />
+            </div>
+            <div className="w-3xl mx-auto px-6">
+              <ServiceInfo
+                details={service.details ?? ""}
+                afterSalesRule={service.afterSalesRule ?? ""}
+              />
+            </div>
+          </div>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="#contact"
+              className={buttonVariants({
+                size: "lg",
+                className:
+                  " border-black text-black hover:bg-neutral-200 hover:border-white",
+              })}
+            >
+              立即咨询
+            </Link>
+            <Link
+              href="#services"
+              className={buttonVariants({
+                variant: "outline",
+                size: "lg",
+                className:
+                  "border-white text-black hover:bg-neutral-900 hover:text-white",
+              })}
+            >
+              查看服务 →
+            </Link>
           </div>
         </div>
       </div>
-      <div className="container mx-auto">
-        <div>
-          <h3>服务详细</h3>
-          <div>xxxx</div>
-        </div>
-        <div>
-          <h3>售后规则</h3>
-          <div>xxxx</div>
-        </div>
+
+      <div className="w-4xl mx-auto my-20">
+        {service.cases && <CaseShowcase cases={service.cases} />}
       </div>
     </div>
   );

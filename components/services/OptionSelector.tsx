@@ -77,19 +77,6 @@ export default function OptionSelector({
           );
         })}
       </div>
-
-      {/* 底部提交按钮 */}
-      {totalGroups > 0 && (
-        <div className="mt-8 flex justify-end">
-          <Button
-            size="lg"
-            disabled={selectedCount < totalGroups}
-            className="rounded-full px-8"
-          >
-            提交申请
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
