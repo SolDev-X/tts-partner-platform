@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/sheet";
 import {services} from "@/lib/data";
 import {useState, useEffect} from "react";
-import {SiTiktok} from "@icons-pack/react-simple-icons";
 import {Button} from "./ui/button";
 import {Menu} from "lucide-react";
 import {ModeToggle} from "./mode-toggle";
@@ -43,9 +42,7 @@ export default function Header() {
     <header className="flex items-center justify-between mx-auto max-w-6xl w-full p-4">
       <h1>
         <Link href="/" className="flex gap-1.5 items-center">
-          <SiTiktok size={20} />
-          <span className="font-black text-xl md:text-2xl">TTS</span>
-          <span className="font-bold text-base md:text-xl">跨境服务</span>
+          <span className="font-bold text-base md:text-xl">跨境服务平台</span>
         </Link>
       </h1>
 

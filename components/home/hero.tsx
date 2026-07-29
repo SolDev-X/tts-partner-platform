@@ -2,7 +2,6 @@ import Link from "next/link";
 import {Button} from "@/components/ui/button";
 import Image from "next/image";
 import {SiTiktok} from "@icons-pack/react-simple-icons";
-import {ChevronDown} from "lucide-react";
 
 export default function HeroSection() {
   return (
@@ -11,11 +10,11 @@ export default function HeroSection() {
         <div className="relative text-center">
           <SiTiktok className="mx-auto" />
           <h1 className="mx-auto mt-16 max-w-xl text-balance text-3xl font-[900] md:text-5xl">
-            Tiktok shop跨境服务平台
+            一站式跨境电商服务平台
           </h1>
 
           <p className="text-muted-foreground mx-auto mb-6 mt-4 text-balance text-base md:text-xl">
-            一站式跨境电商解决方案
+            专业跨境电商服务商,助力商家合规运营、高效出海。
           </p>
 
           <div className="flex flex-col items-center gap-2 *:w-full sm:flex-row sm:justify-center sm:*:w-auto">

@@ -5,7 +5,6 @@ import {
 } from "@/components/ui/hover-card";
 import {Mail} from "lucide-react";
 import {SiGithub, SiX, SiWechat} from "@icons-pack/react-simple-icons";
-import {SiTiktok} from "@icons-pack/react-simple-icons";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -74,9 +73,9 @@ export default function Footer() {
               aria-label="go home"
               className="block size-fit flex gap-1.5 items-center pl-3"
             >
-              <SiTiktok className="w-5 h-5 md:w-7 md:h-7" />
-              <span className="font-black text-xl md:text-3xl">TTS</span>
-              <span className="font-bold text-base md:text-2xl">跨境服务</span>
+              <span className="font-bold text-base md:text-2xl">
+                跨境服务平台
+              </span>
             </Link>
             <div className="flex gap-5 ml-2 ">
               <Image
