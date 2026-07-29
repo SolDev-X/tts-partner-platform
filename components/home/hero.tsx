@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {Button} from "@/components/ui/button";
 import Image from "next/image";
-import {Logos} from "../logos";
 
 export default function HeroSection() {
   return (
@@ -49,7 +48,6 @@ export default function HeroSection() {
             />
           </div>
         </div>
-        <Logos />
       </div>
     </section>
   );

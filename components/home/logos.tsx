@@ -107,8 +107,8 @@ const Logos = (props: Props) => {
   };
 
   return (
-    <section className={cn("py-32", className)}>
-      <div className="container flex flex-col items-center text-center">
+    <section className={cn("py-5", className)}>
+      <div className="container flex flex-col items-center text-center mx-auto">
         <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2>
       </div>
       <div className="mt-8 lg:mt-12">
