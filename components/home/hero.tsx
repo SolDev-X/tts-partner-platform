@@ -1,14 +1,13 @@
 import Link from "next/link";
 import {Button} from "@/components/ui/button";
 import Image from "next/image";
-import {SiTiktok} from "@icons-pack/react-simple-icons";
+import {Logos} from "../logos";
 
 export default function HeroSection() {
   return (
-    <section className="py-20 md:h-screen">
+    <section className="py-20">
       <div className="relative z-10 mx-auto w-full max-w-2xl px-6 lg:px-0">
         <div className="relative text-center">
-          <SiTiktok className="mx-auto" />
           <h1 className="mx-auto mt-16 max-w-xl text-balance text-3xl font-[900] md:text-5xl">
             一站式跨境电商服务平台
           </h1>
@@ -50,6 +49,7 @@ export default function HeroSection() {
             />
           </div>
         </div>
+        <Logos />
       </div>
     </section>
   );
