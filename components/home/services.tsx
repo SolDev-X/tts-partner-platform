@@ -1,7 +1,5 @@
 "use client";
 
-import {Code, Cog, PenTool} from "lucide-react";
-
 import {cn} from "@/lib/utils";
 
 interface ServicesProps {

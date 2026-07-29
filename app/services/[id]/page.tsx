@@ -1,6 +1,6 @@
 import {services} from "@/lib/data";
 import {notFound} from "next/navigation";
-import ServiceClient from "./service-client";
+import {ServiceDetail1} from "./service-client";
 
 export default async function ServicePage({
   params,
@@ -14,5 +14,5 @@ export default async function ServicePage({
     notFound();
   }
 
-  return <ServiceClient service={service} />;
+  return <ServiceDetail1 service={service} />;
 }
