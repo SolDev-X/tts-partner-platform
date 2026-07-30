@@ -4,7 +4,7 @@ import {cn} from "@/lib/utils";
 
 interface Button {
   text: string;
-  url: string;
+  href: string;
   icon?: React.ReactNode;
 }
 interface Buttons {
@@ -28,11 +28,11 @@ const defaultProps: CtaProps = {
   buttons: {
     primary: {
       text: "[立即咨询]",
-      url: "https://shadcnblocks.com",
+      href: "/contact",
     },
     secondary: {
       text: "查看服务",
-      url: "https://shadcnblocks.com",
+      href: "#services",
     },
   },
 };
@@ -57,7 +57,7 @@ const Cta = (props: Props) => {
                 <Button
                   size="lg"
                   className="w-full sm:w-auto"
-                  render={<a href={buttons.primary.url} />}
+                  render={<a href={buttons.primary.href} />}
                   nativeButton={false}
                 >
                   {buttons.primary.text}
@@ -68,7 +68,7 @@ const Cta = (props: Props) => {
                   variant="outline"
                   size="lg"
                   className="w-full sm:w-auto"
-                  render={<a href={buttons.secondary.url} />}
+                  render={<a href={buttons.secondary.href} />}
                   nativeButton={false}
                 >
                   {buttons.secondary.text}
@@ -82,4 +82,4 @@ const Cta = (props: Props) => {
   );
 };
 
-export {Cta};
+export default Cta;

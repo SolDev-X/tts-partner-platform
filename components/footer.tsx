@@ -35,7 +35,7 @@ const links = [
     items: [
       {
         title: "团队介绍",
-        href: "#",
+        href: "/about",
       },
       {
         title: "加入我们",

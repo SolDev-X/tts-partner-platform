@@ -52,7 +52,9 @@ const Process = ({className}: ProcessProps) => {
 
             <Button
               variant="ghost"
+              nativeButton={false}
               className="flex items-center justify-start gap-2"
+              render={<a href="/contact" />}
             >
               <CornerDownRight className="text-orange-500" />
               立即咨询
@@ -89,7 +91,7 @@ const Process = ({className}: ProcessProps) => {
   );
 };
 
-export {Process};
+export default Process;
 
 const Illustration = (props: React.SVGProps<SVGSVGElement>) => {
   return (

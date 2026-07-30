@@ -6,7 +6,7 @@ interface ServicesProps {
   className?: string;
 }
 
-export const Services = ({className}: ServicesProps) => {
+const Services = ({className}: ServicesProps) => {
   const services = [
     {
       title: "定邀/普招代入驻",
@@ -57,3 +57,5 @@ export const Services = ({className}: ServicesProps) => {
     </section>
   );
 };
+
+export default Services;

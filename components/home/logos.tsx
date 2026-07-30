@@ -134,4 +134,4 @@ const Logos = (props: Props) => {
   );
 };
 
-export {Logos};
+export default Logos;
