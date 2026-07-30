@@ -20,6 +20,7 @@ import {useState, useEffect} from "react";
 import {Button} from "./ui/button";
 import {Menu} from "lucide-react";
 import {ModeToggle} from "./mode-toggle";
+import Image from "next/image";
 
 const navLinks = [
   {href: "/about", label: "关于我们"},
@@ -42,6 +43,7 @@ export default function Header() {
     <header className="flex items-center justify-between mx-auto max-w-6xl w-full p-4">
       <h1>
         <Link href="/" className="flex gap-1.5 items-center">
+          <Image src="/vercel.svg" alt="跨境服务平台" width="20" height="20" />
           <span className="font-bold text-base md:text-xl">跨境服务平台</span>
         </Link>
       </h1>
@@ -135,7 +137,6 @@ export default function Header() {
             </div>
           </SheetContent>
         </Sheet>
-
         {/* 主题切换 */}
         <ModeToggle />
       </div>

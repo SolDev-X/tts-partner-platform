@@ -19,8 +19,8 @@ const Testimonial = ({
   className,
   quote = "入驻流程比想象中顺利很多,资料一次就通过了,省了不少时间,团队响应也很及时。",
   author = {
-    name: "某跨境卖家",
-    role: "3C数码类目 · TikTok Shop",
+    name: "广州某 3C 类目卖家",
+    role: "类目报白 · TikTok Shop 美区",
     avatar: {
       src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-1.webp",
       alt: "Customer Name",

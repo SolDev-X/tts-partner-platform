@@ -27,9 +27,9 @@ function siteOption(
 export const services: Service[] = [
   {
     id: "onboarding",
-    label: "定邀/普招代入驻",
+    label: "定邀/普招入驻代办",
     description:
-      "协助店铺完成定向邀约邀请码入驻/普招入驻申请流程，覆盖多站点，按平台规范提交资料。",
+      "为卖家提供定向邀约与公开招募两类入驻申请代办服务,覆盖多站点资质审核与材料提交,全程按平台规范执行。",
     optionGroups: [
       {
         key: "sites",
@@ -83,7 +83,7 @@ export const services: Service[] = [
     id: "whitelist",
     label: "本土/跨境类目报白",
     description:
-      "协助本土及跨境类目报白申请，资料整理与提交流程指导，按平台审核要求规范办理。",
+      "面向本土与跨境两种经营模式,提供类目报白资质审核、材料整理及提交全流程代办服务,确保申请材料符合平台审核标准。",
     optionGroups: [
       {
         key: "sites",
@@ -145,9 +145,9 @@ export const services: Service[] = [
 
   {
     id: "permissions",
-    label: "开通全类目&一品多仓",
+    label: "全类目开通与一品多仓布局",
     description:
-      "协助开通全类目权限及一品多仓模式，支持直邮与海外仓混发布局，适合多市场运营卖家。",
+      "提供全类目经营权限开通及一品多仓布局代办服务,支持直邮与海外仓混合发货模式,适配多市场运营需求。",
     optionGroups: [
       {
         key: "sites",

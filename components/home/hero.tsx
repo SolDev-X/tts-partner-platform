@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function HeroSection() {
   return (
-    <section className="py-20">
+    <section className="py-5">
       <div className="relative z-10 mx-auto w-full max-w-2xl px-6 lg:px-0">
         <div className="relative text-center">
           <h1 className="mx-auto mt-16 max-w-xl text-balance text-3xl font-[900] md:text-5xl">
@@ -37,16 +37,14 @@ export default function HeroSection() {
           </div>
         </div>
 
-        <div className="relative mt-12 overflow-hidden rounded-3xl bg-black/10 md:mt-16">
-          <div className="bg-background rounded-(--radius) relative m-4 overflow-hidden border border-transparent shadow-xl shadow-black/15 ring-1 ring-black/10 sm:m-8 md:m-12">
-            <Image
-              src="/public/cases/onboarding"
-              alt=""
-              width="2880"
-              height="1842"
-              className="object-top-left size-full object-cover"
-            />
-          </div>
+        <div className="bg-background rounded-(--radius) relative m-4 overflow-hidden border border-transparent shadow-xl shadow-black/15 ring-1 ring-black/10 sm:m-8 md:m-12">
+          <Image
+            src="/hero.jpg"
+            alt=""
+            width="2880"
+            height="1842"
+            className="object-top-left size-full object-cover"
+          />
         </div>
       </div>
     </section>

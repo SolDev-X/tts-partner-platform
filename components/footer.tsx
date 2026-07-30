@@ -4,7 +4,7 @@ import {
   HoverCardContent,
 } from "@/components/ui/hover-card";
 import {Mail} from "lucide-react";
-import {SiGithub, SiX, SiWechat} from "@icons-pack/react-simple-icons";
+import {SiWechat} from "@icons-pack/react-simple-icons";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -13,20 +13,16 @@ const links = [
     group: "服务",
     items: [
       {
-        title: "代入驻",
-        href: "#",
-      },
-      {
-        title: "全类目",
-        href: "#",
-      },
-      {
-        title: "一品多仓",
-        href: "#",
+        title: "入驻代办",
+        href: "/services/onboarding",
       },
       {
         title: "类目报白",
-        href: "#",
+        href: "/services/whitelist",
+      },
+      {
+        title: "权限开通",
+        href: "/services/permissions",
       },
     ],
   },
@@ -73,9 +69,15 @@ export default function Footer() {
               aria-label="go home"
               className="block size-fit flex gap-1.5 items-center pl-3"
             >
-              <span className="font-bold text-base md:text-2xl">
+              <h2 className="font-bold text-base md:text-2xl flex gap-1.5 items-center ">
+                <Image
+                  src="/vercel.svg"
+                  alt="跨境服务平台"
+                  width="25"
+                  height="25"
+                />
                 跨境服务平台
-              </span>
+              </h2>
             </Link>
             <div className="flex gap-5 ml-2 ">
               <Image
@@ -137,6 +139,14 @@ export default function Footer() {
                   alt="飞书"
                   width={24}
                   height={24}
+                  className="dark:hidden"
+                />
+                <Image
+                  src="/icons/feishu-dark.svg"
+                  alt="飞书"
+                  width={24}
+                  height={24}
+                  className="hidden dark:block"
                 />
               </HoverCardTrigger>
               <HoverCardContent className="w-auto p-1">
@@ -148,20 +158,6 @@ export default function Footer() {
                 />
               </HoverCardContent>
             </HoverCard>
-            <Link
-              href="https://github.com/SolDevy"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <SiGithub size={20} />
-            </Link>
-            <Link
-              href="https://x.com/SolDevy_eth"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <SiX size={18} />
-            </Link>
             <Link href="wenyao.dev@gmail.com">
               <Mail size={20} />
             </Link>

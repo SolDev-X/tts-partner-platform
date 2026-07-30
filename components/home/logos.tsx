@@ -1,7 +1,7 @@
 "use client";
 
 import Marquee from "react-fast-marquee";
-
+import Image from "next/image";
 import {cn} from "@/lib/utils";
 
 type LogosSimpleStaticLogo = Logo & {
@@ -15,7 +15,6 @@ interface Logo {
 }
 
 interface LogosSimpleStaticProps {
-  heading: string;
   logos: LogosSimpleStaticLogo[];
   className?: string;
 }
@@ -23,94 +22,73 @@ interface LogosSimpleStaticProps {
 type Props = Partial<LogosSimpleStaticProps>;
 
 const defaultProps: LogosSimpleStaticProps = {
-  heading: "覆盖主流跨境电商平台",
   logos: [
     {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/image-set/placeholder/logos/fictional-company-logo-1.svg",
-      alt: "Company logo 1",
+      src: "/logos/amazon.svg",
+      alt: "Amazon",
       className: "h-7 w-auto",
-      href: "https://www.shadcnblocks.com",
     },
     {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/image-set/placeholder/logos/fictional-company-logo-2.svg",
-      alt: "Company logo 2",
+      src: "/logos/ebay.svg",
+      alt: "eBay",
       className: "h-7 w-auto",
-      href: "https://www.shadcnblocks.com",
     },
     {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/image-set/placeholder/logos/fictional-company-logo-3.svg",
-      alt: "Company logo 3",
+      src: "/logos/shopee.svg",
+      alt: "Shopee",
       className: "h-7 w-auto",
-      href: "https://www.shadcnblocks.com",
     },
     {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/image-set/placeholder/logos/fictional-company-logo-4.svg",
-      alt: "Company logo 4",
+      src: "/logos/lazada.svg",
+      alt: "Lazada",
       className: "h-7 w-auto",
-      href: "https://www.shadcnblocks.com",
     },
     {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/image-set/placeholder/logos/fictional-company-logo-5.svg",
-      alt: "Company logo 5",
-      className: "h-5 w-auto",
-      href: "https://www.shadcnblocks.com",
+      src: "/logos/temu.svg",
+      alt: "Temu",
+      className: "h-7 w-auto invert",
     },
     {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/image-set/placeholder/logos/fictional-company-logo-6.svg",
-      alt: "Company logo 6",
+      src: "/logos/shein.svg",
+      alt: "SHEIN",
       className: "h-7 w-auto",
-      href: "https://www.shadcnblocks.com",
     },
     {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/image-set/placeholder/logos/fictional-company-logo-7.svg",
-      alt: "Company logo 7",
+      src: "/logos/aliexpress.svg",
+      alt: "AliExpress",
       className: "h-7 w-auto",
-      href: "https://www.shadcnblocks.com",
     },
     {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/image-set/placeholder/logos/fictional-company-logo-8.svg",
-      alt: "Company logo 8",
+      src: "/logos/tiktokshop.png",
+      alt: "TikTok Shop",
       className: "h-7 w-auto",
-      href: "https://www.shadcnblocks.com",
     },
     {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/image-set/placeholder/logos/fictional-company-logo-9.svg",
-      alt: "Company logo 9",
+      src: "/logos/shopify.svg",
+      alt: "Shopify",
       className: "h-7 w-auto",
-      href: "https://www.shadcnblocks.com",
     },
     {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/image-set/placeholder/logos/fictional-company-logo-10.svg",
-      alt: "Company logo 10",
+      src: "/logos/rakuten.svg",
+      alt: "Rakuten",
       className: "h-7 w-auto",
-      href: "https://www.shadcnblocks.com",
     },
     {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/image-set/placeholder/logos/fictional-company-logo-11.svg",
-      alt: "Company logo 11",
+      src: "/logos/yahoo.svg",
+      alt: "Yahoo",
       className: "h-7 w-auto",
-      href: "https://www.shadcnblocks.com",
-    },
-    {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/image-set/placeholder/logos/fictional-company-logo-12.svg",
-      alt: "Company logo 12",
-      className: "h-7 w-auto",
-      href: "https://www.shadcnblocks.com",
     },
   ],
 };
 
 const Logos = (props: Props) => {
-  const {heading, logos, className} = {
+  const {logos, className} = {
     ...defaultProps,
     ...props,
   };
 
   return (
     <section className={cn("py-5", className)}>
-      <div className="container flex flex-col items-center text-center mx-auto">
-        <h2 className="text-2xl font-semibold tracking-tight">{heading}</h2>
-      </div>
       <div className="mt-8 lg:mt-12">
         <Marquee gradient gradientWidth={64} autoFill pauseOnHover speed={60}>
           {logos.map((logo, index) => (
@@ -118,13 +96,12 @@ const Logos = (props: Props) => {
               key={`${logo.src}-${index}`}
               className="mx-8 flex aspect-3/1 w-28 items-center justify-center sm:w-32 lg:mx-10"
             >
-              <img
+              <Image
                 src={logo.src}
                 alt={logo.alt}
-                className={cn(
-                  logo.className,
-                  "h-auto max-h-7 w-auto object-contain dark:invert",
-                )}
+                width={112}
+                height={40}
+                className="h-full w-full object-contain dark:invert"
               />
             </div>
           ))}

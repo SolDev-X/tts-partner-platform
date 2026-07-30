@@ -23,11 +23,12 @@ type CtaProps = CtaSimpleProps;
 type Props = Partial<CtaProps>;
 
 const defaultProps: CtaProps = {
-  heading: "准备好开启你的跨境之旅了吗?",
-  description: "免费评估你的入驻资格,专人一对一为你解答疑问。",
+  heading: "入驻资料反复被拒？流程不用你自己摸索",
+  description:
+    "熟悉各平台审核规则与常见拒审原因，减少反复提交、被驳回浪费的时间成本。",
   buttons: {
     primary: {
-      text: "[立即咨询]",
+      text: "团队介绍",
       href: "/contact",
     },
     secondary: {
