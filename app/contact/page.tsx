@@ -1,94 +1,293 @@
+"use client";
+
+import {zodResolver} from "@hookform/resolvers/zod";
+import {LoaderIcon, MailIcon, PhoneIcon} from "lucide-react";
+import {useState} from "react";
+import {Controller, useForm} from "react-hook-form";
+import {z} from "zod";
+
 import {Button} from "@/components/ui/button";
-import {Card} from "@/components/ui/card";
+import {Field, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field";
 import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
-import Link from "next/link";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
+import Image from "next/image";
+import {cn} from "@/lib/utils";
 
-export default function Contact() {
+interface ContactFormDetailsProps {
+  title: string;
+  description: string;
+  phone: string;
+  email: string;
+  formSubheading: string;
+  formHeading: string;
+  successMessage: string;
+  submitLabel: string;
+  submittingLabel: string;
+  className?: string;
+}
+
+interface ContactProps extends ContactFormDetailsProps {
+  onSubmit?: (data: ContactFormData) => Promise<void>;
+}
+type Props = Partial<ContactProps>;
+
+const defaultProps: ContactProps = {
+  title: "联系我们",
+  description:
+    "专注跨境电商店铺入驻与权限代办服务，如有任何疑问，欢迎随时与我们联系。",
+  phone: "+86 15534046728",
+  email: "wenyao.dev@gmail.com",
+  formSubheading: "我们通常会在当天内回复您。",
+  formHeading: "留下您的需求",
+  successMessage: "感谢您的留言，我们已收到，会尽快与您联系。",
+  submitLabel: "提交",
+  submittingLabel: "提交中…",
+};
+
+const contactFormSchema = z.object({
+  companyName: z.string().min(1, "请填写公司/店铺名称"),
+  contact: z.string().min(1, "请填写联系方式"),
+  subject: z.string().min(1, "请填写咨询类型"),
+  message: z.string().min(1, "请填写需求描述"),
+});
+
+type ContactFormData = z.infer<typeof contactFormSchema>;
+
+const Contact = (props: Props) => {
+  const {
+    title,
+    description,
+    phone,
+    email,
+    formHeading,
+    formSubheading,
+    successMessage,
+    submitLabel,
+    submittingLabel,
+    className,
+    onSubmit,
+  } = {...defaultProps, ...props};
+
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const form = useForm<ContactFormData>({
+    resolver: zodResolver(contactFormSchema),
+    mode: "onSubmit",
+    reValidateMode: "onSubmit",
+    defaultValues: {
+      companyName: "",
+      contact: "",
+      subject: "",
+      message: "",
+    },
+  });
+
+  const handleFormSubmit = async (data: ContactFormData) => {
+    try {
+      if (onSubmit) {
+        await onSubmit(data);
+      } else {
+        console.log("Form submitted:", data);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+      setIsSubmitted(true);
+      setShowSuccess(true);
+      form.reset();
+      setTimeout(() => setShowSuccess(false), 4500);
+      setTimeout(() => setIsSubmitted(false), 5000);
+    } catch {
+      form.setError("root", {
+        message: "提交失败，请重试。",
+      });
+    }
+  };
+
   return (
-    <section className="bg-background @container py-24 h-screen grid items-center">
-      <div className="mx-auto max-w-3xl px-6">
-        <div className="flex flex-col text-center">
-          <h1 className="text-balance font-serif text-4xl font-medium sm:text-5xl">
-            联系我们
-          </h1>
-          <p className="text-muted-foreground mt-4 text-balance">
-            有疑问吗？我们很乐意为您解答。请给我们发送消息，我们会尽快回复您。
-          </p>
-        </div>
-
-        <div className="@xl:grid-cols-5 mt-12 grid gap-8">
-          <div className="@xl:col-span-2 space-y-6 *:space-y-2">
-            <div>
-              <p className="text-foreground text-sm font-medium">Email</p>
-              <Link
-                href="wenyao.dev@gmail.com"
-                className="text-muted-foreground hover:text-primary text-sm"
-              >
-                wenyao.dev@gmail.com
-              </Link>
+    <section className={cn("py-32", className)}>
+      <div className="container mx-auto">
+        <div className="flex flex-col gap-16 lg:flex-row lg:gap-24">
+          <div className="flex flex-1 flex-col gap-10">
+            <div className="flex flex-col gap-4">
+              <h1 className="text-4xl font-semibold tracking-tight text-pretty md:text-5xl lg:text-6xl">
+                {title}
+              </h1>
+              <p className="text-muted-foreground lg:text-xl lg:text-balance">
+                {description}
+              </p>
             </div>
-
-            <div>
-              <p className="text-foreground text-sm font-medium">Wechat</p>
-              <Link
-                href="tel:+15534046728"
-                className="text-muted-foreground hover:text-primary text-sm"
+            <div className="flex flex-col gap-6">
+              <a
+                href={`tel:${phone}`}
+                className="group flex items-center gap-3"
               >
-                +86 15534046728
-              </Link>
+                <PhoneIcon className="size-5 text-muted-foreground" />
+                <span className="group-hover:underline">{phone}</span>
+              </a>
+              <a
+                href={`mailto:${email}`}
+                className="group flex items-center gap-3"
+              >
+                <MailIcon className="size-5 text-muted-foreground" />
+                <span className="group-hover:underline">{email}</span>
+              </a>
+              <Image
+                src="/QRcode/wechatQRcode.jpg"
+                alt="微信"
+                width={160}
+                height={160}
+              />
             </div>
           </div>
-
-          <Card className="@xl:col-span-3 p-6">
-            <form action="" className="space-y-5">
-              <div className="@md:grid-cols-2 grid gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm">
-                    微信/手机号
-                  </Label>
-                  <Input
-                    type="tel"
-                    id="tel"
-                    name="tel"
-                    placeholder="+86 188 8888 8888"
-                    required
-                  />
+          <div className="flex-1">
+            <form
+              onSubmit={form.handleSubmit(handleFormSubmit)}
+              className="flex flex-col gap-6 rounded-xl bg-muted/50 p-8 md:p-10"
+            >
+              <div className="flex flex-col gap-1">
+                <h2 className="text-xl font-semibold tracking-tight text-balance">
+                  {formHeading}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  {formSubheading}
+                </p>
+              </div>
+              {isSubmitted && (
+                <div
+                  role="status"
+                  aria-live="polite"
+                  className={cn(
+                    "rounded-lg border border-green-500/20 bg-green-500/10 p-4 text-center transition-opacity duration-500",
+                    showSuccess ? "opacity-100" : "opacity-0",
+                  )}
+                >
+                  <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                    {successMessage}
+                  </p>
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="subject" className="text-sm">
-                  咨询类型
-                </Label>
-                <Input
-                  type="text"
-                  id="subject"
+              )}
+              <FieldGroup className="gap-6">
+                <Controller
+                  control={form.control}
+                  name="companyName"
+                  render={({field, fieldState}) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        公司/店铺名称{" "}
+                        <span className="text-destructive">*</span>
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        placeholder="请填写您的公司或店铺名称"
+                        className="bg-background"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  control={form.control}
+                  name="contact"
+                  render={({field, fieldState}) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        联系方式（微信/手机号）{" "}
+                        <span className="text-destructive">*</span>
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        placeholder="+86 188 8888 8888"
+                        className="bg-background"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  control={form.control}
                   name="subject"
-                  placeholder="例如:定邀入驻 / 类目报白 / 一品多仓开通"
+                  render={({field, fieldState}) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel>
+                        咨询类型 <span className="text-destructive">*</span>
+                      </FieldLabel>
+                      <RadioGroup
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        className="flex items-center gap-5"
+                      >
+                        <FieldLabel
+                          htmlFor="subject-seller"
+                          className="flex items-center gap-2 rounded-lg border p-3 text-sm font-normal cursor-pointer has-[[data-state=checked]]:border-primary"
+                        >
+                          <RadioGroupItem value="seller" id="subject-seller" />
+                          店铺商家
+                        </FieldLabel>
+                        <FieldLabel
+                          htmlFor="subject-agent"
+                          className="flex items-center gap-2 rounded-lg border p-3 text-sm font-normal cursor-pointer has-[[data-state=checked]]:border-primary"
+                        >
+                          <RadioGroupItem value="agent" id="subject-agent" />
+                          代理/合作伙伴
+                        </FieldLabel>
+                      </RadioGroup>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="message" className="text-sm">
-                  需求描述
-                </Label>
-                <Textarea
-                  id="message"
+                <Controller
+                  control={form.control}
                   name="message"
-                  rows={4}
-                  placeholder="请简单描述您的店铺情况和需求"
-                  required
-                  className="min-h-28"
+                  render={({field, fieldState}) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        需求描述 <span className="text-destructive">*</span>
+                      </FieldLabel>
+                      <Textarea
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        placeholder="请简单描述您的店铺情况和需求…"
+                        rows={4}
+                        className="bg-background"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
                 />
-              </div>
-
-              <Button className="w-full">提交咨询</Button>
+                {form.formState.errors.root && (
+                  <p className="text-sm text-destructive">提交失败，请重试。</p>
+                )}
+                <Button
+                  size="lg"
+                  className="w-full"
+                  disabled={form.formState.isSubmitting}
+                >
+                  {form.formState.isSubmitting ? (
+                    <LoaderIcon className="size-4 animate-spin" aria-hidden />
+                  ) : null}
+                  {form.formState.isSubmitting ? submittingLabel : submitLabel}
+                </Button>
+              </FieldGroup>
             </form>
-          </Card>
+          </div>
         </div>
       </div>
     </section>
   );
-}
+};
+
+export default Contact;

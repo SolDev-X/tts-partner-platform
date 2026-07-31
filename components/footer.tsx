@@ -44,7 +44,7 @@ const links = [
     items: [
       {
         title: "常见问题",
-        href: "#",
+        href: "#faqs",
       },
       {
         title: "服务条款",
@@ -69,35 +69,20 @@ export default function Footer() {
               aria-label="go home"
               className="block size-fit flex gap-1.5 items-center pl-3"
             >
-              <h2 className="font-bold text-base md:text-2xl flex gap-1.5 items-center ">
+              <h2 className="hidden md:flex font-bold text-base md:text-2xl gap-1.5 items-center">
                 <Image
                   src="/vercel.svg"
                   alt="跨境服务平台"
                   width="25"
                   height="25"
+                  className="dark:invert"
                 />
                 跨境服务平台
               </h2>
             </Link>
-            <div className="flex gap-5 ml-2 ">
-              <Image
-                src="/wechatQRcode.jpg"
-                alt="微信"
-                width={78}
-                height={78}
-                className="p-1 border border-white-1 rounded-2xl bg-white"
-              />
-              <Image
-                src="/feishuQRcode.jpg"
-                alt="飞书"
-                width={78}
-                height={78}
-                className="p-1 border border-white-1 rounded-2xl bg-white"
-              />
-            </div>
           </div>
 
-          <div className="flex flex-row md:gap-20 gap-18 mt-5 text-[14px]">
+          <div className="flex flex-row gap-18 mt-5 text-[14px] md:gap-20">
             {links.map((link, index) => (
               <div key={index} className="space-y-4">
                 <span className="block font-medium">{link.group}</span>
@@ -125,7 +110,7 @@ export default function Footer() {
               </HoverCardTrigger>
               <HoverCardContent className="w-auto p-1">
                 <Image
-                  src="/wechatQRcode.jpg"
+                  src="/QRcode/wechatQRcode.jpg"
                   alt="微信"
                   width={160}
                   height={160}
@@ -151,7 +136,7 @@ export default function Footer() {
               </HoverCardTrigger>
               <HoverCardContent className="w-auto p-1">
                 <Image
-                  src="/feishuQRcode.jpg"
+                  src="/QRcode/feishuQRcode.jpg"
                   alt="飞书"
                   width={160}
                   height={160}

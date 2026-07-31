@@ -1,9 +1,3 @@
-import {
-  Marquee,
-  MarqueeContent,
-  MarqueeFade,
-  MarqueeItem,
-} from "@/components/kibo-ui/marquee";
 import {Button} from "@/components/ui/button";
 import {cn} from "@/lib/utils";
 
@@ -20,8 +14,6 @@ interface AboutProps {
     alt: string;
   };
   breakout: {
-    src?: string;
-    alt?: string;
     title: string;
     description: string;
     buttonText?: string;
@@ -56,21 +48,19 @@ const About = ({
     alt: "about",
   },
   breakout = {
-    src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/block-1.svg",
-    alt: "logo",
     title: "为什么选择我们",
-    description: "从资料准备到审核通过,专人全程跟进,让入驻流程更省心、更高效。",
+    description:
+      "交易全程可通过第三方担保平台完成，办理前明确约定责任范围与退款标准，不玩文字游戏，让每一笔合作都有据可依。",
     buttonText: "查看服务",
     buttonUrl: "/services",
   },
 
   achievementsTitle = "我们的服务数据",
-  achievementsDescription = "用扎实的服务经验,帮助更多商家顺利拓展海外市场。",
+  achievementsDescription = "用扎实的服务经验，帮助更多商家顺利拓展海外市场。",
   achievements = [
-    {label: "服务卖家", value: "800+"},
-    {label: "完成订单", value: "1000+"},
-    {label: "客户满意度", value: "95%"},
-    {label: "覆盖站点", value: "10+"},
+    {label: "累计服务客户", value: "1000+"},
+    {label: "深耕跨境电商领域", value: "3年"},
+    {label: "覆盖主流站点", value: "6+"},
   ],
   contentSections = [
     {
@@ -92,7 +82,7 @@ const About = ({
           <h1 className="text-5xl font-semibold tracking-tighter lg:text-6xl">
             {title}
           </h1>
-          <p className="text-lg text-muted-foreground md:text-xl">
+          <p className="text-base text-muted-foreground md:text-xl">
             {description}
           </p>
         </div>
@@ -104,11 +94,6 @@ const About = ({
           />
           <div className="flex flex-col gap-7 md:flex-row lg:flex-col">
             <div className="flex flex-col justify-between gap-6 rounded-xl bg-muted p-7 md:w-1/2 lg:w-auto">
-              <img
-                src={breakout.src}
-                alt={breakout.alt}
-                className="mr-auto h-12 dark:invert"
-              />
               <div>
                 <p className="mb-2 text-lg font-semibold">{breakout.title}</p>
                 <p className="text-muted-foreground">{breakout.description}</p>
@@ -116,7 +101,7 @@ const About = ({
               <Button
                 variant="outline"
                 className="mr-auto"
-                render={<a href={breakout.buttonUrl} target="_blank" />}
+                render={<a href={breakout.buttonUrl} />}
                 nativeButton={false}
               >
                 {breakout.buttonText}
@@ -129,7 +114,7 @@ const About = ({
             />
           </div>
         </div>
-        <div className="relative overflow-hidden rounded-xl bg-muted p-7 md:p-16">
+        <div className="relative overflow-hidden rounded-xl bg-muted p-7 md:p-16 mt-10">
           <div className="flex flex-col gap-4 text-center md:text-left">
             <h2 className="text-3xl font-medium md:text-4xl">
               {achievementsTitle}
@@ -157,7 +142,7 @@ const About = ({
             {contentSections.map((section, idx) => (
               <div key={section.title + idx}>
                 <h2 className="mb-5 text-4xl font-medium">{section.title}</h2>
-                <p className="text-lg leading-7 whitespace-pre-line text-muted-foreground">
+                <p className="md:text-lg text-base leading-7 whitespace-pre-line text-muted-foreground">
                   {section.content}
                 </p>
               </div>
