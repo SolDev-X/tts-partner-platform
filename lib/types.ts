@@ -35,7 +35,7 @@ export type CombinationRule = {
 };
 
 export type ServiceVariantMatch = {
-  sites?: string[];
+  sites?: string | string[];
   shopType?: string;
   onboardingType?: string;
   category?: string;
@@ -43,9 +43,10 @@ export type ServiceVariantMatch = {
 
 export type ServiceVariantRule = {
   match: ServiceVariantMatch;
-  requiredMaterials: string[];
-  eligibility: string;
-  disclaimer: string;
+  requiredMaterials?: string[];
+  eligibility?: string;
+  disclaimer?: string;
+  price?: string;
 };
 
 export type Service = {

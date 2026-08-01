@@ -203,6 +203,7 @@ const OptionRadioGroup = ({
         options={group.options}
         value={field.value}
         onChange={field.onChange}
+        placeholder={`请选择${group.title.replace(/是？$|？$/, "")}`}
         disabledIds={disabledMap
           .filter((item) => item.disabled)
           .map((item) => item.option.id)}

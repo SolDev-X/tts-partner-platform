@@ -2,8 +2,9 @@
 
 import {useState} from "react";
 import {cn} from "@/lib/utils";
-import type {Service} from "@/lib/types";
-import {matchVariantRule, type ServiceSelection} from "@/lib/utils";
+import type {Service, ServiceVariantRule} from "@/lib/types";
+import {matchVariantRule} from "@/lib/utils";
+import type {ServiceSelection} from "@/lib/types";
 
 import type {OptionGroup} from "./service-options-form";
 import {ServiceOptionsForm} from "./service-options-form";
@@ -53,45 +54,51 @@ const ServiceDetail1 = ({service}: ServiceClientProps) => {
   );
 };
 
-const ServiceVariantInfo = ({
-  rule,
-}: {
-  rule: Service["variantRules"][number] | null;
-}) => {
+const ServiceVariantInfo = ({rule}: {rule: ServiceVariantRule | null}) => {
   if (!rule) {
     return (
       <div className="rounded-lg border bg-muted/40 p-4 text-sm text-muted-foreground">
-        请选择完整的站点 / 店铺类型 / 入驻方式，查看对应的材料要求与服务说明。
+        请完善以上信息，查看对应的材料要求与服务说明。
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="mb-4 text-lg font-semibold">所需材料</h2>
-        <ul className="space-y-2">
-          {rule.requiredMaterials.map((item, index) => (
-            <li
-              key={`material-${index}`}
-              className="flex items-start gap-3 text-sm text-muted-foreground"
-            >
-              <span className="mt-1 size-1.5 shrink-0 rounded-full bg-primary" />
-              {item}
-            </li>
-          ))}
-        </ul>
-      </div>
+      {rule.requiredMaterials && rule.requiredMaterials.length > 0 && (
+        <div>
+          <h2 className="mb-4 text-lg font-semibold">需提供材料</h2>
+          <ul className="space-y-2">
+            {rule.requiredMaterials.map((item, index) => (
+              <li
+                key={`material-${index}`}
+                className="flex items-start gap-3 text-sm text-muted-foreground"
+              >
+                <span className="mt-1 size-1.5 shrink-0 rounded-full bg-primary" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
-      <div className="rounded-lg border bg-muted/40 p-4">
-        <h2 className="mb-2 text-sm font-semibold">准入条件</h2>
-        <p className="text-sm text-muted-foreground">{rule.eligibility}</p>
-      </div>
+      {rule.eligibility && (
+        <div className="rounded-lg border bg-muted/40 p-4">
+          <h2 className="mb-2 text-sm font-semibold">准入条件</h2>
+          <p className="text-sm text-muted-foreground whitespace-pre-line">
+            {rule.eligibility}
+          </p>
+        </div>
+      )}
 
-      <div className="rounded-lg border bg-muted/40 p-4">
-        <h2 className="mb-2 text-sm font-semibold">服务说明</h2>
-        <p className="text-sm text-muted-foreground">{rule.disclaimer}</p>
-      </div>
+      {rule.disclaimer && (
+        <div className="rounded-lg border bg-muted/40 p-4">
+          <h2 className="mb-2 text-sm font-semibold">服务承诺与责任说明</h2>
+          <p className="text-sm text-muted-foreground whitespace-pre-line">
+            {rule.disclaimer}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
