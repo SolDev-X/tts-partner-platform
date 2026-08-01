@@ -1,22 +1,14 @@
 import type {OptionItem, Service} from "./types";
 
-/**
- * 站点名称的唯一数据源。
- * 以后新增站点、改站点名称，只需要改这一处。
- */
 const SITE_LABELS = {
-  us: "美区",
-  jp: "日区",
-  uk: "英区",
-  eu: "欧盟",
-  sea: "东南亚",
+  us: "美国",
+  sea: "东南亚（5 国）",
+  eu: "欧盟（12国）",
+  uk: "英国",
+  jp: "日本",
   mx: "墨西哥",
 } as const;
 
-/**
- * 构造一个站点 option，name 统一从 SITE_LABELS 取，
- * 每个服务只需要传 id + 该服务下这个站点特有的规则（如 directMailRule）。
- */
 function siteOption(
   id: keyof typeof SITE_LABELS,
   extra?: Partial<Omit<OptionItem, "id" | "name">>,
@@ -33,31 +25,106 @@ export const services: Service[] = [
     optionGroups: [
       {
         key: "sites",
-        title: "站点",
+        title: "您在哪个市场售卖？",
         options: [
-          siteOption("us", {directMailRule: "invite-only"}),
-          siteOption("jp", {directMailRule: "both"}),
-          siteOption("uk", {directMailRule: "invite-only"}),
-          siteOption("eu", {directMailRule: "invite-only"}),
-          siteOption("sea", {directMailRule: "both"}),
-          siteOption("mx", {directMailRule: "invite-only"}),
+          siteOption("us"),
+          siteOption("sea"),
+          siteOption("eu"),
+          siteOption("uk"),
+          siteOption("jp"),
+          siteOption("mx"),
+        ],
+      },
+
+      {
+        key: "category",
+        title: "主营类目",
+        options: [
+          {id: "home", name: "家居用品"},
+          {id: "kitchen", name: "厨房用品"},
+          {id: "textile", name: "家纺布艺"},
+          {id: "appliance", name: "家电"},
+          {id: "womenswear", name: "女装与女士内衣"},
+          {id: "muslim", name: "穆斯林时尚"},
+          {id: "shoes", name: "鞋靴"},
+          {id: "beauty", name: "美妆个护"},
+          {id: "mobile", name: "手机与数码"},
+          {id: "office", name: "电脑办公"},
+          {id: "pet", name: "宠物用品"},
+          {id: "baby", name: "母婴用品"},
+          {id: "sports", name: "运动与户外"},
+          {id: "toys", name: "玩具和爱好"},
+          {id: "furniture", name: "家具"},
+          {id: "hardware", name: "五金工具"},
+          {id: "homeImprovement", name: "家装建材"},
+          {id: "auto", name: "汽车与摩托车"},
+          {id: "fashionAccessories", name: "时尚配件"},
+          {id: "food", name: "食品饮料"},
+          // 保健：墨西哥不开放
+          {
+            id: "health",
+            name: "保健",
+          },
+          {id: "books", name: "图书、杂志和音频"},
+          {id: "kidswear", name: "儿童时尚"},
+          {id: "menswear", name: "男装与男士内衣"},
+          {id: "bags", name: "箱包"},
+          {id: "virtual", name: "虚拟商品"},
+          {id: "collectibles", name: "收藏品"},
+
+          {
+            id: "jewelry",
+            name: "珠宝与衍生品",
+          },
+          {id: "ticketing", name: "票务与代金券"},
         ],
       },
       {
         key: "shopType",
-        title: "店铺类型",
+        title: "你在该市场使用的物流模式是？",
         options: [
-          {id: "pop", name: "POP"},
-          {id: "direct", name: "直邮"},
+          {id: "pop", name: "本地仓发货（客户下单后，从海外当地仓库直接发货）"},
+          {
+            id: "direct",
+            name: "跨境直邮（客户下单后，从国内仓库直接发货到海外）",
+          },
         ],
       },
+
       {
         key: "onboardingType",
-        title: "入驻方式",
+        title: "选择入驻该市场方式？",
         options: [
-          {id: "invite", name: "定邀"},
-          {id: "public", name: "普招"},
+          {id: "invite", name: "邀请码入驻"},
+          {id: "public", name: "普招入驻"},
         ],
+      },
+    ],
+    combinationRules: [
+      {
+        // 美区不支持直邮，只能 POP
+        when: {sites: "us"},
+        disable: {shopType: ["direct"]},
+      },
+      {
+        // 墨西哥的保健类目：完全不支持入驻（POP、直邮都不行）
+        when: {sites: "mx", category: "health"},
+        disable: {shopType: ["pop", "direct"]},
+      },
+      {
+        // 珠宝在英区/欧盟/墨西哥：完全不支持入驻
+        when: {sites: ["uk", "eu", "mx"], category: "jewelry"},
+        disable: {shopType: ["pop", "direct"]},
+      },
+      {
+        // 英区/欧盟/墨西哥的直邮，仅支持定邀，普招不可选
+        when: {sites: ["uk", "eu", "mx"], shopType: "direct"},
+        disable: {onboardingType: ["public"]},
+      },
+      {
+        // 珠宝在美区/日区：仅支持"直邮 + 定邀"
+        when: {sites: ["us", "jp"], category: "jewelry"},
+        disable: {shopType: ["pop"], onboardingType: ["public"]},
       },
     ],
     cases: [
@@ -74,11 +141,38 @@ export const services: Service[] = [
         tag: "美区 · POP",
       },
     ],
-    details: "1. 提交入驻申请\n2. 顾问核实资料\n3. 平台审核\n4. 完成入驻",
-    afterSalesRule:
-      "审核未通过全额退款；服务过程中如遇平台政策调整，将及时同步处理方案。",
+    variantRules: [
+      {
+        match: {
+          onboardingType: "invite", // 邀请码入驻
+        },
+        requiredMaterials: [
+          "手机号（未入驻过 TikTok Shop）",
+          "营业执照（四角需完整露出）",
+        ],
+        eligibility:
+          "法人名下无封店记录，正常经营中，且未在其他区域被封禁或拒绝过入驻申请，均可申请。",
+        disclaimer:
+          "如客户隐瞒执照存在的问题，导致邀请码下发后无法正常使用，本服务不承担责任。本服务仅负责协助获取入驻邀请码，保证邀请码在有效期内可正常使用；因平台规则或客户自身原因导致的使用问题，需自行处理。超过 30 个工作日未通过审核，可申请全额退款。",
+      },
+      {
+        match: {
+          onboardingType: "public", // 改成这个
+        },
+        requiredMaterials: [
+          "主营类目",
+          "手机号（未入驻过 TikTok Shop）",
+          "邮箱（未入驻过 TikTok Shop）",
+          "身份证正反(法人需要配合扫脸)",
+          "营业执照（四角需完整露出）",
+        ],
+        eligibility:
+          "法人名下无封店记录，正常经营中，且未在其他区域被封禁或拒绝过入驻申请，均可申请。",
+        disclaimer:
+          "本服务承诺协助客户完成普招入驻，若最终未能成功开店，可申请全额退款。如客户隐瞒执照存在的问题，导致入驻申请未通过，需承担 50 元资料审核费，不再退还其余款项。",
+      },
+    ],
   },
-
   {
     id: "whitelist",
     label: "本土/跨境类目报白",
@@ -102,22 +196,14 @@ export const services: Service[] = [
         key: "category",
         title: "类目",
         options: [
-          {
-            id: "beauty",
-            name: "美妆个护",
-            availableSites: ["us", "jp", "sea"],
-          },
+          {id: "beauty", name: "美妆个护", availableSites: ["us", "jp", "sea"]},
           {id: "health", name: "保健品", availableSites: ["us", "jp", "sea"]},
           {id: "food", name: "食品饮料", availableSites: ["us", "jp", "sea"]},
           {id: "baby", name: "母婴用品", availableSites: ["us", "jp"]},
           {id: "pet", name: "宠物用品", availableSites: ["us", "jp", "sea"]},
           {id: "toys", name: "玩具和爱好", availableSites: ["us"]},
           {id: "collectibles", name: "收藏品", availableSites: ["sea"]},
-          {
-            id: "jewelry",
-            name: "珠宝与衍生品",
-            availableSites: ["jp", "sea"],
-          },
+          {id: "jewelry", name: "珠宝与衍生品", availableSites: ["jp", "sea"]},
         ],
       },
     ],
@@ -135,14 +221,7 @@ export const services: Service[] = [
         tag: "东南亚 · 食品饮料",
       },
     ],
-    // TODO: 补充本服务的具体办理流程
-    details:
-      "1. 提交类目报白申请\n2. 顾问核实资质资料\n3. 平台审核\n4. 类目开通",
-    // TODO: 补充本服务的售后/保障说明
-    afterSalesRule:
-      "审核未通过全额退款；如平台类目政策调整，将及时同步处理方案。",
   },
-
   {
     id: "permissions",
     label: "全类目开通与一品多仓布局",
@@ -177,10 +256,5 @@ export const services: Service[] = [
         tag: "英区 · 一品多仓",
       },
     ],
-    // TODO: 补充本服务的具体办理流程
-    details:
-      "1. 提交权限开通申请\n2. 顾问核实店铺资质\n3. 平台审核\n4. 完成权限开通/仓配布局",
-    // TODO: 补充本服务的售后/保障说明
-    afterSalesRule: "审核未通过全额退款；仓配方案调整支持一次免费重新规划。",
   },
 ];

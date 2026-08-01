@@ -7,41 +7,23 @@ import z from "zod";
 
 import {Button} from "@/components/ui/button";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
-
-/**
- * 下面这几个类型跟 lib/types.ts 里的 OptionItem / OptionGroup 保持一致，
- * 如果 lib/types.ts 已经 export 了同名类型，直接删掉这里的定义，
- * 改成 `import type {OptionItem, OptionGroup} from "@/lib/types";`
- */
-export interface OptionItem {
-  id: string;
-  name: string;
-  directMailRule?: "invite-only" | "both";
-  availableSites?: string[];
-}
-
-export interface OptionGroup {
-  key: string;
-  title: string;
-  options: OptionItem[];
-}
+import type {CombinationRule, OptionGroup, OptionItem} from "@/lib/types";
+import {CategoryCombobox} from "@/components/ui/category-combobox";
 
 type FormValues = Record<string, string>;
 
 interface ServiceOptionsFormProps {
   optionGroups: OptionGroup[];
+  combinationRules?: CombinationRule[];
   onSubmitValues?: (values: FormValues) => void;
+  onChange?: (values: FormValues) => void; // 有没有这一行？
 }
 
-/**
- * 动态渲染每个服务的 optionGroups（站点 / 店铺类型 / 入驻方式 / 类目 / 开通模式……）
- * 并处理组之间的联动禁用逻辑：
- * - "onboardingType" 组：若所选站点 directMailRule 为 "invite-only"，则禁用 "public"（普招）选项
- * - 任意组里带 availableSites 的选项：若不在所选站点范围内，则禁用该选项
- */
 const ServiceOptionsForm = ({
   optionGroups,
+  combinationRules = [],
   onSubmitValues,
+  onChange, // 有没有这一行？
 }: ServiceOptionsFormProps) => {
   const formSchema = useMemo(() => {
     const shape: Record<string, z.ZodTypeAny> = {};
@@ -56,37 +38,60 @@ const ServiceOptionsForm = ({
     defaultValues: {},
   });
 
+  // 当前完整的选择状态：{ sites: "us", shopType: "direct", category: "jewelry", onboardingType: "invite" }
+  const selection = form.watch(); // 这行保留，渲染时仍然需要用它做禁用逻辑判断
+
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      onChange?.(values as FormValues);
+    });
+    return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const sitesGroup = optionGroups.find((group) => group.key === "sites");
-  const selectedSiteId = form.watch("sites");
   const selectedSite = sitesGroup?.options.find(
-    (option) => option.id === selectedSiteId,
+    (option) => option.id === selection.sites,
   );
 
-  // 站点切换后，清空已经不再适用的联动字段选择
+  // 任意一个上游字段变化后，清空已经因为规则变化而不再合法的下游选择
   useEffect(() => {
-    if (!selectedSiteId) return;
     optionGroups.forEach((group) => {
-      if (group.key === "sites") return;
       const currentValue = form.getValues(group.key);
       if (!currentValue) return;
+
       const currentOption = group.options.find(
         (option) => option.id === currentValue,
       );
-      if (
-        currentOption &&
-        isOptionDisabled(group, currentOption, selectedSite)
-      ) {
+
+      const stillAvailable =
+        !currentOption?.availableSites ||
+        !selection.sites ||
+        currentOption.availableSites.includes(selection.sites);
+
+      const nowDisabled = isOptionDisabled(
+        group,
+        currentValue,
+        selection,
+        combinationRules,
+      );
+
+      if (!stillAvailable || nowDisabled) {
         form.setValue(group.key, "");
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSiteId]);
+  }, [
+    selection.sites,
+    selection.shopType,
+    selection.category,
+    selection.onboardingType,
+  ]);
 
   function onSubmit(values: FormValues) {
     if (onSubmitValues) {
       onSubmitValues(values);
     } else {
-      // TODO: 接入实际的咨询提交逻辑（表单弹窗 / 企业微信 / 后端接口等）
       console.log("服务咨询需求：", values);
     }
   }
@@ -106,7 +111,8 @@ const ServiceOptionsForm = ({
               <OptionRadioGroup
                 field={field}
                 group={group}
-                selectedSite={selectedSite}
+                selection={selection}
+                combinationRules={combinationRules}
               />
               {form.formState.errors[group.key] && (
                 <p className="text-xs text-destructive">
@@ -125,43 +131,85 @@ const ServiceOptionsForm = ({
   );
 };
 
+/**
+ * 判断某个 option 是否应该禁用：
+ * 1. 该 option 有 availableSites 限制，且当前选中站点不在范围内 → 禁用（一般用于"该站点不显示/不可选此项"）
+ * 2. 命中 combinationRules 里某条规则的 when 条件，且该规则的 disable 里点名了这个 group + option → 禁用
+ */
 function isOptionDisabled(
   group: OptionGroup,
-  option: OptionItem,
-  selectedSite?: OptionItem,
-) {
-  // 类目 / 其他带 availableSites 限制的选项：所选站点不在范围内则禁用
+  optionId: string,
+  selection: FormValues,
+  combinationRules: CombinationRule[],
+): boolean {
+  const option = group.options.find((o) => o.id === optionId);
+
   if (
-    option.availableSites &&
-    selectedSite &&
-    !option.availableSites.includes(selectedSite.id)
+    option?.availableSites &&
+    selection.sites &&
+    !option.availableSites.includes(selection.sites)
   ) {
     return true;
   }
 
-  // 入驻方式：站点仅支持定邀时，禁用"普招"
-  if (
-    group.key === "onboardingType" &&
-    option.id === "public" &&
-    selectedSite?.directMailRule === "invite-only"
-  ) {
-    return true;
-  }
+  return combinationRules.some((rule) => {
+    const whenMatched = Object.entries(rule.when).every(([key, expected]) => {
+      const actual = selection[key];
+      if (!actual) return false;
+      return Array.isArray(expected)
+        ? expected.includes(actual)
+        : expected === actual;
+    });
 
-  return false;
+    if (!whenMatched) return false;
+
+    return rule.disable[group.key]?.includes(optionId) ?? false;
+  });
 }
 
 interface OptionRadioGroupProps {
   group: OptionGroup;
-  selectedSite?: OptionItem;
+  selection: FormValues;
+  combinationRules: CombinationRule[];
   field: ControllerRenderProps<FormValues>;
 }
 
 const OptionRadioGroup = ({
   group,
-  selectedSite,
+  selection,
+  combinationRules,
   field,
 }: OptionRadioGroupProps) => {
+  const disabledMap = group.options.map((option) => ({
+    option,
+    disabled: isOptionDisabled(group, option.id, selection, combinationRules),
+  }));
+
+  const allDisabled =
+    disabledMap.length > 0 && disabledMap.every((item) => item.disabled);
+
+  if (allDisabled) {
+    return (
+      <p className="rounded-md border border-dashed bg-muted/40 p-3 text-sm text-muted-foreground">
+        当前所选类目暂不支持入驻，请更换类目或站点。
+      </p>
+    );
+  }
+
+  // ↓↓↓ 判断逻辑加在这里，函数内部，不是JSX属性
+  if (group.key === "category") {
+    return (
+      <CategoryCombobox
+        options={group.options}
+        value={field.value}
+        onChange={field.onChange}
+        disabledIds={disabledMap
+          .filter((item) => item.disabled)
+          .map((item) => item.option.id)}
+      />
+    );
+  }
+
   return (
     <RadioGroup
       {...field}
@@ -173,14 +221,11 @@ const OptionRadioGroup = ({
       }}
       className="flex flex-wrap gap-3"
     >
-      {group.options.map((option) => (
+      {disabledMap.map(({option, disabled}) => (
         <ServiceOption
           key={`service-detail-option-${group.key}-${option.id}`}
           option={option}
-          disabled={
-            group.key !== "sites" &&
-            isOptionDisabled(group, option, selectedSite)
-          }
+          disabled={disabled}
         />
       ))}
     </RadioGroup>
