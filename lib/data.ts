@@ -131,14 +131,27 @@ export const services: Service[] = [
       {
         id: "case1",
         imageUrl: "/cases/onboarding/1.jpg",
-        title: "日区店铺定邀入驻成功",
-        tag: "日区 · 定邀",
+        title: "欧盟 · 直邮",
       },
       {
         id: "case2",
         imageUrl: "/cases/onboarding/2.jpg",
-        title: "美区POP入驻案例",
-        tag: "美区 · POP",
+        title: "美区 · POP",
+      },
+      {
+        id: "case3",
+        imageUrl: "/cases/onboarding/3.jpg",
+        title: "美区 · POP",
+      },
+      {
+        id: "case4",
+        imageUrl: "/cases/onboarding/4.jpg",
+        title: "美区 · POP",
+      },
+      {
+        id: "case5",
+        imageUrl: "/cases/onboarding/5.jpg",
+        title: "美区 · POP",
       },
     ],
     variantRules: [
@@ -211,14 +224,14 @@ export const services: Service[] = [
       {
         id: "case1",
         imageUrl: "/cases/whitelist/1.jpg",
-        title: "美区美妆个护类目报白成功",
-        tag: "美区 · 美妆个护",
+
+        title: "美区 · 美妆个护",
       },
       {
         id: "case2",
         imageUrl: "/cases/whitelist/2.jpg",
-        title: "东南亚食品饮料类目报白案例",
-        tag: "东南亚 · 食品饮料",
+
+        title: "东南亚 · 食品饮料",
       },
     ],
   },
@@ -246,14 +259,12 @@ export const services: Service[] = [
       {
         id: "case1",
         imageUrl: "/cases/permissions/1.jpg",
-        title: "日区全类目权限开通案例",
-        tag: "日区 · 全类目",
+        title: "日区 · 全类目",
       },
       {
         id: "case2",
         imageUrl: "/cases/permissions/2.jpg",
-        title: "英区一品多仓布局案例",
-        tag: "英区 · 一品多仓",
+        title: "英区 · 一品多仓",
       },
     ],
   },

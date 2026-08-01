@@ -14,8 +14,7 @@ export type OptionGroup = {
 export type ServiceCase = {
   id: string;
   imageUrl: string;
-  title: string;
-  tag?: string;
+  title?: string;
 };
 
 /** 用户当前的选择状态：optionGroup.key -> 选中的 option id */
