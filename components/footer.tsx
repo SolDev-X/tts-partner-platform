@@ -52,7 +52,7 @@ const links = [
       },
       {
         title: "隐私政策",
-        href: "#",
+        href: "/privacy",
       },
     ],
   },
