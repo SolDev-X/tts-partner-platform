@@ -2,13 +2,18 @@
 
 import {useState} from "react";
 import {cn} from "@/lib/utils";
-import type {Service, ServiceVariantRule} from "@/lib/types";
+import type {Service, ServiceVariantRule, FAQItem} from "@/lib/types";
 import {matchVariantRule} from "@/lib/utils";
 import type {ServiceSelection} from "@/lib/types";
-
-import type {OptionGroup} from "./service-options-form";
+import type {OptionGroup} from "@/lib/types";
 import {ServiceOptionsForm} from "./service-options-form";
 import {ServiceImageGallery} from "./service-image-gallery";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface ServiceClientProps {
   service: Service;
@@ -46,7 +51,7 @@ const ServiceDetail1 = ({service}: ServiceClientProps) => {
               onChange={setSelection}
             />
 
-            <ServiceVariantInfo rule={matchedRule} />
+            <ServiceVariantInfo rule={matchedRule} faqs={service.faqs} />
           </div>
         </div>
       </div>
@@ -54,18 +59,22 @@ const ServiceDetail1 = ({service}: ServiceClientProps) => {
   );
 };
 
-const ServiceVariantInfo = ({rule}: {rule: ServiceVariantRule | null}) => {
-  if (!rule) {
-    return (
-      <div className="rounded-lg border bg-muted/40 p-4 text-sm text-muted-foreground">
-        请完善以上信息，查看对应的材料要求与服务说明。
-      </div>
-    );
-  }
-
+const ServiceVariantInfo = ({
+  rule,
+  faqs,
+}: {
+  rule: ServiceVariantRule | null;
+  faqs?: FAQItem[];
+}) => {
   return (
     <div className="space-y-6">
-      {rule.requiredMaterials && rule.requiredMaterials.length > 0 && (
+      {!rule && (
+        <div className="rounded-lg border bg-muted/40 p-4 text-sm text-muted-foreground">
+          请完善以上信息，查看对应的材料要求与服务说明。
+        </div>
+      )}
+
+      {rule?.requiredMaterials && rule.requiredMaterials.length > 0 && (
         <div>
           <h2 className="mb-4 text-lg font-semibold">需提供材料</h2>
           <ul className="space-y-2">
@@ -82,7 +91,7 @@ const ServiceVariantInfo = ({rule}: {rule: ServiceVariantRule | null}) => {
         </div>
       )}
 
-      {rule.eligibility && (
+      {rule?.eligibility && (
         <div className="rounded-lg border bg-muted/40 p-4">
           <h2 className="mb-2 text-sm font-semibold">准入条件</h2>
           <p className="text-sm text-muted-foreground whitespace-pre-line">
@@ -91,12 +100,30 @@ const ServiceVariantInfo = ({rule}: {rule: ServiceVariantRule | null}) => {
         </div>
       )}
 
-      {rule.disclaimer && (
+      {rule?.disclaimer && (
         <div className="rounded-lg border bg-muted/40 p-4">
           <h2 className="mb-2 text-sm font-semibold">服务承诺与责任说明</h2>
           <p className="text-sm text-muted-foreground whitespace-pre-line">
             {rule.disclaimer}
           </p>
+        </div>
+      )}
+
+      {faqs && faqs.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold">常见问题</h2>
+          <Accordion type="single" collapsible>
+            {faqs.map((item) => (
+              <AccordionItem key={item.id} value={item.id}>
+                <AccordionTrigger className="text-sm">
+                  {item.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-muted-foreground">
+                  {item.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       )}
     </div>

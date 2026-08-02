@@ -39,6 +39,7 @@ export type ServiceVariantMatch = {
   shopType?: string;
   onboardingType?: string;
   category?: string;
+  mode?: string;
 };
 
 export type ServiceVariantRule = {
@@ -49,6 +50,12 @@ export type ServiceVariantRule = {
   price?: string;
 };
 
+export type FAQItem = {
+  id: string;
+  question: string;
+  answer: string;
+};
+
 export type Service = {
   id: string;
   label: string;
@@ -57,4 +64,5 @@ export type Service = {
   combinationRules?: CombinationRule[];
   cases?: ServiceCase[];
   variantRules?: ServiceVariantRule[];
+  faqs?: FAQItem[];
 };
