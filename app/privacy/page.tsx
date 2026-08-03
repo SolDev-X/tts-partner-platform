@@ -29,7 +29,7 @@ export default function PrivacyPage() {
                 隐私政策
               </h1>
               <p className="text-sm text-muted-foreground">
-                最后更新日期：2026年8月2日
+                最后更新日期：2026年8月3日
               </p>
             </div>
             <nav className="hidden space-y-1 border-l pl-4 lg:block">
