@@ -54,6 +54,10 @@ const links = [
         title: "隐私政策",
         href: "/privacy",
       },
+      {
+        title: "退款政策",
+        href: "/",
+      },
     ],
   },
 ];
