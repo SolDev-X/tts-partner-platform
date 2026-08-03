@@ -12,4 +12,14 @@ export const auth = betterAuth({
     minPasswordLength: 8,
     maxPasswordLength: 128,
   },
+  user: {
+    additionalFields: {
+      role: {
+        type: ["CUSTOMER", "ADMIN"],
+        required: true,
+        defaultValue: "CUSTOMER",
+        input: false,
+      },
+    },
+  },
 });

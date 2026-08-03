@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -15,10 +16,20 @@ import {
   SheetTrigger,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {services} from "@/lib/data";
-import {useState, useEffect} from "react";
+import {authClient} from "@/lib/auth-client";
+import {useState} from "react";
 import {Button} from "./ui/button";
-import {Menu} from "lucide-react";
+import {ChevronDown, LoaderCircle, LogOut, Menu} from "lucide-react";
 import {ModeToggle} from "./mode-toggle";
 import Image from "next/image";
 
@@ -28,16 +39,25 @@ const navLinks = [
 ];
 
 export default function Header() {
+  const router = useRouter();
+  const {data: session, isPending} = authClient.useSession();
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const user = session?.user;
+  const initials = (user?.name || user?.email || "用户")
+    .trim()
+    .charAt(0)
+    .toUpperCase();
+
+  async function handleSignOut() {
+    setIsSigningOut(true);
+    await authClient.signOut();
+    setOpen(false);
+    setIsSigningOut(false);
+    router.push("/");
+    router.refresh();
+  }
 
   return (
     <header className="flex items-center justify-between mx-auto max-w-6xl w-full p-4">
@@ -141,8 +161,122 @@ export default function Header() {
                 ))}
               </div>
             </div>
+
+            <div className="border-t p-4">
+              {isPending ? (
+                <div className="h-9" aria-hidden="true" />
+              ) : user ? (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 px-2">
+                    <Avatar>
+                      {user.image && (
+                        <AvatarImage src={user.image} alt={user.name} />
+                      )}
+                      <AvatarFallback>{initials}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{user.name}</p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleSignOut}
+                    disabled={isSigningOut}
+                  >
+                    {isSigningOut ? (
+                      <LoaderCircle className="animate-spin" />
+                    ) : (
+                      <LogOut />
+                    )}
+                    {isSigningOut ? "正在退出" : "退出登录"}
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant="outline"
+                    nativeButton={false}
+                    render={<Link href="/login" onClick={() => setOpen(false)} />}
+                  >
+                    登录
+                  </Button>
+                  <Button
+                    nativeButton={false}
+                    render={
+                      <Link href="/register" onClick={() => setOpen(false)} />
+                    }
+                  >
+                    注册
+                  </Button>
+                </div>
+              )}
+            </div>
           </SheetContent>
         </Sheet>
+
+        <div className="hidden items-center gap-1 md:flex">
+          {isPending ? (
+            <div className="h-8 w-28" aria-hidden="true" />
+          ) : user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button variant="ghost" className="h-9 gap-2 px-2">
+                    <Avatar size="sm">
+                      {user.image && (
+                        <AvatarImage src={user.image} alt={user.name} />
+                      )}
+                      <AvatarFallback>{initials}</AvatarFallback>
+                    </Avatar>
+                    <span className="max-w-24 truncate">{user.name}</span>
+                    <ChevronDown className="size-3.5 text-muted-foreground" />
+                  </Button>
+                }
+              />
+              <DropdownMenuContent align="end" className="w-60">
+                <DropdownMenuLabel className="px-2 py-1.5 font-normal">
+                  <span className="block truncate text-sm font-medium text-foreground">
+                    {user.name}
+                  </span>
+                  <span className="block truncate text-xs">{user.email}</span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  disabled={isSigningOut}
+                  className="px-2 py-1.5"
+                >
+                  {isSigningOut ? (
+                    <LoaderCircle className="animate-spin" />
+                  ) : (
+                    <LogOut />
+                  )}
+                  {isSigningOut ? "正在退出" : "退出登录"}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Button
+                variant="ghost"
+                nativeButton={false}
+                render={<Link href="/login" />}
+              >
+                登录
+              </Button>
+              <Button
+                nativeButton={false}
+                render={<Link href="/register" />}
+              >
+                注册
+              </Button>
+            </>
+          )}
+        </div>
         {/* 主题切换 */}
         <ModeToggle />
       </div>
