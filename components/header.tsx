@@ -19,6 +19,7 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -29,7 +30,13 @@ import {services} from "@/lib/data";
 import {authClient} from "@/lib/auth-client";
 import {useState} from "react";
 import {Button} from "./ui/button";
-import {ChevronDown, LoaderCircle, LogOut, Menu} from "lucide-react";
+import {
+  ChevronDown,
+  LoaderCircle,
+  LogOut,
+  Menu,
+  ShoppingBag,
+} from "lucide-react";
 import {ModeToggle} from "./mode-toggle";
 import Image from "next/image";
 
@@ -45,6 +52,7 @@ export default function Header() {
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const user = session?.user;
+  const isAdmin = user?.role === "ADMIN";
   const initials = (user?.name || user?.email || "用户")
     .trim()
     .charAt(0)
@@ -70,11 +78,11 @@ export default function Header() {
             height="20"
             className="dark:invert"
           />
-          <span className="font-bold text-base md:text-xl">跨境服务平台</span>
+          <span className="text-base font-bold lg:text-xl">跨境服务平台</span>
         </Link>
       </h1>
 
-      <nav className="hidden md:flex items-center gap-8 lg:gap-14">
+      <nav className="hidden items-center gap-14 lg:flex">
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
@@ -106,11 +114,63 @@ export default function Header() {
       </nav>
 
       <div className="flex items-center gap-2">
+        {/* 移动端账户菜单 */}
+        {!isPending && user && (
+          <div className="lg:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button variant="ghost" size="icon" aria-label="打开账户菜单">
+                    <Avatar size="sm">
+                      {user.image && (
+                        <AvatarImage src={user.image} alt={user.name} />
+                      )}
+                      <AvatarFallback>{initials}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                }
+              />
+              <DropdownMenuContent align="end" className="w-60">
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel className="px-2 py-1.5 font-normal">
+                    <span className="block truncate text-sm font-medium text-foreground">
+                      {user.name}
+                    </span>
+                    <span className="block truncate text-xs">{user.email}</span>
+                  </DropdownMenuLabel>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                {!isAdmin && (
+                  <DropdownMenuItem
+                    render={<Link href="/account/orders" />}
+                    className="px-2 py-1.5"
+                  >
+                    <ShoppingBag />
+                    我的订单
+                  </DropdownMenuItem>
+                )}
+                {!isAdmin && <DropdownMenuSeparator />}
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  disabled={isSigningOut}
+                  className="px-2 py-1.5"
+                >
+                  {isSigningOut ? (
+                    <LoaderCircle className="animate-spin" />
+                  ) : (
+                    <LogOut />
+                  )}
+                  {isSigningOut ? "正在退出" : "退出登录"}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
         {/* 移动端汉堡菜单 */}
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger
             render={
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button variant="ghost" size="icon" className="lg:hidden">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">打开菜单</span>
               </Button>
@@ -181,6 +241,22 @@ export default function Header() {
                       </p>
                     </div>
                   </div>
+                  {!isAdmin && (
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      nativeButton={false}
+                      render={
+                        <Link
+                          href="/account/orders"
+                          onClick={() => setOpen(false)}
+                        />
+                      }
+                    >
+                      <ShoppingBag />
+                      我的订单
+                    </Button>
+                  )}
                   <Button
                     variant="outline"
                     className="w-full"
@@ -218,7 +294,7 @@ export default function Header() {
           </SheetContent>
         </Sheet>
 
-        <div className="hidden items-center gap-1 md:flex">
+        <div className="hidden items-center gap-1 lg:flex">
           {isPending ? (
             <div className="h-8 w-28" aria-hidden="true" />
           ) : user ? (
@@ -238,13 +314,25 @@ export default function Header() {
                 }
               />
               <DropdownMenuContent align="end" className="w-60">
-                <DropdownMenuLabel className="px-2 py-1.5 font-normal">
-                  <span className="block truncate text-sm font-medium text-foreground">
-                    {user.name}
-                  </span>
-                  <span className="block truncate text-xs">{user.email}</span>
-                </DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel className="px-2 py-1.5 font-normal">
+                    <span className="block truncate text-sm font-medium text-foreground">
+                      {user.name}
+                    </span>
+                    <span className="block truncate text-xs">{user.email}</span>
+                  </DropdownMenuLabel>
+                </DropdownMenuGroup>
                 <DropdownMenuSeparator />
+                {!isAdmin && (
+                  <DropdownMenuItem
+                    render={<Link href="/account/orders" />}
+                    className="px-2 py-1.5"
+                  >
+                    <ShoppingBag />
+                    我的订单
+                  </DropdownMenuItem>
+                )}
+                {!isAdmin && <DropdownMenuSeparator />}
                 <DropdownMenuItem
                   onClick={handleSignOut}
                   disabled={isSigningOut}
@@ -277,6 +365,7 @@ export default function Header() {
             </>
           )}
         </div>
+
         {/* 主题切换 */}
         <ModeToggle />
       </div>

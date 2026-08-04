@@ -19,10 +19,14 @@ export default async function LoginPage() {
     redirect("/");
   }
 
+  const phoneAuthEnabled =
+    process.env.NODE_ENV !== "production" ||
+    process.env.PHONE_AUTH_ENABLED === "true";
+
   return (
     <section className="flex min-h-[70svh] items-center bg-muted/30 py-16 md:py-24">
       <div className="container mx-auto px-4">
-        <LoginForm />
+        <LoginForm phoneAuthEnabled={phoneAuthEnabled} />
       </div>
     </section>
   );
