@@ -22,11 +22,21 @@ export default async function LoginPage() {
   const phoneAuthEnabled =
     process.env.NODE_ENV !== "production" ||
     process.env.PHONE_AUTH_ENABLED === "true";
+  const emailOtpEnabled =
+    process.env.NODE_ENV !== "production" ||
+    process.env.EMAIL_OTP_ENABLED === "true";
+  const googleAuthEnabled = Boolean(
+    process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET,
+  );
 
   return (
     <section className="flex min-h-[70svh] items-center bg-muted/30 py-16 md:py-24">
       <div className="container mx-auto px-4">
-        <LoginForm phoneAuthEnabled={phoneAuthEnabled} />
+        <LoginForm
+          phoneAuthEnabled={phoneAuthEnabled}
+          emailOtpEnabled={emailOtpEnabled}
+          googleAuthEnabled={googleAuthEnabled}
+        />
       </div>
     </section>
   );

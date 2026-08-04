@@ -1,11 +1,21 @@
 import {betterAuth} from "better-auth/minimal";
 import {prismaAdapter} from "better-auth/adapters/prisma";
-import {phoneNumber} from "better-auth/plugins";
+import {emailOTP, phoneNumber} from "better-auth/plugins";
 
 import {prisma} from "@/lib/prisma";
 
+const googleClientId = process.env.GOOGLE_CLIENT_ID;
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
 function maskPhoneNumber(phone: string) {
   return `${phone.slice(0, 6)}****${phone.slice(-4)}`;
+}
+
+function maskEmail(email: string) {
+  const [localPart, domain] = email.split("@");
+  const visibleLocalPart = localPart.slice(0, 2);
+
+  return `${visibleLocalPart}***@${domain}`;
 }
 
 export const auth = betterAuth({
@@ -17,6 +27,15 @@ export const auth = betterAuth({
     minPasswordLength: 8,
     maxPasswordLength: 128,
   },
+  socialProviders:
+    googleClientId && googleClientSecret
+      ? {
+          google: {
+            clientId: googleClientId,
+            clientSecret: googleClientSecret,
+          },
+        }
+      : {},
   user: {
     additionalFields: {
       role: {
@@ -28,6 +47,25 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    emailOTP({
+      otpLength: 6,
+      expiresIn: 300,
+      allowedAttempts: 3,
+      storeOTP: "hashed",
+      rateLimit: {
+        window: 60,
+        max: 3,
+      },
+      sendVerificationOTP: async ({email, otp, type}) => {
+        if (process.env.NODE_ENV === "production") {
+          throw new Error("Email provider is not configured");
+        }
+
+        console.info(
+          `[auth] 邮箱验证码 ${maskEmail(email)}：${otp}（${type}，5 分钟内有效）`,
+        );
+      },
+    }),
     phoneNumber({
       otpLength: 6,
       expiresIn: 300,
