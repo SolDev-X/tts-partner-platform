@@ -1,6 +1,6 @@
 "use client";
 
-import {useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {cn} from "@/lib/utils";
 import type {Service, ServiceVariantRule, FAQItem} from "@/lib/types";
 import {matchVariantRule} from "@/lib/utils";
@@ -23,16 +23,37 @@ const ServiceDetail1 = ({service}: ServiceClientProps) => {
   const optionGroups = (service.optionGroups ?? []) as OptionGroup[];
   const cases = service.cases ?? [];
 
-  const [selection, setSelection] = useState<ServiceSelection>({});
+  const [submittedSelection, setSubmittedSelection] =
+    useState<ServiceSelection | null>(null);
+  const planRef = useRef<HTMLDivElement>(null);
 
-  const matchedRule = matchVariantRule(service.variantRules ?? [], selection);
+  const matchedRule = submittedSelection
+    ? matchVariantRule(service.variantRules ?? [], submittedSelection)
+    : null;
+
+  useEffect(() => {
+    if (!submittedSelection) return;
+
+    planRef.current?.scrollIntoView({behavior: "smooth", block: "start"});
+  }, [submittedSelection]);
+
+  const handleSelectionChange = useCallback(() => {
+    setSubmittedSelection(null);
+  }, []);
+
+  const handlePlanSubmit = useCallback((values: ServiceSelection) => {
+    setSubmittedSelection(values);
+  }, []);
 
   return (
     <section className={cn("py-32")}>
       <div className="container mx-auto items-center">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
-          <div>
+          <div className="space-y-8">
             <ServiceImageGallery cases={cases} />
+            <div className="hidden lg:block">
+              <ServiceFaqs faqs={service.faqs} />
+            </div>
           </div>
           <div className="space-y-6">
             <div className="space-y-4">
@@ -48,10 +69,20 @@ const ServiceDetail1 = ({service}: ServiceClientProps) => {
             <ServiceOptionsForm
               optionGroups={optionGroups}
               combinationRules={service.combinationRules}
-              onChange={setSelection}
+              onChange={handleSelectionChange}
+              onSubmitValues={handlePlanSubmit}
             />
 
-            <ServiceVariantInfo rule={matchedRule} faqs={service.faqs} />
+            <div ref={planRef} className="scroll-mt-24">
+              <ServiceVariantInfo
+                rule={matchedRule}
+                planGenerated={Boolean(submittedSelection)}
+              />
+            </div>
+
+            <div className="lg:hidden">
+              <ServiceFaqs faqs={service.faqs} />
+            </div>
           </div>
         </div>
       </div>
@@ -59,18 +90,46 @@ const ServiceDetail1 = ({service}: ServiceClientProps) => {
   );
 };
 
+const ServiceFaqs = ({faqs}: {faqs?: FAQItem[]}) => {
+  if (!faqs || faqs.length === 0) return null;
+
+  return (
+    <div className="space-y-3">
+      <h2 className="text-lg font-semibold">常见问题</h2>
+      <Accordion type="single" collapsible>
+        {faqs.map((item) => (
+          <AccordionItem key={item.id} value={item.id}>
+            <AccordionTrigger className="text-sm">
+              {item.question}
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-muted-foreground">
+              {item.answer}
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </div>
+  );
+};
+
 const ServiceVariantInfo = ({
   rule,
-  faqs,
+  planGenerated,
 }: {
   rule: ServiceVariantRule | null;
-  faqs?: FAQItem[];
+  planGenerated: boolean;
 }) => {
   return (
     <div className="space-y-6">
-      {!rule && (
+      {!planGenerated && (
         <div className="rounded-lg border bg-muted/40 p-4 text-sm text-muted-foreground">
-          请完善以上信息，查看对应的材料要求与服务说明。
+          请完善以上信息并查看服务方案。
+        </div>
+      )}
+
+      {planGenerated && !rule && (
+        <div className="rounded-lg border bg-muted/40 p-4 text-sm text-muted-foreground">
+          当前配置需要平台进一步确认，您可以调整规格后重新查看方案。
         </div>
       )}
 
@@ -100,32 +159,50 @@ const ServiceVariantInfo = ({
         </div>
       )}
 
-      {rule?.disclaimer && (
+      {rule?.serviceContent && rule.serviceContent.length > 0 && (
         <div className="rounded-lg border bg-muted/40 p-4">
-          <h2 className="mb-2 text-sm font-semibold">服务承诺与责任说明</h2>
-          <p className="text-sm text-muted-foreground whitespace-pre-line">
-            {rule.disclaimer}
+          <h2 className="mb-3 text-sm font-semibold">服务内容</h2>
+          <ul className="space-y-2">
+            {rule.serviceContent.map((item, index) => (
+              <li
+                key={`service-content-${index}`}
+                className="flex items-start gap-3 text-sm text-muted-foreground"
+              >
+                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {rule?.timelineAndDelivery && (
+        <div className="rounded-lg border bg-muted/40 p-4">
+          <h2 className="mb-2 text-sm font-semibold">办理周期与交付</h2>
+          <p className="text-sm whitespace-pre-line text-muted-foreground">
+            {rule.timelineAndDelivery}
           </p>
         </div>
       )}
 
-      {faqs && faqs.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-lg font-semibold">常见问题</h2>
-          <Accordion type="single" collapsible>
-            {faqs.map((item) => (
-              <AccordionItem key={item.id} value={item.id}>
-                <AccordionTrigger className="text-sm">
-                  {item.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-sm text-muted-foreground">
-                  {item.answer}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+      {rule?.refundPolicy && (
+        <div className="rounded-lg border bg-muted/40 p-4">
+          <h2 className="mb-2 text-sm font-semibold">退款规则</h2>
+          <p className="text-sm whitespace-pre-line text-muted-foreground">
+            {rule.refundPolicy}
+          </p>
         </div>
       )}
+
+      {rule?.importantNotice && (
+        <div className="rounded-lg border bg-muted/40 p-4">
+          <h2 className="mb-2 text-sm font-semibold">重要说明</h2>
+          <p className="text-sm whitespace-pre-line text-muted-foreground">
+            {rule.importantNotice}
+          </p>
+        </div>
+      )}
+
     </div>
   );
 };

@@ -54,7 +54,7 @@ const defaultProps: LogosSimpleStaticProps = {
       className: "h-7 w-auto",
     },
     {
-      src: "/logos/aliexpress.svg",
+      src: "/logos/ALIEXPRESS.svg",
       alt: "AliExpress",
       className: "h-7 w-auto",
     },

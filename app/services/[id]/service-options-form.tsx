@@ -2,7 +2,7 @@
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useEffect, useMemo} from "react";
 import type {ControllerRenderProps} from "react-hook-form";
-import {Controller, useForm} from "react-hook-form";
+import {Controller, useForm, useWatch} from "react-hook-form";
 import z from "zod";
 
 import {Button} from "@/components/ui/button";
@@ -16,14 +16,14 @@ interface ServiceOptionsFormProps {
   optionGroups: OptionGroup[];
   combinationRules?: CombinationRule[];
   onSubmitValues?: (values: FormValues) => void;
-  onChange?: (values: FormValues) => void; // 有没有这一行？
+  onChange?: (values: FormValues) => void;
 }
 
 const ServiceOptionsForm = ({
   optionGroups,
   combinationRules = [],
   onSubmitValues,
-  onChange, // 有没有这一行？
+  onChange,
 }: ServiceOptionsFormProps) => {
   const formSchema = useMemo(() => {
     const shape: Record<string, z.ZodTypeAny> = {};
@@ -39,20 +39,11 @@ const ServiceOptionsForm = ({
   });
 
   // 当前完整的选择状态：{ sites: "us", shopType: "direct", category: "jewelry", onboardingType: "invite" }
-  const selection = form.watch(); // 这行保留，渲染时仍然需要用它做禁用逻辑判断
+  const selection = useWatch({control: form.control}) as FormValues;
 
   useEffect(() => {
-    const subscription = form.watch((values) => {
-      onChange?.(values as FormValues);
-    });
-    return () => subscription.unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const sitesGroup = optionGroups.find((group) => group.key === "sites");
-  const selectedSite = sitesGroup?.options.find(
-    (option) => option.id === selection.sites,
-  );
+    onChange?.(selection);
+  }, [onChange, selection]);
 
   // 任意一个上游字段变化后，清空已经因为规则变化而不再合法的下游选择
   useEffect(() => {
@@ -92,7 +83,7 @@ const ServiceOptionsForm = ({
     if (onSubmitValues) {
       onSubmitValues(values);
     } else {
-      console.log("服务咨询需求：", values);
+      console.log("服务方案配置：", values);
     }
   }
 
@@ -125,7 +116,7 @@ const ServiceOptionsForm = ({
       ))}
 
       <Button type="submit" size="lg" className="w-full">
-        提交咨询需求
+        查看服务方案
       </Button>
     </form>
   );

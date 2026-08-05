@@ -46,8 +46,10 @@ export type ServiceVariantRule = {
   match: ServiceVariantMatch;
   requiredMaterials?: string[];
   eligibility?: string;
-  disclaimer?: string;
-  price?: string;
+  serviceContent?: string[];
+  timelineAndDelivery?: string;
+  refundPolicy?: string;
+  importantNotice?: string;
 };
 
 export type FAQItem = {
