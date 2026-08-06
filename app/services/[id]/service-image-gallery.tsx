@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import {useState} from "react";
 import {X} from "lucide-react";
 import {AspectRatio} from "@/components/ui/aspect-ratio";
@@ -36,9 +37,11 @@ const ServiceImageGallery = ({cases}: ServiceImageGalleryProps) => {
                 : "border-transparent opacity-70 hover:opacity-100",
             )}
           >
-            <img
+            <Image
               src={item.imageUrl}
-              alt={item.title}
+              alt={item.title ?? "服务案例"}
+              width={80}
+              height={80}
               className="block size-full object-contain"
             />
           </button>
@@ -54,11 +57,13 @@ const ServiceImageGallery = ({cases}: ServiceImageGalleryProps) => {
           <button
             type="button"
             onClick={() => setLightboxOpen(true)}
-            className="block size-full cursor-zoom-in"
+            className="relative block size-full cursor-zoom-in"
           >
-            <img
+            <Image
               src={active.imageUrl}
-              alt={active.title}
+              alt={active.title ?? "服务案例"}
+              fill
+              sizes="(min-width: 1024px) 40vw, 100vw"
               className="block size-full object-contain object-center"
             />
           </button>
@@ -71,23 +76,6 @@ const ServiceImageGallery = ({cases}: ServiceImageGalleryProps) => {
           </div>
         </AspectRatio>
       </div>
-
-      {/* 大图预览弹窗 */}
-      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-        <DialogContent
-          className={cn(
-            "max-w-none! border-none bg-transparent p-0 shadow-none",
-            "w-[95vw] sm:w-auto",
-          )}
-        >
-          <DialogTitle className="sr-only">{active.title}</DialogTitle>
-          <img
-            src={active.imageUrl}
-            alt={active.title}
-            className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
-          />
-        </DialogContent>
-      </Dialog>
 
       {/* 大图预览弹窗：移动端全屏，桌面端居中带边距 */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
@@ -115,10 +103,13 @@ const ServiceImageGallery = ({cases}: ServiceImageGalleryProps) => {
           </button>
 
           <div className="flex size-full items-center justify-center">
-            <img
+            <Image
               src={active.imageUrl}
-              alt={active.title}
-              className="max-h-full max-w-full object-contain sm:max-h-[90vh] sm:max-w-[90vw] sm:rounded-lg"
+              alt={active.title ?? "服务案例"}
+              width={1600}
+              height={1600}
+              sizes="90vw"
+              className="h-auto max-h-full w-auto max-w-full object-contain sm:max-h-[90vh] sm:max-w-[90vw] sm:rounded-lg"
             />
           </div>
         </DialogContent>

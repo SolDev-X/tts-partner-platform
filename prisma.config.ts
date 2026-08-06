@@ -9,6 +9,8 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // Use Neon’s direct endpoint for schema migrations when it is available.
+    // The application itself continues to use DATABASE_URL (the pooled endpoint).
+    url: process.env["DIRECT_URL"] ?? process.env["DATABASE_URL"],
   },
 });

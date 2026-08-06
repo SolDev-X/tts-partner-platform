@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import {Button} from "@/components/ui/button";
 import {cn} from "@/lib/utils";
 
@@ -87,9 +89,12 @@ const About = ({
           </p>
         </div>
         <div className="grid gap-7 lg:grid-cols-3">
-          <img
+          <Image
             src={mainImage.src}
             alt={mainImage.alt}
+            width={1600}
+            height={1067}
+            sizes="(min-width: 1024px) 66vw, 100vw"
             className="size-full max-h-[620px] rounded-xl object-cover lg:col-span-2"
           />
           <div className="flex flex-col gap-7 md:flex-row lg:flex-col">
@@ -107,9 +112,12 @@ const About = ({
                 {breakout.buttonText}
               </Button>
             </div>
-            <img
+            <Image
               src={secondaryImage.src}
               alt={secondaryImage.alt}
+              width={1200}
+              height={800}
+              sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
               className="grow basis-0 rounded-xl object-cover md:w-1/2 lg:min-h-0 lg:w-auto"
             />
           </div>

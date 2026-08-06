@@ -7,6 +7,7 @@ import {PackageOpen} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent} from "@/components/ui/card";
 import {auth} from "@/lib/auth";
+import {prisma} from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "我的订单 | 跨境服务平台",
@@ -22,6 +23,27 @@ export default async function OrdersPage() {
     redirect("/login");
   }
 
+  const orders = await prisma.order.findMany({
+    where: {userId: session.user.id},
+    orderBy: {createdAt: "desc"},
+    select: {
+      id: true,
+      orderNumber: true,
+      serviceLabel: true,
+      status: true,
+      createdAt: true,
+    },
+  });
+
+  const statusLabels = {
+    PENDING_CONFIRMATION: "待确认",
+    PROCESSING: "处理中",
+    WAITING_FOR_CUSTOMER: "待补充材料",
+    UNDER_REVIEW: "审核中",
+    COMPLETED: "已完成",
+    CANCELLED: "已取消",
+  };
+
   return (
     <section className="container mx-auto max-w-6xl px-4 py-12 md:py-16">
       <div>
@@ -31,6 +53,7 @@ export default async function OrdersPage() {
         </p>
       </div>
 
+      {orders.length === 0 ? (
       <Card className="mt-8" variant="outline">
         <CardContent className="flex min-h-80 flex-col items-center justify-center px-6 py-12 text-center">
           <div className="flex size-12 items-center justify-center rounded-full bg-muted">
@@ -49,6 +72,30 @@ export default async function OrdersPage() {
           </Button>
         </CardContent>
       </Card>
+      ) : (
+        <div className="mt-8 space-y-3">
+          {orders.map((order) => (
+            <Card key={order.id} variant="outline">
+              <CardContent className="flex flex-col gap-3 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="font-medium">{order.serviceLabel}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    订单号：{order.orderNumber}
+                  </p>
+                </div>
+                <div className="text-sm text-muted-foreground sm:text-right">
+                  <p className="font-medium text-foreground">
+                    {statusLabels[order.status]}
+                  </p>
+                  <p className="mt-1">
+                    {order.createdAt.toLocaleDateString("zh-CN")}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

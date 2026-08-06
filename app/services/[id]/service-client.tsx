@@ -1,6 +1,8 @@
 "use client";
 
 import {useCallback, useEffect, useRef, useState} from "react";
+import {useRouter} from "next/navigation";
+import {LoaderCircle} from "lucide-react";
 import {cn} from "@/lib/utils";
 import type {Service, ServiceVariantRule, FAQItem} from "@/lib/types";
 import {matchVariantRule} from "@/lib/utils";
@@ -14,6 +16,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {Button} from "@/components/ui/button";
 
 interface ServiceClientProps {
   service: Service;
@@ -77,6 +80,8 @@ const ServiceDetail1 = ({service}: ServiceClientProps) => {
               <ServiceVariantInfo
                 rule={matchedRule}
                 planGenerated={Boolean(submittedSelection)}
+                service={service}
+                selection={submittedSelection}
               />
             </div>
 
@@ -115,9 +120,13 @@ const ServiceFaqs = ({faqs}: {faqs?: FAQItem[]}) => {
 const ServiceVariantInfo = ({
   rule,
   planGenerated,
+  service,
+  selection,
 }: {
   rule: ServiceVariantRule | null;
   planGenerated: boolean;
+  service: Service;
+  selection: ServiceSelection | null;
 }) => {
   return (
     <div className="space-y-6">
@@ -203,6 +212,70 @@ const ServiceVariantInfo = ({
         </div>
       )}
 
+      {rule && selection && (
+        <CreateOrderCard service={service} selection={selection} />
+      )}
+    </div>
+  );
+};
+
+const CreateOrderCard = ({
+  service,
+  selection,
+}: {
+  service: Service;
+  selection: ServiceSelection;
+}) => {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string>();
+
+  async function createOrder() {
+    setError(undefined);
+    setIsSubmitting(true);
+
+    const response = await fetch("/api/orders", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({serviceId: service.id, selection}),
+    });
+
+    if (response.status === 401) {
+      router.push("/login");
+      return;
+    }
+
+    if (!response.ok) {
+      setIsSubmitting(false);
+      setError("创建订单失败，请检查方案后重试。");
+      return;
+    }
+
+    router.push("/account/orders");
+    router.refresh();
+  }
+
+  return (
+    <div className="rounded-lg border bg-muted/40 p-4">
+      <h2 className="text-sm font-semibold">确认方案</h2>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">
+        创建订单后，顾问将确认材料并与您沟通最终报价。
+      </p>
+      {error && (
+        <p className="mt-3 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {error}
+        </p>
+      )}
+      <Button
+        type="button"
+        size="lg"
+        className="mt-4 w-full"
+        disabled={isSubmitting}
+        onClick={createOrder}
+      >
+        {isSubmitting && <LoaderCircle className="animate-spin" aria-hidden="true" />}
+        {isSubmitting ? "正在创建订单" : "确认方案并创建订单"}
+      </Button>
     </div>
   );
 };
