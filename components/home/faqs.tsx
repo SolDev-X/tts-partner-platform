@@ -1,12 +1,5 @@
-"use client";
-
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import Link from "next/link";
+import {ChevronDown} from "lucide-react";
 import {homeFAQs} from "@/lib/data";
 
 export default function FAQs() {
@@ -18,24 +11,23 @@ export default function FAQs() {
             常见问题
           </h2>
 
-          <Accordion type="single" collapsible className="-mx-2 sm:mx-0">
+          <div className="-mx-2 sm:mx-0">
             {homeFAQs.map((item) => (
-              <div className="group" key={item.id}>
-                <AccordionItem
-                  value={item.id}
-                  className="data-[state=open]:bg-muted peer rounded-xl border-none px-5 py-1 data-[state=open]:border-none md:px-7"
-                >
-                  <AccordionTrigger className="cursor-pointer text-base hover:no-underline">
-                    {item.question}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <p className="md:text-base text-sm">{item.answer}</p>
-                  </AccordionContent>
-                </AccordionItem>
-                <hr className="mx-5 -mb-px group-last:hidden peer-data-[state=open]:opacity-0 md:mx-7" />
-              </div>
+              <details
+                key={item.id}
+                name="home-faq"
+                className="group rounded-xl px-5 py-1 open:bg-muted md:px-7"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-base font-medium [&::-webkit-details-marker]:hidden">
+                  <span>{item.question}</span>
+                  <ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180" />
+                </summary>
+                <div className="pb-4">
+                  <p className="text-sm md:text-base">{item.answer}</p>
+                </div>
+              </details>
             ))}
-          </Accordion>
+          </div>
 
           <p className="text-muted-foreground text-center md:text-[14px] text-[12px]">
             找不到您要找的内容？请联系我们的{" "}

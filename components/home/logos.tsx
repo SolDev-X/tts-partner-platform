@@ -1,6 +1,3 @@
-"use client";
-
-import Marquee from "react-fast-marquee";
 import Image from "next/image";
 import {cn} from "@/lib/utils";
 
@@ -90,11 +87,13 @@ const Logos = (props: Props) => {
   return (
     <section className={cn("py-5", className)}>
       <div className="mt-8 lg:mt-12">
-        <Marquee gradient gradientWidth={64} autoFill pauseOnHover speed={60}>
-          {logos.map((logo, index) => (
+        <div className="overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+          <div className="flex w-max animate-[logo-marquee_45s_linear_infinite] hover:[animation-play-state:paused] motion-reduce:animate-none">
+            {[...logos, ...logos].map((logo, index) => (
             <div
               key={`${logo.src}-${index}`}
               className="mx-8 flex aspect-3/1 w-28 items-center justify-center sm:w-32 lg:mx-10"
+              aria-hidden={index >= logos.length}
             >
               <Image
                 src={logo.src}
@@ -104,8 +103,9 @@ const Logos = (props: Props) => {
                 className="h-full w-full object-contain dark:invert"
               />
             </div>
-          ))}
-        </Marquee>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );

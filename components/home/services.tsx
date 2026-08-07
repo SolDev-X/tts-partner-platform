@@ -1,5 +1,3 @@
-"use client";
-
 import {cn} from "@/lib/utils";
 import {services} from "@/lib/data";
 import Link from "next/link";
