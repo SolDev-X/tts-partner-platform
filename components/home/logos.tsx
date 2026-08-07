@@ -100,7 +100,7 @@ const Logos = (props: Props) => {
                 alt={logo.alt}
                 width={112}
                 height={40}
-                className="h-full w-full object-contain dark:invert"
+                className="h-full w-full object-contain"
               />
             </div>
             ))}

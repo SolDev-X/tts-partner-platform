@@ -162,7 +162,7 @@ const Contact = (props: Props) => {
                     showSuccess ? "opacity-100" : "opacity-0",
                   )}
                 >
-                  <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                  <p className="text-sm font-medium text-green-600">
                     {successMessage}
                   </p>
                 </div>

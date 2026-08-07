@@ -20,7 +20,6 @@ export default function Header() {
             alt="跨境服务平台"
             width={20}
             height={20}
-            className="dark:invert"
           />
           <span className="text-base font-bold lg:text-xl">跨境服务平台</span>
         </Link>

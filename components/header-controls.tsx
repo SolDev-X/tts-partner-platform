@@ -25,7 +25,6 @@ import {
 import {Sheet, SheetContent, SheetTitle, SheetTrigger} from "@/components/ui/sheet";
 import {authClient} from "@/lib/auth-client";
 import {services} from "@/lib/data";
-import {ModeToggle} from "./mode-toggle";
 
 const navLinks = [
   {href: "/about", label: "关于我们"},
@@ -128,7 +127,17 @@ export function HeaderControls() {
                     <p className="truncate text-xs text-muted-foreground">{user.email}</p>
                   </div>
                 </div>
-                {!isAdmin && (
+                {isAdmin ? (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    nativeButton={false}
+                    render={<Link href="/admin/orders" onClick={() => setOpen(false)} />}
+                  >
+                    <ShoppingBag />
+                    订单管理
+                  </Button>
+                ) : (
                   <Button
                     variant="outline"
                     className="w-full"
@@ -192,8 +201,6 @@ export function HeaderControls() {
           </>
         )}
       </div>
-
-      <ModeToggle />
     </div>
   );
 }
@@ -246,13 +253,18 @@ function AccountMenu({
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        {!isAdmin && (
+        {isAdmin ? (
+          <DropdownMenuItem render={<Link href="/admin/orders" />} className="px-2 py-1.5">
+            <ShoppingBag />
+            订单管理
+          </DropdownMenuItem>
+        ) : (
           <DropdownMenuItem render={<Link href="/account/orders" />} className="px-2 py-1.5">
             <ShoppingBag />
             我的订单
           </DropdownMenuItem>
         )}
-        {!isAdmin && <DropdownMenuSeparator />}
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={onSignOut} disabled={isSigningOut} className="px-2 py-1.5">
           {isSigningOut ? <LoaderCircle className="animate-spin" /> : <LogOut />}
           {isSigningOut ? "正在退出" : "退出登录"}

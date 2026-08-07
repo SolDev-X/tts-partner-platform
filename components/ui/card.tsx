@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 const cardVariants = cva('text-card-foreground rounded-2xl', {
     variants: {
         variant: {
-            default: 'bg-card ring-1 ring-foreground/6.5 shadow-lg shadow-foreground/5 dark:shadow-black/10',
+            default: 'bg-card ring-1 ring-foreground/6.5 shadow-lg shadow-foreground/5',
             soft: 'bg-muted',
             mixed: 'bg-muted border',
             outline: 'bg-card ring-1 ring-border',

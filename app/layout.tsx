@@ -2,7 +2,6 @@ import type {Metadata} from "next";
 import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import {ThemeProvider} from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "跨境服务平台",
@@ -16,22 +15,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="zh-CN"
-      suppressHydrationWarning
-      className="h-full antialiased"
-    >
+    <html lang="zh-CN" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Header />
-          <main className="flex-1 relative">{children}</main>
-          <Footer />
-        </ThemeProvider>
+        <Header />
+        <main className="flex-1 relative">{children}</main>
+        <Footer />
       </body>
     </html>
   );

@@ -260,7 +260,7 @@ export default function PrivacyPage() {
 
               <PolicySection id="sensitive" index={4} title="敏感个人信息处理">
                 <div className="flex gap-3 rounded-xl border border-amber-500/25 bg-amber-500/5 p-4 text-foreground">
-                  <CircleAlert className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-400" />
+                  <CircleAlert className="mt-0.5 size-5 shrink-0 text-amber-600" />
                   <p className="text-sm leading-6">
                     身份证件影像、金融账户、店铺登录凭证及不满十四周岁未成年人的个人信息，
                     可能属于敏感个人信息。泄露或不当使用可能对人身、财产或账户安全造成影响。

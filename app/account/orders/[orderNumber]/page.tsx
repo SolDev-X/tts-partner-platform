@@ -35,6 +35,7 @@ export default async function OrderDetailPage({
       serviceLabel: true,
       selection: true,
       status: true,
+      customerMessage: true,
       createdAt: true,
     },
   });
@@ -93,6 +94,17 @@ export default async function OrderDetailPage({
             </p>
           </CardContent>
         </Card>
+
+        {order.customerMessage && (
+          <Card variant="outline">
+            <CardContent className="p-5">
+              <h2 className="font-semibold">平台处理说明</h2>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground whitespace-pre-line">
+                {order.customerMessage}
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
         <Card variant="outline">
           <CardContent className="p-5">

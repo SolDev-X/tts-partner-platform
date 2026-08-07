@@ -16,7 +16,7 @@ export default async function LoginPage() {
   });
 
   if (session) {
-    redirect("/");
+    redirect(session.user.role === "ADMIN" ? "/admin/orders" : "/");
   }
 
   const phoneAuthEnabled =

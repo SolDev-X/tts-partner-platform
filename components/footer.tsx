@@ -79,7 +79,6 @@ export default function Footer() {
                   alt="跨境服务平台"
                   width="25"
                   height="25"
-                  className="dark:invert"
                 />
                 跨境服务平台
               </h2>
@@ -128,14 +127,6 @@ export default function Footer() {
                   alt="飞书"
                   width={24}
                   height={24}
-                  className="dark:hidden"
-                />
-                <Image
-                  src="/icons/feishu-dark.svg"
-                  alt="飞书"
-                  width={24}
-                  height={24}
-                  className="hidden dark:block"
                 />
               </HoverCardTrigger>
               <HoverCardContent className="w-auto p-1">

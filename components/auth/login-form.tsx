@@ -29,6 +29,7 @@ const otpSchema = z.string().regex(/^\d{6}$/, "请输入 6 位数字验证码");
 
 type EmailLoginValues = z.infer<typeof emailLoginSchema>;
 type LoginMethod = "otp" | "password";
+type LoginIdentity = "customer" | "admin";
 type OtpIdentifier = {
   type: "phone" | "email";
   value: string;
@@ -47,6 +48,7 @@ export function LoginForm({
   googleAuthEnabled = false,
 }: LoginFormProps) {
   const otpAuthEnabled = phoneAuthEnabled || emailOtpEnabled;
+  const [identity, setIdentity] = useState<LoginIdentity>("customer");
   const [method, setMethod] = useState<LoginMethod>(
     otpAuthEnabled ? "otp" : "password",
   );
@@ -72,13 +74,32 @@ export function LoginForm({
     <div className="mx-auto w-full max-w-md">
       <div className="text-center">
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          登录或注册
+          {identity === "admin" ? "管理员登录" : "登录或注册"}
         </h1>
       </div>
 
       <Card className="mt-8" variant="default">
         <CardContent className="space-y-6 px-6 py-7 sm:px-8 sm:py-8">
-          {googleAuthEnabled && (
+          <div className="grid grid-cols-2 rounded-lg bg-muted p-1">
+            <Button
+              type="button"
+              variant={identity === "customer" ? "default" : "ghost"}
+              className="w-full"
+              onClick={() => setIdentity("customer")}
+            >
+              客户登录
+            </Button>
+            <Button
+              type="button"
+              variant={identity === "admin" ? "default" : "ghost"}
+              className="w-full"
+              onClick={() => setIdentity("admin")}
+            >
+              管理员登录
+            </Button>
+          </div>
+
+          {identity === "customer" && googleAuthEnabled && (
             <>
               <Button
                 type="button"
@@ -111,31 +132,41 @@ export function LoginForm({
             </>
           )}
 
-          {method === "otp" && otpAuthEnabled ? (
+          {identity === "admin" ? (
+            <EmailLoginFields expectedRole="ADMIN" />
+          ) : method === "otp" && otpAuthEnabled ? (
             <IdentifierOtpFields
               phoneAuthEnabled={phoneAuthEnabled}
               emailOtpEnabled={emailOtpEnabled}
             />
           ) : (
-            <EmailLoginFields />
+            <EmailLoginFields expectedRole="CUSTOMER" />
           )}
 
-          <div className="space-y-3 text-center text-sm">
-            {otpAuthEnabled && (
-              <Button
-                type="button"
-                variant="link"
-                className="h-auto p-0 text-muted-foreground"
-                onClick={() =>
-                  setMethod(method === "otp" ? "password" : "otp")
-                }
-              >
-                {method === "otp"
-                  ? "使用邮箱密码登录"
-                  : "使用手机号或邮箱验证码登录"}
-              </Button>
-            )}
-          </div>
+          {identity === "customer" && (
+            <div className="space-y-3 text-center text-sm">
+              {otpAuthEnabled && (
+                <Button
+                  type="button"
+                  variant="link"
+                  className="h-auto p-0 text-muted-foreground"
+                  onClick={() =>
+                    setMethod(method === "otp" ? "password" : "otp")
+                  }
+                >
+                  {method === "otp"
+                    ? "使用邮箱密码登录"
+                    : "使用手机号或邮箱验证码登录"}
+                </Button>
+              )}
+            </div>
+          )}
+
+          {identity === "admin" && (
+            <p className="text-center text-xs leading-5 text-muted-foreground">
+              管理员账号由平台指定，不提供注册或验证码登录。
+            </p>
+          )}
 
           <p className="text-center text-xs leading-5 text-muted-foreground">
             继续即表示您已阅读并同意
@@ -532,7 +563,11 @@ function IdentifierOtpFields({
   );
 }
 
-function EmailLoginFields() {
+function EmailLoginFields({
+  expectedRole,
+}: {
+  expectedRole: "CUSTOMER" | "ADMIN";
+}) {
   const router = useRouter();
   const form = useForm<EmailLoginValues>({
     resolver: zodResolver(emailLoginSchema),
@@ -558,7 +593,23 @@ function EmailLoginFields() {
       return;
     }
 
-    router.push("/");
+    const roleResponse = await fetch("/api/account/role");
+    const roleResult = roleResponse.ok
+      ? ((await roleResponse.json()) as {role?: string})
+      : undefined;
+
+    if (roleResult?.role !== expectedRole) {
+      await authClient.signOut();
+      form.setError("root", {
+        message:
+          expectedRole === "ADMIN"
+            ? "该账号不是管理员，请使用客户登录。"
+            : "该账号为管理员，请使用管理员登录入口。",
+      });
+      return;
+    }
+
+    router.push(expectedRole === "ADMIN" ? "/admin/orders" : "/");
     router.refresh();
   }
 
@@ -602,15 +653,17 @@ function EmailLoginFields() {
             />
             <div className="space-y-1 leading-4">
               <p>{form.formState.errors.root.message}</p>
-              <p>
-                还没有注册账号？{" "}
-                <Link
-                  href="/register"
-                  className="font-medium underline underline-offset-4"
-                >
-                  前往注册账号
-                </Link>
-              </p>
+              {expectedRole === "CUSTOMER" && (
+                <p>
+                  还没有注册账号？{" "}
+                  <Link
+                    href="/register"
+                    className="font-medium underline underline-offset-4"
+                  >
+                    前往注册账号
+                  </Link>
+                </p>
+              )}
             </div>
           </div>
         )}
