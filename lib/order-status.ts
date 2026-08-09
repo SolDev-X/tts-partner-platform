@@ -6,7 +6,7 @@ export const orderStatusMeta: Record<
 > = {
   PENDING_CONFIRMATION: {
     label: "待确认",
-    nextStep: "顾问将在 1 个工作日内确认材料要求与后续安排。",
+    nextStep: "我们将在 1 个工作日内确认材料要求与后续安排。",
   },
   PROCESSING: {
     label: "处理中",

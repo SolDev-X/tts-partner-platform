@@ -106,10 +106,15 @@ export default function Footer() {
           <span className="text-muted-foreground order-last block text-center text-[12px] md:order-first">
             © {2026} 跨境服务. 所有资料需真实有效，结果以平台最终审核为准。
           </span>
-          <div className="order-first flex flex-wrap justify-center gap-6 text-sm md:order-last items-center">
+          <div className="order-first flex flex-wrap justify-center gap-4 text-sm md:order-last items-center text-center">
             <HoverCard>
               <HoverCardTrigger>
-                <SiWechat size={20} />
+                <Image
+                  src="/icons/Wecom.svg"
+                  alt="企业微信"
+                  width={24}
+                  height={24}
+                />
               </HoverCardTrigger>
               <HoverCardContent className="w-auto p-1">
                 <Image
@@ -125,8 +130,8 @@ export default function Footer() {
                 <Image
                   src="/icons/feishu.svg"
                   alt="飞书"
-                  width={24}
-                  height={24}
+                  width={22}
+                  height={22}
                 />
               </HoverCardTrigger>
               <HoverCardContent className="w-auto p-1">
@@ -139,7 +144,12 @@ export default function Footer() {
               </HoverCardContent>
             </HoverCard>
             <Link href="wenyao.dev@gmail.com">
-              <Mail size={20} />
+              <Image
+                src="/icons/gmail.svg"
+                alt="gmail"
+                width={20}
+                height={20}
+              />
             </Link>
           </div>
         </div>
