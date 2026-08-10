@@ -159,19 +159,13 @@ export function HeaderControls() {
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2">
+              <div>
                 <Button
-                  variant="outline"
+                  className="w-full"
                   nativeButton={false}
                   render={<Link href="/login" onClick={() => setOpen(false)} />}
                 >
-                  登录
-                </Button>
-                <Button
-                  nativeButton={false}
-                  render={<Link href="/register" onClick={() => setOpen(false)} />}
-                >
-                  注册
+                  登录 / 注册
                 </Button>
               </div>
             )}
@@ -191,14 +185,9 @@ export function HeaderControls() {
             onSignOut={handleSignOut}
           />
         ) : (
-          <>
-            <Button variant="ghost" nativeButton={false} render={<Link href="/login" />}>
-              登录
-            </Button>
-            <Button nativeButton={false} render={<Link href="/register" />}>
-              注册
-            </Button>
-          </>
+          <Button nativeButton={false} render={<Link href="/login" />}>
+            登录 / 注册
+          </Button>
         )}
       </div>
     </div>

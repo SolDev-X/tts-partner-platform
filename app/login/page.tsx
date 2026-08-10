@@ -6,8 +6,8 @@ import {LoginForm} from "@/components/auth/login-form";
 import {auth} from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "登录 | 跨境服务平台",
-  description: "登录跨境服务平台账户。",
+  title: "登录或注册 | 跨境服务平台",
+  description: "使用手机号或邮箱登录或创建跨境服务平台账户。",
 };
 
 export default async function LoginPage() {

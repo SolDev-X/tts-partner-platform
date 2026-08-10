@@ -15,8 +15,11 @@ import {Input} from "@/components/ui/input";
 import {Separator} from "@/components/ui/separator";
 import {authClient} from "@/lib/auth-client";
 
-const emailLoginSchema = z.object({
-  email: z.string().trim().email("请输入有效的邮箱地址"),
+const passwordLoginSchema = z.object({
+  identifier: z
+    .string()
+    .trim()
+    .min(1, "请输入邮箱或手机号"),
   password: z
     .string()
     .min(8, "密码至少需要 8 位")
@@ -27,7 +30,7 @@ const phoneSchema = z.string().regex(/^1[3-9]\d{9}$/, "请输入有效的手机�
 const emailSchema = z.string().trim().toLowerCase().email();
 const otpSchema = z.string().regex(/^\d{6}$/, "请输入 6 位数字验证码");
 
-type EmailLoginValues = z.infer<typeof emailLoginSchema>;
+type PasswordLoginValues = z.infer<typeof passwordLoginSchema>;
 type LoginMethod = "otp" | "password";
 type LoginIdentity = "customer" | "admin";
 type OtpIdentifier = {
@@ -40,6 +43,20 @@ interface LoginFormProps {
   phoneAuthEnabled?: boolean;
   emailOtpEnabled?: boolean;
   googleAuthEnabled?: boolean;
+}
+
+async function signInWithPhonePassword(phone: string, password: string) {
+  try {
+    const response = await fetch("/api/auth/phone-password", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({phone, password}),
+    });
+
+    return response.ok ? undefined : new Error("Invalid credentials");
+  } catch {
+    return new Error("Unable to sign in");
+  }
 }
 
 export function LoginForm({
@@ -133,14 +150,17 @@ export function LoginForm({
           )}
 
           {identity === "admin" ? (
-            <EmailLoginFields expectedRole="ADMIN" />
+            <PasswordLoginFields expectedRole="ADMIN" />
           ) : method === "otp" && otpAuthEnabled ? (
             <IdentifierOtpFields
               phoneAuthEnabled={phoneAuthEnabled}
               emailOtpEnabled={emailOtpEnabled}
             />
           ) : (
-            <EmailLoginFields expectedRole="CUSTOMER" />
+            <PasswordLoginFields
+              expectedRole="CUSTOMER"
+              onUseOtp={() => setMethod("otp")}
+            />
           )}
 
           {identity === "customer" && (
@@ -154,9 +174,7 @@ export function LoginForm({
                     setMethod(method === "otp" ? "password" : "otp")
                   }
                 >
-                  {method === "otp"
-                    ? "使用邮箱密码登录"
-                    : "使用手机号或邮箱验证码登录"}
+                  {method === "otp" ? "密码登录" : "验证码登录"}
                 </Button>
               )}
             </div>
@@ -556,39 +574,48 @@ function IdentifierOtpFields({
         </FieldGroup>
       </form>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
+      <p className="mt-6 text-center text-xs text-muted-foreground">
         未注册的手机号或邮箱验证后将自动创建账户。
       </p>
     </>
   );
 }
 
-function EmailLoginFields({
+function PasswordLoginFields({
   expectedRole,
+  onUseOtp,
 }: {
   expectedRole: "CUSTOMER" | "ADMIN";
+  onUseOtp?: () => void;
 }) {
   const router = useRouter();
-  const form = useForm<EmailLoginValues>({
-    resolver: zodResolver(emailLoginSchema),
+  const form = useForm<PasswordLoginValues>({
+    resolver: zodResolver(passwordLoginSchema),
     defaultValues: {
-      email: "",
+      identifier: "",
       password: "",
     },
   });
 
-  async function onSubmit(values: EmailLoginValues) {
+  async function onSubmit(values: PasswordLoginValues) {
     form.clearErrors("root");
 
-    const {error} = await authClient.signIn.email({
-      email: values.email,
-      password: values.password,
-      rememberMe: true,
-    });
+    const identifier = values.identifier.trim();
+    const isPhone = phoneSchema.safeParse(identifier).success;
+
+    const error = isPhone
+      ? await signInWithPhonePassword(identifier, values.password)
+      : (
+          await authClient.signIn.email({
+            email: identifier,
+            password: values.password,
+            rememberMe: true,
+          })
+        ).error;
 
     if (error) {
       form.setError("root", {
-        message: "邮箱或密码错误，请重新检查。",
+        message: "邮箱、手机号或密码错误，请重新检查。",
       });
       return;
     }
@@ -616,17 +643,24 @@ function EmailLoginFields({
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
       <FieldGroup>
-        <Field data-invalid={Boolean(form.formState.errors.email)}>
-          <FieldLabel htmlFor="email">邮箱</FieldLabel>
+        <Field data-invalid={Boolean(form.formState.errors.identifier)}>
+          <FieldLabel htmlFor="login-identifier">
+            {expectedRole === "ADMIN" ? "邮箱" : "邮箱或手机号"}
+          </FieldLabel>
           <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            placeholder="name@example.com"
-            aria-invalid={Boolean(form.formState.errors.email)}
-            {...form.register("email")}
+            id="login-identifier"
+            type="text"
+            inputMode={expectedRole === "ADMIN" ? "email" : "text"}
+            autoComplete="username"
+            autoCapitalize="none"
+            spellCheck={false}
+            placeholder={
+              expectedRole === "ADMIN" ? "name@example.com" : "请输入手机号或邮箱"
+            }
+            aria-invalid={Boolean(form.formState.errors.identifier)}
+            {...form.register("identifier")}
           />
-          <FieldError errors={[form.formState.errors.email]} />
+          <FieldError errors={[form.formState.errors.identifier]} />
         </Field>
 
         <Field data-invalid={Boolean(form.formState.errors.password)}>
@@ -655,13 +689,17 @@ function EmailLoginFields({
               <p>{form.formState.errors.root.message}</p>
               {expectedRole === "CUSTOMER" && (
                 <p>
-                  还没有注册账号？{" "}
-                  <Link
-                    href="/register"
-                    className="font-medium underline underline-offset-4"
-                  >
-                    前往注册账号
-                  </Link>
+                  未注册的手机号或邮箱请使用验证码继续，验证后将自动创建账户。{" "}
+                  {onUseOtp && (
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="h-auto p-0 font-medium text-destructive underline underline-offset-4"
+                      onClick={onUseOtp}
+                    >
+                      使用验证码继续
+                    </Button>
+                  )}
                 </p>
               )}
             </div>
