@@ -779,6 +779,15 @@ function PasswordLoginFields({
           )}
           {form.formState.isSubmitting ? "正在登录" : "登录"}
         </Button>
+
+        <div className="text-center">
+          <Link
+            href="/forgot-password"
+            className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+          >
+            忘记密码？
+          </Link>
+        </div>
       </FieldGroup>
     </form>
   );

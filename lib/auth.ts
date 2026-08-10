@@ -51,6 +51,29 @@ async function sendEmailOtp(email: string, otp: string) {
   }
 }
 
+async function sendPasswordResetEmail(email: string, resetUrl: string) {
+  if (!resendApiKey || !emailFrom) {
+    throw new Error("Email provider is not configured");
+  }
+
+  const resend = new Resend(resendApiKey);
+  const {error} = await resend.emails.send({
+    from: emailFrom,
+    to: email,
+    subject: "重置您的跨境服务平台密码",
+    text: `请在 1 小时内打开以下链接重置密码：${resetUrl}\n\n如果不是您本人操作，请忽略此邮件。`,
+    html: `<p>您正在重置跨境服务平台的登录密码。</p><p><a href="${resetUrl}">重置密码</a></p><p>此链接将在 1 小时后失效。如果不是您本人操作，请忽略此邮件。</p>`,
+  });
+
+  if (error) {
+    console.error("[auth] Resend 密码重置邮件发送失败", {
+      name: error.name,
+      message: error.message,
+    });
+    throw new Error(`Unable to send password reset email: ${error.message}`);
+  }
+}
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
@@ -59,6 +82,10 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 8,
     maxPasswordLength: 128,
+    revokeSessionsOnPasswordReset: true,
+    sendResetPassword: async ({user, url}) => {
+      await sendPasswordResetEmail(user.email, url);
+    },
   },
   socialProviders:
     googleClientId && googleClientSecret
