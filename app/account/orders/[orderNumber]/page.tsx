@@ -78,7 +78,9 @@ export default async function OrderDetailPage({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="secondary">{status.label}</Badge>
+          <Badge variant="outline" className={status.badgeClassName}>
+            {status.label}
+          </Badge>
           {order.status === "PENDING_CONFIRMATION" && (
             <CancelOrderButton orderNumber={order.orderNumber} />
           )}

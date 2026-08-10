@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import {ChevronDown} from "lucide-react";
+import {useEffect, useRef, useState} from "react";
 
 import {services} from "@/lib/data";
 import {HeaderControls} from "@/components/header-controls";
@@ -11,6 +14,23 @@ const navLinks = [
 ];
 
 export default function Header() {
+  const [servicesOpen, setServicesOpen] = useState(false);
+  const servicesMenuRef = useRef<HTMLDetailsElement>(null);
+
+  useEffect(() => {
+    if (!servicesOpen) return;
+
+    function closeOnOutsidePointerDown(event: PointerEvent) {
+      if (!servicesMenuRef.current?.contains(event.target as Node)) {
+        setServicesOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", closeOnOutsidePointerDown);
+    return () =>
+      document.removeEventListener("pointerdown", closeOnOutsidePointerDown);
+  }, [servicesOpen]);
+
   return (
     <header className="mx-auto flex w-full max-w-6xl items-center justify-between p-4">
       <h1>
@@ -26,7 +46,12 @@ export default function Header() {
       </h1>
 
       <nav className="hidden items-center gap-14 lg:flex" aria-label="主导航">
-        <details className="group relative">
+        <details
+          ref={servicesMenuRef}
+          className="group relative"
+          open={servicesOpen}
+          onToggle={(event) => setServicesOpen(event.currentTarget.open)}
+        >
           <summary className="flex h-9 cursor-pointer list-none items-center rounded-lg px-2.5 py-1.5 text-[14px] font-medium outline-none transition-all hover:bg-muted hover:opacity-70 focus-visible:ring-3 focus-visible:ring-ring/50 [&::-webkit-details-marker]:hidden">
             服务
             <ChevronDown className="ml-1 size-3 transition-transform group-open:rotate-180" />
@@ -36,6 +61,7 @@ export default function Header() {
               <li key={service.id}>
                 <Link
                   href={`/services/${service.id}`}
+                  onClick={() => setServicesOpen(false)}
                   className="block rounded-md p-2 text-sm font-medium transition-colors hover:bg-muted"
                 >
                   {service.label}

@@ -1,11 +1,14 @@
 import {betterAuth} from "better-auth/minimal";
 import {prismaAdapter} from "better-auth/adapters/prisma";
 import {emailOTP, phoneNumber} from "better-auth/plugins";
+import {Resend} from "resend";
 
 import {prisma} from "@/lib/prisma";
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const resendApiKey = process.env.RESEND_API_KEY;
+const emailFrom = process.env.EMAIL_FROM;
 
 function maskPhoneNumber(phone: string) {
   return `${phone.slice(0, 6)}****${phone.slice(-4)}`;
@@ -16,6 +19,36 @@ function maskEmail(email: string) {
   const visibleLocalPart = localPart.slice(0, 2);
 
   return `${visibleLocalPart}***@${domain}`;
+}
+
+async function sendEmailOtp(email: string, otp: string) {
+  if (!resendApiKey || !emailFrom) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Email provider is not configured");
+    }
+
+    console.info(
+      `[auth] 邮箱验证码 ${maskEmail(email)}：${otp}（5 分钟内有效）`,
+    );
+    return;
+  }
+
+  const resend = new Resend(resendApiKey);
+  const {error} = await resend.emails.send({
+    from: emailFrom,
+    to: email,
+    subject: "跨境服务平台验证码",
+    text: `您的验证码是 ${otp}，5 分钟内有效。请勿将验证码提供给他人。`,
+    html: `<p>您的验证码是 <strong style="font-size: 24px; letter-spacing: 0.12em;">${otp}</strong></p><p>验证码将在 5 分钟后失效。请勿将验证码提供给他人。</p>`,
+  });
+
+  if (error) {
+    console.error("[auth] Resend 邮箱验证码发送失败", {
+      name: error.name,
+      message: error.message,
+    });
+    throw new Error(`Unable to send email OTP: ${error.message}`);
+  }
 }
 
 export const auth = betterAuth({
@@ -46,6 +79,18 @@ export const auth = betterAuth({
       },
     },
   },
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          await prisma.user.update({
+            where: {id: user.id},
+            data: {onboardingRequired: true},
+          });
+        },
+      },
+    },
+  },
   plugins: [
     emailOTP({
       otpLength: 6,
@@ -56,14 +101,8 @@ export const auth = betterAuth({
         window: 60,
         max: 3,
       },
-      sendVerificationOTP: async ({email, otp, type}) => {
-        if (process.env.NODE_ENV === "production") {
-          throw new Error("Email provider is not configured");
-        }
-
-        console.info(
-          `[auth] 邮箱验证码 ${maskEmail(email)}：${otp}（${type}，5 分钟内有效）`,
-        );
+      sendVerificationOTP: async ({email, otp}) => {
+        await sendEmailOtp(email, otp);
       },
     }),
     phoneNumber({

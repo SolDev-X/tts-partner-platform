@@ -2,6 +2,7 @@ import type {Metadata} from "next";
 import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import {AccountOnboardingGuard} from "@/components/account-onboarding-guard";
 
 export const metadata: Metadata = {
   title: "跨境服务平台",
@@ -18,6 +19,7 @@ export default function RootLayout({
     <html lang="zh-CN" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <Header />
+        <AccountOnboardingGuard />
         <main className="flex-1 relative">{children}</main>
         <Footer />
       </body>

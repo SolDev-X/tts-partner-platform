@@ -4,6 +4,7 @@ import {redirect} from "next/navigation";
 
 import {LoginForm} from "@/components/auth/login-form";
 import {auth} from "@/lib/auth";
+import {prisma} from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "登录或注册 | 跨境服务平台",
@@ -16,7 +17,18 @@ export default async function LoginPage() {
   });
 
   if (session) {
-    redirect(session.user.role === "ADMIN" ? "/admin/orders" : "/");
+    if (session.user.role === "ADMIN") {
+      redirect("/admin/orders");
+    }
+
+    const account = await prisma.user.findUnique({
+      where: {id: session.user.id},
+      select: {onboardingRequired: true},
+    });
+
+    if (!account?.onboardingRequired) {
+      redirect("/");
+    }
   }
 
   const phoneAuthEnabled =
@@ -36,6 +48,7 @@ export default async function LoginPage() {
           phoneAuthEnabled={phoneAuthEnabled}
           emailOtpEnabled={emailOtpEnabled}
           googleAuthEnabled={googleAuthEnabled}
+          initialAccountSetup={Boolean(session?.user.role === "CUSTOMER")}
         />
       </div>
     </section>

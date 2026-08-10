@@ -99,43 +99,56 @@ export default async function OrdersPage({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-medium text-muted-foreground">服务中心</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight">我的服务</h1>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight">
+            我的服务
+          </h1>
           <p className="mt-2 text-muted-foreground">
             查看申请进度、待办事项与服务记录。
           </p>
         </div>
-        <Button nativeButton={false} render={<Link href="/#services" />}>
-          浏览服务
-          <ArrowRight />
-        </Button>
       </div>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-3">
-        <Card variant="outline" className={attentionCount ? "border-foreground/20" : undefined}>
+        <Card
+          variant="outline"
+          className={attentionCount ? "border-foreground/20" : undefined}
+        >
           <CardContent className="flex items-start justify-between gap-4 p-5">
             <div>
               <p className="text-sm font-medium">待我处理</p>
-              <p className="mt-1 text-xs text-muted-foreground">需要查看或补充材料</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                需要查看或补充材料
+              </p>
             </div>
-            <span className="text-2xl font-semibold tabular-nums">{attentionCount}</span>
+            <span className="text-2xl font-semibold tabular-nums">
+              {attentionCount}
+            </span>
           </CardContent>
         </Card>
         <Card variant="outline">
           <CardContent className="flex items-start justify-between gap-4 p-5">
             <div>
               <p className="text-sm font-medium">办理中</p>
-              <p className="mt-1 text-xs text-muted-foreground">顾问或平台正在处理</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                正在处理中的订单
+              </p>
             </div>
-            <span className="text-2xl font-semibold tabular-nums">{inProgressCount}</span>
+            <span className="text-2xl font-semibold tabular-nums">
+              {inProgressCount}
+            </span>
           </CardContent>
         </Card>
         <Card variant="outline">
           <CardContent className="flex items-start justify-between gap-4 p-5">
             <div>
               <p className="text-sm font-medium">已完成</p>
-              <p className="mt-1 text-xs text-muted-foreground">已结束的服务申请</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                已结束的服务申请
+              </p>
             </div>
-            <span className="text-2xl font-semibold tabular-nums">{completedCount}</span>
+            <span className="text-2xl font-semibold tabular-nums">
+              {completedCount}
+            </span>
           </CardContent>
         </Card>
       </div>
@@ -197,7 +210,10 @@ export default async function OrdersPage({
                         order.selection,
                       )}
                     </p>
-                    <Badge variant="secondary">
+                    <Badge
+                      variant="outline"
+                      className={orderStatusMeta[order.status].badgeClassName}
+                    >
                       {orderStatusMeta[order.status].label}
                     </Badge>
                   </div>
@@ -212,7 +228,9 @@ export default async function OrdersPage({
                 <Button
                   className="shrink-0"
                   nativeButton={false}
-                  render={<Link href={`/account/orders/${order.orderNumber}`} />}
+                  render={
+                    <Link href={`/account/orders/${order.orderNumber}`} />
+                  }
                 >
                   {getOrderAction(order.status)}
                   <ArrowRight />
@@ -227,7 +245,8 @@ export default async function OrdersPage({
         <div className="mt-6 flex items-start gap-3 rounded-xl border bg-muted/30 p-4 text-sm text-muted-foreground">
           <ClipboardList className="mt-0.5 size-4 shrink-0 text-foreground" />
           <p>
-            您有 {attentionCount} 个订单需要处理。请进入对应订单查看材料要求和顾问说明。
+            您有 {attentionCount}{" "}
+            个订单需要处理。请进入对应订单查看材料要求和顾问说明。
           </p>
         </div>
       )}

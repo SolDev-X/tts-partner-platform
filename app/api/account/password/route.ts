@@ -6,6 +6,7 @@ import {prisma} from "@/lib/prisma";
 
 const passwordSchema = z.object({
   password: z.string().min(8).max(128),
+  companyName: z.string().trim().min(2).max(80),
 });
 
 async function getAuthenticatedUser(request: Request) {
@@ -23,16 +24,25 @@ export async function GET(request: Request) {
     return NextResponse.json({error: "Unauthorized"}, {status: 401});
   }
 
-  const credentialAccount = await prisma.account.findFirst({
-    where: {
-      userId: user.id,
-      providerId: "credential",
-      password: {not: null},
-    },
-    select: {id: true},
-  });
+  const [credentialAccount, account] = await Promise.all([
+    prisma.account.findFirst({
+      where: {
+        userId: user.id,
+        providerId: "credential",
+        password: {not: null},
+      },
+      select: {id: true},
+    }),
+    prisma.user.findUnique({
+      where: {id: user.id},
+      select: {onboardingRequired: true},
+    }),
+  ]);
 
-  return NextResponse.json({hasPassword: Boolean(credentialAccount)});
+  return NextResponse.json({
+    hasPassword: Boolean(credentialAccount),
+    needsOnboarding: Boolean(account?.onboardingRequired),
+  });
 }
 
 export async function POST(request: Request) {
@@ -56,7 +66,12 @@ export async function POST(request: Request) {
     select: {id: true},
   });
 
-  if (credentialAccount) {
+  const account = await prisma.user.findUnique({
+    where: {id: user.id},
+    select: {onboardingRequired: true},
+  });
+
+  if (credentialAccount || !account?.onboardingRequired) {
     return NextResponse.json({error: "Password already set"}, {status: 409});
   }
 
@@ -64,6 +79,14 @@ export async function POST(request: Request) {
     await auth.api.setPassword({
       headers: request.headers,
       body: {newPassword: parsedBody.data.password},
+    });
+
+    await prisma.user.update({
+      where: {id: user.id},
+      data: {
+        name: parsedBody.data.companyName,
+        onboardingRequired: false,
+      },
     });
 
     return NextResponse.json({status: true});

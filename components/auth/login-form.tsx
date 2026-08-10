@@ -16,10 +16,7 @@ import {Separator} from "@/components/ui/separator";
 import {authClient} from "@/lib/auth-client";
 
 const passwordLoginSchema = z.object({
-  identifier: z
-    .string()
-    .trim()
-    .min(1, "请输入邮箱或手机号"),
+  identifier: z.string().trim().min(1, "请输入邮箱或手机号"),
   password: z
     .string()
     .min(8, "密码至少需要 8 位")
@@ -43,6 +40,7 @@ interface LoginFormProps {
   phoneAuthEnabled?: boolean;
   emailOtpEnabled?: boolean;
   googleAuthEnabled?: boolean;
+  initialAccountSetup?: boolean;
 }
 
 async function signInWithPhonePassword(phone: string, password: string) {
@@ -63,6 +61,7 @@ export function LoginForm({
   phoneAuthEnabled = false,
   emailOtpEnabled = false,
   googleAuthEnabled = false,
+  initialAccountSetup = false,
 }: LoginFormProps) {
   const otpAuthEnabled = phoneAuthEnabled || emailOtpEnabled;
   const [identity, setIdentity] = useState<LoginIdentity>("customer");
@@ -97,26 +96,28 @@ export function LoginForm({
 
       <Card className="mt-8" variant="default">
         <CardContent className="space-y-6 px-6 py-7 sm:px-8 sm:py-8">
-          <div className="grid grid-cols-2 rounded-lg bg-muted p-1">
-            <Button
-              type="button"
-              variant={identity === "customer" ? "default" : "ghost"}
-              className="w-full"
-              onClick={() => setIdentity("customer")}
-            >
-              客户登录
-            </Button>
-            <Button
-              type="button"
-              variant={identity === "admin" ? "default" : "ghost"}
-              className="w-full"
-              onClick={() => setIdentity("admin")}
-            >
-              管理员登录
-            </Button>
-          </div>
+          {!initialAccountSetup && (
+            <div className="grid grid-cols-2 rounded-lg bg-muted p-1">
+              <Button
+                type="button"
+                variant={identity === "customer" ? "default" : "ghost"}
+                className="w-full"
+                onClick={() => setIdentity("customer")}
+              >
+                客户登录
+              </Button>
+              <Button
+                type="button"
+                variant={identity === "admin" ? "default" : "ghost"}
+                className="w-full"
+                onClick={() => setIdentity("admin")}
+              >
+                管理员登录
+              </Button>
+            </div>
+          )}
 
-          {identity === "customer" && googleAuthEnabled && (
+          {!initialAccountSetup && identity === "customer" && googleAuthEnabled && (
             <>
               <Button
                 type="button"
@@ -149,7 +150,13 @@ export function LoginForm({
             </>
           )}
 
-          {identity === "admin" ? (
+          {initialAccountSetup ? (
+            <IdentifierOtpFields
+              phoneAuthEnabled={phoneAuthEnabled}
+              emailOtpEnabled={emailOtpEnabled}
+              initialNeedsPassword
+            />
+          ) : identity === "admin" ? (
             <PasswordLoginFields expectedRole="ADMIN" />
           ) : method === "otp" && otpAuthEnabled ? (
             <IdentifierOtpFields
@@ -163,7 +170,7 @@ export function LoginForm({
             />
           )}
 
-          {identity === "customer" && (
+          {!initialAccountSetup && identity === "customer" && (
             <div className="space-y-3 text-center text-sm">
               {otpAuthEnabled && (
                 <Button
@@ -180,7 +187,7 @@ export function LoginForm({
             </div>
           )}
 
-          {identity === "admin" && (
+          {!initialAccountSetup && identity === "admin" && (
             <p className="text-center text-xs leading-5 text-muted-foreground">
               管理员账号由平台指定，不提供注册或验证码登录。
             </p>
@@ -226,11 +233,13 @@ function parseOtpIdentifier(identifier: string): OtpIdentifier | undefined {
 interface IdentifierOtpFieldsProps {
   phoneAuthEnabled: boolean;
   emailOtpEnabled: boolean;
+  initialNeedsPassword?: boolean;
 }
 
 function IdentifierOtpFields({
   phoneAuthEnabled,
   emailOtpEnabled,
+  initialNeedsPassword = false,
 }: IdentifierOtpFieldsProps) {
   const router = useRouter();
   const [identifier, setIdentifier] = useState("");
@@ -240,7 +249,8 @@ function IdentifierOtpFields({
   const [countdown, setCountdown] = useState(0);
   const [isSending, setIsSending] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
-  const [needsPassword, setNeedsPassword] = useState(false);
+  const [needsPassword, setNeedsPassword] = useState(initialNeedsPassword);
+  const [companyName, setCompanyName] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSettingPassword, setIsSettingPassword] = useState(false);
@@ -330,6 +340,23 @@ function IdentifierOtpFields({
       return;
     }
 
+    const roleResponse = await fetch("/api/account/role");
+    if (!roleResponse.ok) {
+      await authClient.signOut();
+      setIsVerifying(false);
+      setError("账户状态检查失败，请重新登录后再试。");
+      return;
+    }
+
+    const roleResult = (await roleResponse.json()) as {role?: string};
+
+    if (roleResult?.role !== "CUSTOMER") {
+      await authClient.signOut();
+      setIsVerifying(false);
+      setError("该账号为管理员，请使用管理员登录入口。");
+      return;
+    }
+
     const passwordStatusResponse = await fetch("/api/account/password");
     if (!passwordStatusResponse.ok) {
       setIsVerifying(false);
@@ -338,11 +365,11 @@ function IdentifierOtpFields({
     }
 
     const passwordStatus = (await passwordStatusResponse.json()) as {
-      hasPassword: boolean;
+      needsOnboarding: boolean;
     };
     setIsVerifying(false);
 
-    if (passwordStatus.hasPassword) {
+    if (!passwordStatus.needsOnboarding) {
       router.push("/");
       router.refresh();
       return;
@@ -355,6 +382,11 @@ function IdentifierOtpFields({
   async function submitPassword(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    if (companyName.trim().length < 2 || companyName.trim().length > 80) {
+      setError("请输入 2 至 80 个字符的公司名称。");
+      return;
+    }
+
     if (password.length < 8 || password.length > 128) {
       setError("密码长度需要为 8 至 128 位。");
       return;
@@ -365,7 +397,7 @@ function IdentifierOtpFields({
     const response = await fetch("/api/account/password", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({password}),
+      body: JSON.stringify({password, companyName: companyName.trim()}),
     });
     setIsSettingPassword(false);
 
@@ -384,6 +416,7 @@ function IdentifierOtpFields({
     setOtp("");
     setCountdown(0);
     setNeedsPassword(false);
+    setCompanyName("");
     setPassword("");
     setError(undefined);
   }
@@ -393,11 +426,24 @@ function IdentifierOtpFields({
       <form onSubmit={submitPassword} noValidate>
         <FieldGroup>
           <div className="space-y-1">
-            <h2 className="text-lg font-semibold">设置登录密码</h2>
+            <h2 className="text-lg font-semibold">完善账户信息</h2>
             <p className="text-sm leading-6 text-muted-foreground">
-              验证码已通过，请为该账户设置登录密码。
+              验证码已通过，请填写公司名称并设置登录密码。
             </p>
           </div>
+
+          <Field data-invalid={Boolean(error)}>
+            <FieldLabel htmlFor="company-name">公司名称</FieldLabel>
+            <Input
+              id="company-name"
+              autoComplete="organization"
+              maxLength={80}
+              placeholder="请输入公司名称"
+              value={companyName}
+              aria-invalid={Boolean(error)}
+              onChange={(event) => setCompanyName(event.target.value)}
+            />
+          </Field>
 
           <Field data-invalid={Boolean(error)}>
             <FieldLabel htmlFor="new-password">密码</FieldLabel>
@@ -442,7 +488,7 @@ function IdentifierOtpFields({
             {isSettingPassword && (
               <LoaderCircle className="animate-spin" aria-hidden="true" />
             )}
-            {isSettingPassword ? "正在设置" : "设置密码并继续"}
+            {isSettingPassword ? "正在保存" : "完成并继续"}
           </Button>
         </FieldGroup>
       </form>
@@ -523,10 +569,6 @@ function IdentifierOtpFields({
               </Button>
             </p>
           </div>
-
-          <p className="text-center text-xs text-muted-foreground">
-            开发验证码请查看服务端终端。
-          </p>
         </FieldGroup>
       </form>
     );
@@ -589,6 +631,7 @@ function PasswordLoginFields({
   onUseOtp?: () => void;
 }) {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
   const form = useForm<PasswordLoginValues>({
     resolver: zodResolver(passwordLoginSchema),
     defaultValues: {
@@ -655,7 +698,9 @@ function PasswordLoginFields({
             autoCapitalize="none"
             spellCheck={false}
             placeholder={
-              expectedRole === "ADMIN" ? "name@example.com" : "请输入手机号或邮箱"
+              expectedRole === "ADMIN"
+                ? "name@example.com"
+                : "请输入手机号或邮箱"
             }
             aria-invalid={Boolean(form.formState.errors.identifier)}
             {...form.register("identifier")}
@@ -665,14 +710,31 @@ function PasswordLoginFields({
 
         <Field data-invalid={Boolean(form.formState.errors.password)}>
           <FieldLabel htmlFor="password">密码</FieldLabel>
-          <Input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            placeholder="请输入密码"
-            aria-invalid={Boolean(form.formState.errors.password)}
-            {...form.register("password")}
-          />
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
+              placeholder="请输入密码"
+              className="pr-11"
+              aria-invalid={Boolean(form.formState.errors.password)}
+              {...form.register("password")}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              className="absolute top-1/2 right-1 -translate-y-1/2 text-muted-foreground"
+              aria-label={showPassword ? "隐藏密码" : "显示密码"}
+              onClick={() => setShowPassword((value) => !value)}
+            >
+              {showPassword ? (
+                <EyeOff aria-hidden="true" />
+              ) : (
+                <Eye aria-hidden="true" />
+              )}
+            </Button>
+          </div>
           <FieldError errors={[form.formState.errors.password]} />
         </Field>
 

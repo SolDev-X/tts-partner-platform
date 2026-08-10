@@ -266,7 +266,10 @@ export default async function AdminOrdersPage({
                       </p>
                     </td>
                     <td className="px-5 py-4">
-                      <Badge variant="secondary">
+                      <Badge
+                        variant="outline"
+                        className={orderStatusMeta[order.status].badgeClassName}
+                      >
                         {orderStatusMeta[order.status].label}
                       </Badge>
                     </td>
@@ -307,7 +310,10 @@ export default async function AdminOrdersPage({
                           order.selection,
                         )}
                       </p>
-                      <Badge variant="secondary" className="shrink-0">
+                      <Badge
+                        variant="outline"
+                        className={`shrink-0 ${orderStatusMeta[order.status].badgeClassName}`}
+                      >
                         {orderStatusMeta[order.status].label}
                       </Badge>
                     </div>

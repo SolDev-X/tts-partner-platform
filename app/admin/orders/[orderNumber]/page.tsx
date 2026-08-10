@@ -67,7 +67,12 @@ export default async function AdminOrderDetailPage({
             {order.serviceLabel} · 订单号：{order.orderNumber}
           </p>
         </div>
-        <Badge variant="secondary">{orderStatusMeta[order.status].label}</Badge>
+        <Badge
+          variant="outline"
+          className={orderStatusMeta[order.status].badgeClassName}
+        >
+          {orderStatusMeta[order.status].label}
+        </Badge>
       </div>
 
       <div className="mt-8 grid gap-4 lg:grid-cols-[1fr_360px]">
