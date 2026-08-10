@@ -3,8 +3,6 @@ import {
   HoverCardTrigger,
   HoverCardContent,
 } from "@/components/ui/hover-card";
-import {Mail} from "lucide-react";
-import {SiWechat} from "@icons-pack/react-simple-icons";
 import Link from "next/link";
 import Image from "next/image";
 
