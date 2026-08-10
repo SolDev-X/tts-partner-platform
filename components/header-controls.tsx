@@ -9,6 +9,7 @@ import {
   LogOut,
   Menu,
   ShoppingBag,
+  UserRound,
 } from "lucide-react";
 
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
@@ -151,6 +152,15 @@ export function HeaderControls() {
                 <Button
                   variant="outline"
                   className="w-full"
+                  nativeButton={false}
+                  render={<Link href="/account" onClick={() => setOpen(false)} />}
+                >
+                  <UserRound />
+                  个人中心
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
                   onClick={handleSignOut}
                   disabled={isSigningOut}
                 >
@@ -253,6 +263,10 @@ function AccountMenu({
             我的订单
           </DropdownMenuItem>
         )}
+        <DropdownMenuItem render={<Link href="/account" />} className="px-2 py-1.5">
+          <UserRound />
+          个人中心
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={onSignOut} disabled={isSigningOut} className="px-2 py-1.5">
           {isSigningOut ? <LoaderCircle className="animate-spin" /> : <LogOut />}

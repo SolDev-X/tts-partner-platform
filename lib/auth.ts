@@ -124,6 +124,10 @@ export const auth = betterAuth({
       expiresIn: 300,
       allowedAttempts: 3,
       storeOTP: "hashed",
+      changeEmail: {
+        enabled: true,
+        verifyCurrentEmail: false,
+      },
       rateLimit: {
         window: 60,
         max: 3,
