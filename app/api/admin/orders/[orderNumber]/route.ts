@@ -2,6 +2,7 @@ import {NextResponse} from "next/server";
 import {z} from "zod";
 
 import {auth} from "@/lib/auth";
+import {logProgressEvent, statusToProgressStep} from "@/lib/order-progress";
 import {prisma} from "@/lib/prisma";
 
 const orderStatusSchema = z.enum([
@@ -39,7 +40,19 @@ export async function PATCH(
   }
 
   const {orderNumber} = await params;
-  const result = await prisma.order.updateMany({
+  const current = await prisma.order.findUnique({
+    where: {orderNumber},
+    select: {id: true, status: true, customerMessage: true},
+  });
+  if (!current) {
+    return NextResponse.json({error: "Order not found"}, {status: 404});
+  }
+
+  const statusChanged = current.status !== body.data.status;
+  const messageChanged =
+    (current.customerMessage ?? "") !== body.data.customerMessage;
+
+  await prisma.order.update({
     where: {orderNumber},
     data: {
       status: body.data.status,
@@ -48,8 +61,16 @@ export async function PATCH(
     },
   });
 
-  if (result.count === 0) {
-    return NextResponse.json({error: "Order not found"}, {status: 404});
+  if (statusChanged || messageChanged) {
+    const step = statusToProgressStep(body.data.status);
+    if (step && body.data.customerMessage) {
+      await logProgressEvent(
+        prisma,
+        current.id,
+        step,
+        body.data.customerMessage,
+      );
+    }
   }
 
   return NextResponse.json({status: true});

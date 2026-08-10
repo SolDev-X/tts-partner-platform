@@ -2,6 +2,7 @@ import {NextResponse} from "next/server";
 import {z} from "zod";
 
 import {auth} from "@/lib/auth";
+import {logProgressEvent} from "@/lib/order-progress";
 import {prisma} from "@/lib/prisma";
 
 const paymentSchema = z.object({
@@ -37,9 +38,7 @@ export async function PATCH(
   }
 
   const amountInCents = parseAmount(body.data.amount, true);
-  const parsedRefundedAmount = parseAmount(
-    body.data.refundedAmount || "0",
-  );
+  const parsedRefundedAmount = parseAmount(body.data.refundedAmount || "0");
   if (amountInCents === undefined || parsedRefundedAmount === undefined) {
     return NextResponse.json(
       {error: "金额应为最多两位小数的非负数字。"},
@@ -47,10 +46,7 @@ export async function PATCH(
     );
   }
   const refundedAmountInCents = parsedRefundedAmount ?? 0;
-  if (
-    amountInCents !== null &&
-    refundedAmountInCents > amountInCents
-  ) {
+  if (amountInCents !== null && refundedAmountInCents > amountInCents) {
     return NextResponse.json(
       {error: "退款金额不能大于订单金额。"},
       {status: 400},
@@ -60,7 +56,7 @@ export async function PATCH(
   const {orderNumber} = await params;
   const current = await prisma.order.findUnique({
     where: {orderNumber},
-    select: {paymentStatus: true, paidAt: true, refundedAt: true},
+    select: {id: true, paymentStatus: true, paidAt: true, refundedAt: true},
   });
   if (!current) {
     return NextResponse.json({error: "Order not found"}, {status: 404});
@@ -77,14 +73,23 @@ export async function PATCH(
       refundedAmountInCents,
       paidAt:
         body.data.paymentStatus === "PAID"
-          ? current.paidAt ?? now
+          ? (current.paidAt ?? now)
           : current.paidAt,
       refundedAt:
         body.data.paymentStatus === "REFUNDED"
-          ? current.refundedAt ?? now
+          ? (current.refundedAt ?? now)
           : null,
     },
   });
+
+  if (body.data.paymentStatus === "PAID" && current.paymentStatus !== "PAID") {
+    await logProgressEvent(
+      prisma,
+      current.id,
+      "PAYMENT_SUCCESS",
+      "客户已完成付款。",
+    );
+  }
 
   return NextResponse.json({status: true});
 }

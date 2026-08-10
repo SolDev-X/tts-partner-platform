@@ -4,6 +4,7 @@ import {z} from "zod";
 import {auth} from "@/lib/auth";
 import {services} from "@/lib/data";
 import {isStringSelection} from "@/lib/order-display";
+import {logProgressEvent} from "@/lib/order-progress";
 import {prisma} from "@/lib/prisma";
 import {matchVariantRule} from "@/lib/utils";
 
@@ -14,9 +15,7 @@ const reviewSchema = z.object({
 
 export async function PATCH(
   request: Request,
-  {
-    params,
-  }: {params: Promise<{orderNumber: string; materialKey: string}>},
+  {params}: {params: Promise<{orderNumber: string; materialKey: string}>},
 ) {
   const session = await auth.api.getSession({headers: request.headers});
   if (!session) {
@@ -75,6 +74,29 @@ export async function PATCH(
       reviewedAt: new Date(),
     },
   });
+
+  if (body.data.status === "APPROVED" && rule?.requiredMaterials?.length) {
+    const allMaterials = await prisma.orderMaterial.findMany({
+      where: {orderId: order.id},
+      select: {key: true, status: true},
+    });
+    const materialMap = new Map(
+      allMaterials.map((item) => [item.key, item.status]),
+    );
+    const allApproved = rule.requiredMaterials.every((_, index) => {
+      const key = `material-${index + 1}`;
+      return materialMap.get(key) === "APPROVED";
+    });
+
+    if (allApproved) {
+      await logProgressEvent(
+        prisma,
+        order.id,
+        "MATERIALS_READY",
+        "客户提交的材料已全部审核通过。",
+      );
+    }
+  }
 
   return NextResponse.json({status: true});
 }

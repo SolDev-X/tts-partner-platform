@@ -2,7 +2,9 @@ import type {Metadata} from "next";
 import {headers} from "next/headers";
 import Link from "next/link";
 import {notFound, redirect} from "next/navigation";
+import {Lock} from "lucide-react";
 
+import {OrderProgressTimeline} from "@/components/orders/order-progress-timeline";
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent} from "@/components/ui/card";
@@ -10,8 +12,10 @@ import {CancelOrderButton} from "@/components/orders/cancel-order-button";
 import {auth} from "@/lib/auth";
 import {services} from "@/lib/data";
 import {getOrderDisplayTitle, isStringSelection} from "@/lib/order-display";
+import {buildOrderTimeline} from "@/lib/order-progress";
 import {orderStatusMeta} from "@/lib/order-status";
 import {prisma} from "@/lib/prisma";
+import {matchVariantRule} from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "订单详情 | 跨境服务平台",
@@ -36,7 +40,26 @@ export default async function OrderDetailPage({
       selection: true,
       status: true,
       customerMessage: true,
+      paymentStatus: true,
+      paidAt: true,
+      deliveryDescription: true,
+      deliveryInvitationCode: true,
+      deliveryStoreNumber: true,
+      deliveryFileName: true,
+      deliveryCompletedAt: true,
+      deliveryVisibleAfterPayment: true,
       createdAt: true,
+      materials: {
+        select: {status: true, reviewedAt: true},
+      },
+      progressEvents: {
+        orderBy: {createdAt: "asc"},
+        select: {
+          step: true,
+          description: true,
+          createdAt: true,
+        },
+      },
     },
   });
 
@@ -51,7 +74,30 @@ export default async function OrderDetailPage({
     const option = group.options.find((item) => item.id === value);
     return [{title: group.title, value: option?.name ?? value}];
   });
+  const variantRule = service
+    ? matchVariantRule(service.variantRules ?? [], selection)
+    : null;
   const status = orderStatusMeta[order.status];
+
+  const timelineSteps = buildOrderTimeline({
+    status: order.status,
+    createdAt: order.createdAt,
+    paidAt: order.paidAt,
+    paymentStatus: order.paymentStatus,
+    deliveryCompletedAt: order.deliveryCompletedAt,
+    materials: order.materials,
+    requiredMaterialCount: variantRule?.requiredMaterials?.length ?? 0,
+    progressEvents: order.progressEvents,
+  });
+
+  const hasDeliveryContent = Boolean(
+    order.deliveryDescription ||
+    order.deliveryInvitationCode ||
+    order.deliveryStoreNumber ||
+    order.deliveryFileName,
+  );
+  const deliveryLocked =
+    order.deliveryVisibleAfterPayment && order.paymentStatus !== "PAID";
 
   return (
     <section className="container mx-auto max-w-3xl px-4 py-12 md:py-16">
@@ -91,10 +137,13 @@ export default async function OrderDetailPage({
       <div className="mt-8 space-y-4">
         <Card variant="outline">
           <CardContent className="p-5">
-            <h2 className="font-semibold">当前进度</h2>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            <h2 className="font-semibold">办理进度</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
               {status.nextStep}
             </p>
+            <div className="mt-5">
+              <OrderProgressTimeline steps={timelineSteps} compact />
+            </div>
           </CardContent>
         </Card>
 
@@ -105,6 +154,60 @@ export default async function OrderDetailPage({
               <p className="mt-3 text-sm leading-6 text-muted-foreground whitespace-pre-line">
                 {order.customerMessage}
               </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {hasDeliveryContent && (
+          <Card variant="outline">
+            <CardContent className="p-5">
+              <h2 className="font-semibold">服务交付</h2>
+              {deliveryLocked ? (
+                <div className="mt-4 flex items-start gap-3 rounded-lg border border-dashed bg-muted/30 p-4 text-sm text-muted-foreground">
+                  <Lock className="mt-0.5 size-4 shrink-0" />
+                  <p>交付结果包含敏感信息，完成付款后可查看。</p>
+                </div>
+              ) : (
+                <div className="mt-4 space-y-4 text-sm">
+                  {order.deliveryDescription && (
+                    <p className="leading-6 text-muted-foreground whitespace-pre-line">
+                      {order.deliveryDescription}
+                    </p>
+                  )}
+                  {(order.deliveryInvitationCode ||
+                    order.deliveryStoreNumber) && (
+                    <dl className="grid gap-3 rounded-lg bg-muted/40 p-4 sm:grid-cols-2">
+                      {order.deliveryInvitationCode && (
+                        <div>
+                          <dt className="text-muted-foreground">邀请码</dt>
+                          <dd className="mt-1 font-medium">
+                            {order.deliveryInvitationCode}
+                          </dd>
+                        </div>
+                      )}
+                      {order.deliveryStoreNumber && (
+                        <div>
+                          <dt className="text-muted-foreground">店铺编号</dt>
+                          <dd className="mt-1 font-medium">
+                            {order.deliveryStoreNumber}
+                          </dd>
+                        </div>
+                      )}
+                    </dl>
+                  )}
+                  {order.deliveryFileName && (
+                    <p className="text-muted-foreground">
+                      结果文件：{order.deliveryFileName}
+                    </p>
+                  )}
+                  {order.deliveryCompletedAt && (
+                    <p className="text-xs text-muted-foreground">
+                      完成时间：
+                      {order.deliveryCompletedAt.toLocaleString("zh-CN")}
+                    </p>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
