@@ -19,10 +19,11 @@ export const metadata: Metadata = {
 };
 
 const activeOrderStatuses: OrderStatus[] = [
+  "PENDING_PAYMENT",
   "PENDING_CONFIRMATION",
-  "PROCESSING",
   "WAITING_FOR_CUSTOMER",
-  "UNDER_REVIEW",
+  "PROCESSING",
+  "REFUNDING",
 ];
 
 const orderFilters = [
@@ -33,8 +34,9 @@ const orderFilters = [
 ] as const;
 
 function getOrderAction(status: OrderStatus) {
+  if (status === "PENDING_PAYMENT") return "前往付款";
   if (status === "WAITING_FOR_CUSTOMER") return "查看材料要求";
-  if (status === "PENDING_CONFIRMATION" || status === "UNDER_REVIEW") {
+  if (status === "PENDING_CONFIRMATION") {
     return "查看进度";
   }
   return "查看详情";
@@ -89,16 +91,16 @@ export default async function OrdersPage({
   );
   const attentionCount = statusCounts.get("WAITING_FOR_CUSTOMER") ?? 0;
   const inProgressCount =
+    (statusCounts.get("PENDING_PAYMENT") ?? 0) +
     (statusCounts.get("PENDING_CONFIRMATION") ?? 0) +
     (statusCounts.get("PROCESSING") ?? 0) +
-    (statusCounts.get("UNDER_REVIEW") ?? 0);
+    (statusCounts.get("REFUNDING") ?? 0);
   const completedCount = statusCounts.get("COMPLETED") ?? 0;
 
   return (
     <section className="container mx-auto max-w-6xl px-4 py-10 md:py-14">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-medium text-muted-foreground">服务中心</p>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight">
             我的服务
           </h1>

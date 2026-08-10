@@ -4,6 +4,8 @@ import Link from "next/link";
 import {notFound, redirect} from "next/navigation";
 
 import {OrderEditor} from "@/components/admin/order-editor";
+import {MaterialReview} from "@/components/admin/material-review";
+import {PaymentEditor} from "@/components/admin/payment-editor";
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent} from "@/components/ui/card";
@@ -12,6 +14,7 @@ import {services} from "@/lib/data";
 import {getOrderDisplayTitle, isStringSelection} from "@/lib/order-display";
 import {orderStatusMeta} from "@/lib/order-status";
 import {prisma} from "@/lib/prisma";
+import {matchVariantRule} from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "管理订单详情 | 跨境服务平台",
@@ -30,6 +33,7 @@ export default async function AdminOrderDetailPage({
   const order = await prisma.order.findUnique({
     where: {orderNumber},
     select: {
+      id: true,
       orderNumber: true,
       serviceId: true,
       serviceLabel: true,
@@ -37,7 +41,26 @@ export default async function AdminOrderDetailPage({
       status: true,
       customerMessage: true,
       adminNote: true,
+      amountInCents: true,
+      paymentStatus: true,
+      paymentChannel: true,
+      transactionId: true,
+      paidAt: true,
+      refundedAmountInCents: true,
+      refundedAt: true,
       createdAt: true,
+      materials: {
+        orderBy: {createdAt: "asc"},
+        select: {
+          key: true,
+          label: true,
+          status: true,
+          fileName: true,
+          customerNote: true,
+          adminFeedback: true,
+          submittedAt: true,
+        },
+      },
       user: {select: {name: true, email: true, phoneNumber: true}},
     },
   });
@@ -51,64 +74,151 @@ export default async function AdminOrderDetailPage({
     const option = group.options.find((item) => item.id === value);
     return [{title: group.title, value: option?.name ?? value}];
   });
+  const variantRule = service
+    ? matchVariantRule(service.variantRules ?? [], selection)
+    : null;
+  const savedMaterials = new Map(
+    order.materials.map((material) => [material.key, material]),
+  );
+  const materials = (variantRule?.requiredMaterials ?? []).map(
+    (label, index) => {
+      const key = `material-${index + 1}`;
+      return (
+        savedMaterials.get(key) ?? {
+          key,
+          label,
+          status: "PENDING" as const,
+          fileName: null,
+          customerNote: null,
+          adminFeedback: null,
+          submittedAt: null,
+        }
+      );
+    },
+  );
 
   return (
-    <section className="container mx-auto max-w-5xl px-4 py-12 md:py-16">
-      <Button variant="ghost" className="-ml-3" nativeButton={false} render={<Link href="/admin/orders" />}>
+    <section className="container mx-auto max-w-6xl px-4 py-10 md:py-14">
+      <Button
+        variant="ghost"
+        size="sm"
+        className="-ml-3 text-muted-foreground hover:text-foreground"
+        nativeButton={false}
+        render={<Link href="/admin/orders" />}
+      >
         返回订单管理
       </Button>
 
-      <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">
+      <div className="mt-5">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
             {getOrderDisplayTitle(order.serviceId, order.serviceLabel, order.selection)}
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {order.serviceLabel} · 订单号：{order.orderNumber}
-          </p>
+          <Badge
+            variant="outline"
+            className={orderStatusMeta[order.status].badgeClassName}
+          >
+            {orderStatusMeta[order.status].label}
+          </Badge>
         </div>
-        <Badge
-          variant="outline"
-          className={orderStatusMeta[order.status].badgeClassName}
-        >
-          {orderStatusMeta[order.status].label}
-        </Badge>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {order.serviceLabel}
+            <span className="mx-2 text-border">/</span>
+            订单号：{order.orderNumber}
+            <span className="mx-2 text-border">/</span>
+            {order.createdAt.toLocaleDateString("zh-CN")}
+          </p>
       </div>
 
-      <div className="mt-8 grid gap-4 lg:grid-cols-[1fr_360px]">
-        <div className="space-y-4">
+      <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="min-w-0 space-y-6">
           <Card variant="outline">
-            <CardContent className="p-5">
-              <h2 className="font-semibold">客户信息</h2>
-              <dl className="mt-4 space-y-3 text-sm">
-                <div className="flex justify-between gap-4"><dt className="text-muted-foreground">账户</dt><dd>{order.user.name || "未设置名称"}</dd></div>
-                <div className="flex justify-between gap-4"><dt className="text-muted-foreground">邮箱</dt><dd>{order.user.email}</dd></div>
-                {order.user.phoneNumber && <div className="flex justify-between gap-4"><dt className="text-muted-foreground">手机号</dt><dd>{order.user.phoneNumber}</dd></div>}
+            <CardContent className="p-0">
+              <div className="border-b px-5 py-4">
+                <h2 className="font-semibold">客户信息</h2>
+              </div>
+              <dl className="grid gap-x-8 gap-y-5 px-5 py-5 text-sm sm:grid-cols-2">
+                <div>
+                  <dt className="text-muted-foreground">公司名称</dt>
+                  <dd className="mt-1.5 font-medium">
+                    {order.user.name || "未设置名称"}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">邮箱</dt>
+                  <dd className="mt-1.5 break-all font-medium">
+                    {order.user.email}
+                  </dd>
+                </div>
+                {order.user.phoneNumber && (
+                  <div>
+                    <dt className="text-muted-foreground">手机号</dt>
+                    <dd className="mt-1.5 font-medium">
+                      {order.user.phoneNumber}
+                    </dd>
+                  </div>
+                )}
               </dl>
             </CardContent>
           </Card>
 
           <Card variant="outline">
-            <CardContent className="p-5">
-              <h2 className="font-semibold">客户所选方案</h2>
-              <dl className="mt-4 divide-y">
+            <CardContent className="p-0">
+              <div className="border-b px-5 py-4">
+                <h2 className="font-semibold">客户所选方案</h2>
+              </div>
+              <dl className="divide-y px-5">
                 {selectedOptions.map((item) => (
-                  <div key={item.title} className="flex flex-col gap-1 py-3 text-sm sm:flex-row sm:justify-between">
+                  <div
+                    key={item.title}
+                    className="flex flex-col gap-1 py-4 text-sm sm:flex-row sm:items-center sm:justify-between sm:gap-6"
+                  >
                     <dt className="text-muted-foreground">{item.title}</dt>
-                    <dd className="font-medium">{item.value}</dd>
+                    <dd className="font-medium sm:max-w-[65%] sm:text-right">
+                      {item.value}
+                    </dd>
                   </div>
                 ))}
               </dl>
-              <p className="mt-4 text-sm text-muted-foreground">
-                创建时间：{order.createdAt.toLocaleString("zh-CN")}
-              </p>
+            </CardContent>
+          </Card>
+
+          <Card variant="outline">
+            <CardContent className="p-5">
+              <PaymentEditor
+                orderNumber={order.orderNumber}
+                amountInCents={order.amountInCents}
+                paymentStatus={order.paymentStatus}
+                paymentChannel={order.paymentChannel}
+                transactionId={order.transactionId}
+                refundedAmountInCents={order.refundedAmountInCents}
+                paidAt={order.paidAt?.toISOString() ?? null}
+                refundedAt={order.refundedAt?.toISOString() ?? null}
+              />
+            </CardContent>
+          </Card>
+
+          <Card variant="outline">
+            <CardContent className="p-5">
+              <MaterialReview
+                orderNumber={order.orderNumber}
+                materials={materials.map((material) => ({
+                  ...material,
+                  submittedAt: material.submittedAt?.toISOString() ?? null,
+                }))}
+              />
             </CardContent>
           </Card>
         </div>
 
-        <Card variant="outline" className="h-fit">
+        <Card variant="outline" className="h-fit lg:sticky lg:top-24">
           <CardContent className="p-5">
-            <h2 className="mb-5 font-semibold">处理订单</h2>
+            <div className="mb-5 border-b pb-4">
+              <h2 className="font-semibold">处理订单</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                更新办理进度和客户可见说明。
+              </p>
+            </div>
             <OrderEditor
               orderNumber={order.orderNumber}
               status={order.status}

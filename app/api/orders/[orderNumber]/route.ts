@@ -17,7 +17,7 @@ export async function DELETE(
     where: {
       orderNumber,
       userId: session.user.id,
-      status: "PENDING_CONFIRMATION",
+      status: {in: ["PENDING_PAYMENT", "PENDING_CONFIRMATION"]},
     },
     data: {status: "CANCELLED"},
   });

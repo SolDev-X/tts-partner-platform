@@ -5,12 +5,14 @@ import {auth} from "@/lib/auth";
 import {prisma} from "@/lib/prisma";
 
 const orderStatusSchema = z.enum([
+  "PENDING_PAYMENT",
   "PENDING_CONFIRMATION",
-  "PROCESSING",
   "WAITING_FOR_CUSTOMER",
-  "UNDER_REVIEW",
+  "PROCESSING",
   "COMPLETED",
   "CANCELLED",
+  "REFUNDING",
+  "REFUNDED",
 ]);
 
 const updateOrderSchema = z.object({

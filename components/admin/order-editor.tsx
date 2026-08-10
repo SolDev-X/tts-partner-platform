@@ -9,10 +9,20 @@ import {Textarea} from "@/components/ui/textarea";
 import {orderStatusMeta} from "@/lib/order-status";
 import type {OrderStatus} from "@/lib/generated/prisma";
 
-const statusOptions = Object.entries(orderStatusMeta) as [
-  OrderStatus,
-  (typeof orderStatusMeta)[OrderStatus],
-][];
+const statusOrder: OrderStatus[] = [
+  "PENDING_PAYMENT",
+  "PENDING_CONFIRMATION",
+  "WAITING_FOR_CUSTOMER",
+  "PROCESSING",
+  "COMPLETED",
+  "CANCELLED",
+  "REFUNDING",
+  "REFUNDED",
+];
+
+const statusOptions = statusOrder.map(
+  (status) => [status, orderStatusMeta[status]] as const,
+);
 
 export function OrderEditor({
   orderNumber,

@@ -404,12 +404,7 @@ export const services: Service[] = [
     variantRules: [
       {
         match: {mode: "multiWarehouse"},
-        requiredMaterials: [
-          "店铺主体名称",
-          "店铺主营类目",
-          "店铺 code",
-          "shop id",
-        ],
+        requiredMaterials: ["店铺主体名称", "店铺主营类目", "code", "shop id"],
         eligibility:
           "仅支持已是跨境直邮模式的商家升级为一品多仓（海外仓混发）；欧盟、英国站点需具备仓储国 VAT 税号方可发货，日本站点无此要求。",
         serviceContent: [
@@ -426,12 +421,7 @@ export const services: Service[] = [
       },
       {
         match: {mode: "category"},
-        requiredMaterials: [
-          "店铺主体名称",
-          "店铺主营类目",
-          "店铺 code",
-          "shop id",
-        ],
+        requiredMaterials: ["店铺主体名称", "店铺主营类目", "code", "shop id"],
         serviceContent: [
           "核验全类目权限申请条件及材料",
           "协助完成权限开通申请与材料提交",

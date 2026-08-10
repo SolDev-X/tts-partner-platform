@@ -23,7 +23,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {Sheet, SheetContent, SheetTitle, SheetTrigger} from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {authClient} from "@/lib/auth-client";
 import {services} from "@/lib/data";
 
@@ -78,7 +83,10 @@ export function HeaderControls() {
             </Button>
           }
         />
-        <SheetContent side="right" className="flex w-[300px] flex-col p-0 sm:w-[340px]">
+        <SheetContent
+          side="right"
+          className="flex w-[300px] flex-col p-0 sm:w-[340px]"
+        >
           <div className="flex items-center justify-between border-b px-6 py-5">
             <SheetTitle className="text-lg font-semibold">菜单</SheetTitle>
           </div>
@@ -120,12 +128,16 @@ export function HeaderControls() {
               <div className="space-y-3">
                 <div className="flex items-center gap-3 px-2">
                   <Avatar>
-                    {user.image && <AvatarImage src={user.image} alt={user.name} />}
+                    {user.image && (
+                      <AvatarImage src={user.image} alt={user.name} />
+                    )}
                     <AvatarFallback>{initials}</AvatarFallback>
                   </Avatar>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium">{user.name}</p>
-                    <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {user.email}
+                    </p>
                   </div>
                 </div>
                 {isAdmin ? (
@@ -133,7 +145,12 @@ export function HeaderControls() {
                     variant="outline"
                     className="w-full"
                     nativeButton={false}
-                    render={<Link href="/admin/orders" onClick={() => setOpen(false)} />}
+                    render={
+                      <Link
+                        href="/admin/orders"
+                        onClick={() => setOpen(false)}
+                      />
+                    }
                   >
                     <ShoppingBag />
                     订单管理
@@ -143,7 +160,12 @@ export function HeaderControls() {
                     variant="outline"
                     className="w-full"
                     nativeButton={false}
-                    render={<Link href="/account/orders" onClick={() => setOpen(false)} />}
+                    render={
+                      <Link
+                        href="/account/orders"
+                        onClick={() => setOpen(false)}
+                      />
+                    }
                   >
                     <ShoppingBag />
                     我的订单
@@ -153,10 +175,12 @@ export function HeaderControls() {
                   variant="outline"
                   className="w-full"
                   nativeButton={false}
-                  render={<Link href="/account" onClick={() => setOpen(false)} />}
+                  render={
+                    <Link href="/account" onClick={() => setOpen(false)} />
+                  }
                 >
                   <UserRound />
-                  个人中心
+                  账户设置
                 </Button>
                 <Button
                   variant="outline"
@@ -164,7 +188,11 @@ export function HeaderControls() {
                   onClick={handleSignOut}
                   disabled={isSigningOut}
                 >
-                  {isSigningOut ? <LoaderCircle className="animate-spin" /> : <LogOut />}
+                  {isSigningOut ? (
+                    <LoaderCircle className="animate-spin" />
+                  ) : (
+                    <LogOut />
+                  )}
                   {isSigningOut ? "正在退出" : "退出登录"}
                 </Button>
               </div>
@@ -247,29 +275,48 @@ function AccountMenu({
       <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuGroup>
           <DropdownMenuLabel className="px-2 py-1.5 font-normal">
-            <span className="block truncate text-sm font-medium text-foreground">{user.name}</span>
+            <span className="block truncate text-sm font-medium text-foreground">
+              {user.name}
+            </span>
             <span className="block truncate text-xs">{user.email}</span>
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         {isAdmin ? (
-          <DropdownMenuItem render={<Link href="/admin/orders" />} className="px-2 py-1.5">
+          <DropdownMenuItem
+            render={<Link href="/admin/orders" />}
+            className="px-2 py-1.5"
+          >
             <ShoppingBag />
             订单管理
           </DropdownMenuItem>
         ) : (
-          <DropdownMenuItem render={<Link href="/account/orders" />} className="px-2 py-1.5">
+          <DropdownMenuItem
+            render={<Link href="/account/orders" />}
+            className="px-2 py-1.5"
+          >
             <ShoppingBag />
             我的订单
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem render={<Link href="/account" />} className="px-2 py-1.5">
+        <DropdownMenuItem
+          render={<Link href="/account" />}
+          className="px-2 py-1.5"
+        >
           <UserRound />
-          个人中心
+          账户设置
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onSignOut} disabled={isSigningOut} className="px-2 py-1.5">
-          {isSigningOut ? <LoaderCircle className="animate-spin" /> : <LogOut />}
+        <DropdownMenuItem
+          onClick={onSignOut}
+          disabled={isSigningOut}
+          className="px-2 py-1.5"
+        >
+          {isSigningOut ? (
+            <LoaderCircle className="animate-spin" />
+          ) : (
+            <LogOut />
+          )}
           {isSigningOut ? "正在退出" : "退出登录"}
         </DropdownMenuItem>
       </DropdownMenuContent>

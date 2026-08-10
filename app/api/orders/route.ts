@@ -79,7 +79,8 @@ export async function POST(request: Request) {
     ]),
   );
 
-  if (!matchVariantRule(service.variantRules ?? [], selection)) {
+  const variantRule = matchVariantRule(service.variantRules ?? [], selection);
+  if (!variantRule) {
     return NextResponse.json({error: "No plan available"}, {status: 422});
   }
 
@@ -90,6 +91,13 @@ export async function POST(request: Request) {
       serviceId: service.id,
       serviceLabel: service.label,
       selection,
+      status: "PENDING_PAYMENT",
+      materials: {
+        create: (variantRule.requiredMaterials ?? []).map((label, index) => ({
+          key: `material-${index + 1}`,
+          label,
+        })),
+      },
     },
     select: {id: true, orderNumber: true},
   });

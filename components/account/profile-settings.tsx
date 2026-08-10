@@ -14,12 +14,7 @@ import {useRouter} from "next/navigation";
 import {useState} from "react";
 
 import {Button} from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -94,7 +89,10 @@ export function ProfileSettings({
     if (!bindingType) return;
     setBindingError(undefined);
 
-    const value = bindingType === "phone" ? normalizePhone(bindingValue) : bindingValue.trim().toLowerCase();
+    const value =
+      bindingType === "phone"
+        ? normalizePhone(bindingValue)
+        : bindingValue.trim().toLowerCase();
     if (bindingType === "phone" && !/^\+861[3-9]\d{9}$/.test(value)) {
       setBindingError("请输入有效的中国大陆手机号。");
       return;
@@ -234,7 +232,7 @@ export function ProfileSettings({
       <aside className="lg:sticky lg:top-6">
         <nav
           className="flex gap-1 overflow-x-auto rounded-xl bg-muted p-1 lg:flex-col lg:overflow-visible"
-          aria-label="个人中心导航"
+          aria-label="账户设置导航"
         >
           <Button
             type="button"
@@ -440,7 +438,11 @@ export function ProfileSettings({
                     id="binding-value"
                     inputMode={bindingType === "phone" ? "tel" : "email"}
                     autoComplete={bindingType === "phone" ? "tel" : "email"}
-                    placeholder={bindingType === "phone" ? "请输入中国大陆手机号" : "name@example.com"}
+                    placeholder={
+                      bindingType === "phone"
+                        ? "请输入中国大陆手机号"
+                        : "name@example.com"
+                    }
                     value={bindingValue}
                     onChange={(event) => setBindingValue(event.target.value)}
                     aria-invalid={Boolean(bindingError)}
@@ -449,7 +451,12 @@ export function ProfileSettings({
                 </Field>
                 <DialogFooter>
                   <Button type="submit" disabled={isBinding}>
-                    {isBinding && <LoaderCircle className="animate-spin" aria-hidden="true" />}
+                    {isBinding && (
+                      <LoaderCircle
+                        className="animate-spin"
+                        aria-hidden="true"
+                      />
+                    )}
                     发送验证码
                   </Button>
                 </DialogFooter>
@@ -467,17 +474,29 @@ export function ProfileSettings({
                     maxLength={6}
                     placeholder="请输入 6 位验证码"
                     value={bindingCode}
-                    onChange={(event) => setBindingCode(event.target.value.replace(/\D/g, ""))}
+                    onChange={(event) =>
+                      setBindingCode(event.target.value.replace(/\D/g, ""))
+                    }
                     aria-invalid={Boolean(bindingError)}
                   />
                   <FieldError>{bindingError}</FieldError>
                 </Field>
                 <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setBindingStep("input")} disabled={isBinding}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setBindingStep("input")}
+                    disabled={isBinding}
+                  >
                     返回修改
                   </Button>
                   <Button type="submit" disabled={isBinding}>
-                    {isBinding && <LoaderCircle className="animate-spin" aria-hidden="true" />}
+                    {isBinding && (
+                      <LoaderCircle
+                        className="animate-spin"
+                        aria-hidden="true"
+                      />
+                    )}
                     确认绑定
                   </Button>
                 </DialogFooter>

@@ -20,10 +20,11 @@ export const metadata: Metadata = {
 };
 
 const activeOrderStatuses: OrderStatus[] = [
+  "PENDING_PAYMENT",
   "PENDING_CONFIRMATION",
-  "PROCESSING",
   "WAITING_FOR_CUSTOMER",
-  "UNDER_REVIEW",
+  "PROCESSING",
+  "REFUNDING",
 ];
 
 const orderFilters = [
@@ -36,10 +37,10 @@ const orderFilters = [
 type OrderFilter = (typeof orderFilters)[number]["id"];
 
 type SummaryStatus =
+  | "PENDING_PAYMENT"
   | "PENDING_CONFIRMATION"
   | "PROCESSING"
-  | "WAITING_FOR_CUSTOMER"
-  | "UNDER_REVIEW";
+  | "WAITING_FOR_CUSTOMER";
 
 const summaryCards: Array<{
   status: SummaryStatus;
@@ -47,17 +48,21 @@ const summaryCards: Array<{
   description: string;
 }> = [
   {
+    status: "PENDING_PAYMENT",
+    label: "待付款",
+    description: "等待客户完成付款",
+  },
+  {
     status: "PENDING_CONFIRMATION",
     label: "待确认",
     description: "等待首次确认的订单",
   },
-  {status: "PROCESSING", label: "处理中", description: "正在推进的服务"},
+  {status: "PROCESSING", label: "办理中", description: "正在推进的服务"},
   {
     status: "WAITING_FOR_CUSTOMER",
     label: "待补材料",
     description: "等待客户补充材料",
   },
-  {status: "UNDER_REVIEW", label: "审核中", description: "平台审核中的订单"},
 ];
 
 function getFilterHref(filter: OrderFilter, query: string) {
@@ -140,22 +145,21 @@ export default async function AdminOrdersPage({
     <section className="container mx-auto max-w-6xl px-4 py-10 md:py-14">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-medium text-muted-foreground">业务工作台</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight">订单管理</h1>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight">
+            业务工作台
+          </h1>
           <p className="mt-2 text-muted-foreground">
             集中处理客户申请、材料补充与办理进度。
           </p>
         </div>
-        <p className="text-sm text-muted-foreground">共 {orders.length} 个匹配订单</p>
+        <p className="text-sm text-muted-foreground">
+          共 {orders.length} 个匹配订单
+        </p>
       </div>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {summaryCards.map((item) => (
-          <Card
-            key={item.status}
-            variant="outline"
-            className="h-full"
-          >
+          <Card key={item.status} variant="outline" className="h-full">
             <CardContent className="flex items-start justify-between gap-4 p-5">
               <div>
                 <p className="text-sm font-medium">{item.label}</p>
@@ -172,7 +176,10 @@ export default async function AdminOrdersPage({
       </div>
 
       <div className="mt-8 rounded-xl border bg-card p-3 sm:p-4">
-        <form className="flex flex-col gap-3 sm:flex-row" action="/admin/orders">
+        <form
+          className="flex flex-col gap-3 sm:flex-row"
+          action="/admin/orders"
+        >
           {activeFilter !== "active" && (
             <input type="hidden" name="status" value={activeFilter} />
           )}
@@ -243,7 +250,10 @@ export default async function AdminOrdersPage({
               </thead>
               <tbody className="divide-y">
                 {orders.map((order) => (
-                  <tr key={order.id} className="transition-colors hover:bg-muted/30">
+                  <tr
+                    key={order.id}
+                    className="transition-colors hover:bg-muted/30"
+                  >
                     <td className="px-5 py-4">
                       <Link
                         href={`/admin/orders/${order.orderNumber}`}
@@ -281,7 +291,9 @@ export default async function AdminOrdersPage({
                         variant="ghost"
                         size="sm"
                         nativeButton={false}
-                        render={<Link href={`/admin/orders/${order.orderNumber}`} />}
+                        render={
+                          <Link href={`/admin/orders/${order.orderNumber}`} />
+                        }
                       >
                         查看
                         <ArrowUpRight />
@@ -300,7 +312,10 @@ export default async function AdminOrdersPage({
                 href={`/admin/orders/${order.orderNumber}`}
                 className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <Card variant="outline" className="transition-colors hover:bg-muted/40">
+                <Card
+                  variant="outline"
+                  className="transition-colors hover:bg-muted/40"
+                >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-3">
                       <p className="font-medium">

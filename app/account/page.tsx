@@ -7,7 +7,7 @@ import {auth} from "@/lib/auth";
 import {prisma} from "@/lib/prisma";
 
 export const metadata: Metadata = {
-  title: "个人中心 | 跨境服务平台",
+  title: "账户设置 | 跨境服务平台",
   description: "管理您的跨境服务平台账户信息和登录密码。",
 };
 
@@ -42,7 +42,9 @@ export default async function AccountPage() {
     <section className="bg-muted/30 py-12 md:py-16">
       <div className="container mx-auto max-w-5xl px-4">
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">个人中心</h1>
+          <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+            账户设置
+          </h1>
           <p className="mt-2 text-muted-foreground">管理账户信息与登录安全。</p>
         </div>
         <ProfileSettings {...user} hasPassword={Boolean(credentialAccount)} />

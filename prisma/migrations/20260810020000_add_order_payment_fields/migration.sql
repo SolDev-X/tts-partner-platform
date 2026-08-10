@@ -1,0 +1,11 @@
+CREATE TYPE "PaymentStatus" AS ENUM ('UNPAID', 'PAID', 'REFUNDING', 'REFUNDED');
+
+ALTER TABLE "Order"
+ADD COLUMN "amountInCents" INTEGER,
+ADD COLUMN "currency" TEXT NOT NULL DEFAULT 'CNY',
+ADD COLUMN "paymentStatus" "PaymentStatus" NOT NULL DEFAULT 'UNPAID',
+ADD COLUMN "paymentChannel" TEXT,
+ADD COLUMN "transactionId" TEXT,
+ADD COLUMN "paidAt" TIMESTAMP(3),
+ADD COLUMN "refundedAmountInCents" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN "refundedAt" TIMESTAMP(3);

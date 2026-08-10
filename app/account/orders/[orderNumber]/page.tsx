@@ -81,7 +81,8 @@ export default async function OrderDetailPage({
           <Badge variant="outline" className={status.badgeClassName}>
             {status.label}
           </Badge>
-          {order.status === "PENDING_CONFIRMATION" && (
+          {(order.status === "PENDING_PAYMENT" ||
+            order.status === "PENDING_CONFIRMATION") && (
             <CancelOrderButton orderNumber={order.orderNumber} />
           )}
         </div>
