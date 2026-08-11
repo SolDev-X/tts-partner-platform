@@ -55,6 +55,19 @@ enum ProgressStep {
   COMPLETED
 }
 
+enum DeliveryStatus {
+  DRAFT
+  PUBLISHED
+  REVISION_REQUESTED
+  CONFIRMED
+}
+
+enum DeliveryEventType {
+  PUBLISHED
+  REVISION_REQUESTED
+  CONFIRMED
+}
+
 model User {
   id            String  @id @default(cuid())
   name          String?
@@ -74,38 +87,54 @@ model User {
 }
 
 model Order {
-  id                    String          @id @default(cuid())
-  orderNumber           String          @unique
-  userId                String
-  serviceId             String
-  serviceLabel          String
-  selection             Json
-  status                OrderStatus     @default(PENDING_PAYMENT)
-  customerNote          String?
-  customerMessage       String?
-  adminNote             String?
-  amountInCents         Int?
-  currency              String          @default("CNY")
-  paymentStatus         PaymentStatus   @default(UNPAID)
-  paymentChannel        String?
-  transactionId         String?
-  paidAt                DateTime?
-  refundedAmountInCents Int             @default(0)
-  refundedAt            DateTime?
+  id                          String               @id @default(cuid())
+  orderNumber                 String               @unique
+  userId                      String
+  serviceId                   String
+  serviceLabel                String
+  selection                   Json
+  status                      OrderStatus          @default(PENDING_PAYMENT)
+  customerNote                String?
+  customerMessage             String?
+  amountInCents               Int?
+  currency                    String               @default("CNY")
+  paymentStatus               PaymentStatus        @default(UNPAID)
+  paymentChannel              String?
+  transactionId               String?
+  paidAt                      DateTime?
+  refundedAmountInCents       Int                  @default(0)
+  refundedAt                  DateTime?
   deliveryDescription         String?
   deliveryInvitationCode      String?
   deliveryStoreNumber         String?
   deliveryFileName            String?
+  deliveryData                Json?
+  deliveryStatus              DeliveryStatus       @default(DRAFT)
+  deliveryPublishedAt         DateTime?
+  deliveryConfirmedAt         DateTime?
+  deliveryRevisionNote        String?
   deliveryCompletedAt         DateTime?
-  deliveryVisibleAfterPayment Boolean         @default(true)
-  createdAt             DateTime        @default(now())
-  updatedAt             DateTime        @updatedAt
-  user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  materials             OrderMaterial[]
-  progressEvents        OrderProgressEvent[]
+  deliveryVisibleAfterPayment Boolean              @default(true)
+  createdAt                   DateTime             @default(now())
+  updatedAt                   DateTime             @updatedAt
+  user                        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  materials                   OrderMaterial[]
+  progressEvents              OrderProgressEvent[]
+  deliveryEvents              OrderDeliveryEvent[]
 
   @@index([userId, createdAt])
   @@index([status, createdAt])
+}
+
+model OrderDeliveryEvent {
+  id        String            @id @default(cuid())
+  orderId   String
+  type      DeliveryEventType
+  note      String?
+  createdAt DateTime          @default(now())
+  order     Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, createdAt])
 }
 
 model OrderProgressEvent {

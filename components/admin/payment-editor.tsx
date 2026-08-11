@@ -66,20 +66,17 @@ export function PaymentEditor({
     setFeedback(undefined);
     setIsSaving(true);
 
-    const response = await fetch(
-      `/api/admin/orders/${orderNumber}/payment`,
-      {
-        method: "PATCH",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-          amount,
-          paymentStatus,
-          paymentChannel,
-          transactionId,
-          refundedAmount,
-        }),
-      },
-    );
+    const response = await fetch(`/api/admin/orders/${orderNumber}/payment`, {
+      method: "PATCH",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        amount,
+        paymentStatus,
+        paymentChannel,
+        transactionId,
+        refundedAmount,
+      }),
+    });
 
     setIsSaving(false);
     if (!response.ok) {
@@ -96,15 +93,12 @@ export function PaymentEditor({
 
   return (
     <form onSubmit={savePayment} className="space-y-5">
-      <div className="flex items-start gap-3 border-b pb-4">
+      <div className="flex items-center gap-3 border-b pb-4">
         <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted">
           <CreditCard className="size-4 text-muted-foreground" />
         </span>
         <div>
           <h2 className="font-semibold">付款信息</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            记录订单金额、支付渠道和退款情况。
-          </p>
         </div>
       </div>
 
@@ -115,7 +109,6 @@ export function PaymentEditor({
             value={amount}
             onChange={(event) => setAmount(event.target.value)}
             inputMode="decimal"
-            placeholder="例如：999.00"
           />
         </label>
         <label className="space-y-2 text-sm font-medium">
@@ -125,7 +118,7 @@ export function PaymentEditor({
             onChange={(event) =>
               setPaymentStatus(event.target.value as PaymentStatus)
             }
-            className="h-9 w-full rounded-lg border bg-background px-3 text-sm outline-none transition-shadow focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="h-9 w-full rounded-lg border bg-background px-2 text-sm outline-none transition-shadow focus-visible:ring-3 focus-visible:ring-ring/50"
           >
             {paymentStatuses.map((item) => (
               <option key={item.value} value={item.value}>
@@ -139,7 +132,7 @@ export function PaymentEditor({
           <select
             value={paymentChannel}
             onChange={(event) => setPaymentChannel(event.target.value)}
-            className="h-9 w-full rounded-lg border bg-background px-3 text-sm outline-none transition-shadow focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="h-9 w-full rounded-lg border bg-background px-2 text-sm outline-none transition-shadow focus-visible:ring-3 focus-visible:ring-ring/50"
           >
             {paymentChannels.map((item) => (
               <option key={item.value} value={item.value}>

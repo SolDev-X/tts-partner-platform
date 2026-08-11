@@ -9,8 +9,10 @@ import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent} from "@/components/ui/card";
 import {CancelOrderButton} from "@/components/orders/cancel-order-button";
+import {DeliveryActions} from "@/components/orders/delivery-actions";
 import {auth} from "@/lib/auth";
 import {services} from "@/lib/data";
+import {deliveryEventLabels, deliveryStatusMeta, getDeliveryFields} from "@/lib/delivery";
 import {getOrderDisplayTitle, isStringSelection} from "@/lib/order-display";
 import {buildOrderTimeline} from "@/lib/order-progress";
 import {orderStatusMeta} from "@/lib/order-status";
@@ -46,8 +48,16 @@ export default async function OrderDetailPage({
       deliveryInvitationCode: true,
       deliveryStoreNumber: true,
       deliveryFileName: true,
+      deliveryData: true,
+      deliveryStatus: true,
+      deliveryPublishedAt: true,
+      deliveryConfirmedAt: true,
+      deliveryRevisionNote: true,
       deliveryCompletedAt: true,
-      deliveryVisibleAfterPayment: true,
+      deliveryEvents: {
+        orderBy: {createdAt: "desc"},
+        select: {type: true, note: true, createdAt: true},
+      },
       createdAt: true,
       materials: {
         select: {status: true, reviewedAt: true},
@@ -90,14 +100,31 @@ export default async function OrderDetailPage({
     progressEvents: order.progressEvents,
   });
 
-  const hasDeliveryContent = Boolean(
-    order.deliveryDescription ||
-    order.deliveryInvitationCode ||
-    order.deliveryStoreNumber ||
-    order.deliveryFileName,
+  const savedDeliveryData =
+    order.deliveryData &&
+    typeof order.deliveryData === "object" &&
+    !Array.isArray(order.deliveryData)
+      ? Object.fromEntries(
+          Object.entries(order.deliveryData).filter(
+            (entry): entry is [string, string] => typeof entry[1] === "string",
+          ),
+        )
+      : {};
+  const deliveryData: Record<string, string> = {
+    ...savedDeliveryData,
+    ...(savedDeliveryData.invitationCode || !order.deliveryInvitationCode
+      ? {}
+      : {invitationCode: order.deliveryInvitationCode}),
+    ...(savedDeliveryData.storeNumber || !order.deliveryStoreNumber
+      ? {}
+      : {storeNumber: order.deliveryStoreNumber}),
+  };
+  const deliveryFields = getDeliveryFields(order.serviceId).filter(
+    (field) => deliveryData[field.key],
   );
-  const deliveryLocked =
-    order.deliveryVisibleAfterPayment && order.paymentStatus !== "PAID";
+  const deliveryIsPublished =
+    order.deliveryStatus === "PUBLISHED" || order.deliveryStatus === "CONFIRMED";
+  const deliveryLocked = order.paymentStatus !== "PAID";
 
   return (
     <section className="container mx-auto max-w-3xl px-4 py-12 md:py-16">
@@ -158,10 +185,23 @@ export default async function OrderDetailPage({
           </Card>
         )}
 
-        {hasDeliveryContent && (
+        {deliveryIsPublished && (
           <Card variant="outline">
             <CardContent className="p-5">
-              <h2 className="font-semibold">服务交付</h2>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="font-semibold">服务交付</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    请核对交付内容，确认无误后完成订单。
+                  </p>
+                </div>
+                <Badge
+                  variant="outline"
+                  className={deliveryStatusMeta[order.deliveryStatus].className}
+                >
+                  {deliveryStatusMeta[order.deliveryStatus].label}
+                </Badge>
+              </div>
               {deliveryLocked ? (
                 <div className="mt-4 flex items-start gap-3 rounded-lg border border-dashed bg-muted/30 p-4 text-sm text-muted-foreground">
                   <Lock className="mt-0.5 size-4 shrink-0" />
@@ -174,25 +214,14 @@ export default async function OrderDetailPage({
                       {order.deliveryDescription}
                     </p>
                   )}
-                  {(order.deliveryInvitationCode ||
-                    order.deliveryStoreNumber) && (
+                  {deliveryFields.length > 0 && (
                     <dl className="grid gap-3 rounded-lg bg-muted/40 p-4 sm:grid-cols-2">
-                      {order.deliveryInvitationCode && (
-                        <div>
-                          <dt className="text-muted-foreground">邀请码</dt>
-                          <dd className="mt-1 font-medium">
-                            {order.deliveryInvitationCode}
-                          </dd>
+                      {deliveryFields.map((field) => (
+                        <div key={field.key}>
+                          <dt className="text-muted-foreground">{field.label}</dt>
+                          <dd className="mt-1 break-all font-medium">{deliveryData[field.key]}</dd>
                         </div>
-                      )}
-                      {order.deliveryStoreNumber && (
-                        <div>
-                          <dt className="text-muted-foreground">店铺编号</dt>
-                          <dd className="mt-1 font-medium">
-                            {order.deliveryStoreNumber}
-                          </dd>
-                        </div>
-                      )}
+                      ))}
                     </dl>
                   )}
                   {order.deliveryFileName && (
@@ -200,11 +229,28 @@ export default async function OrderDetailPage({
                       结果文件：{order.deliveryFileName}
                     </p>
                   )}
-                  {order.deliveryCompletedAt && (
+                  {(order.deliveryConfirmedAt ?? order.deliveryPublishedAt) && (
                     <p className="text-xs text-muted-foreground">
-                      完成时间：
-                      {order.deliveryCompletedAt.toLocaleString("zh-CN")}
+                      {order.deliveryConfirmedAt ? "确认时间" : "发布时间"}：
+                      {(order.deliveryConfirmedAt ?? order.deliveryPublishedAt)?.toLocaleString("zh-CN")}
                     </p>
+                  )}
+                  {order.deliveryEvents.length > 0 && (
+                    <div className="space-y-2 border-t pt-4">
+                      <p className="font-medium">交付记录</p>
+                      {order.deliveryEvents.map((event, index) => (
+                        <div key={`${event.type}-${event.createdAt.toISOString()}-${index}`} className="flex items-start justify-between gap-4 text-xs text-muted-foreground">
+                          <div>
+                            <p>{deliveryEventLabels[event.type]}</p>
+                            {event.type === "REVISION_REQUESTED" && event.note && <p className="mt-1 whitespace-pre-line">{event.note}</p>}
+                          </div>
+                          <time className="shrink-0">{event.createdAt.toLocaleString("zh-CN")}</time>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {order.deliveryStatus === "PUBLISHED" && (
+                    <DeliveryActions orderNumber={order.orderNumber} />
                   )}
                 </div>
               )}

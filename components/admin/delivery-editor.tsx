@@ -1,77 +1,93 @@
 "use client";
 
-import {LoaderCircle, PackageCheck} from "lucide-react";
+import {Clock3, LoaderCircle, PackageCheck} from "lucide-react";
 import {useRouter} from "next/navigation";
 import {useState} from "react";
 
+import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
+import {
+  deliveryEventLabels,
+  deliveryStatusMeta,
+  getDeliveryFields,
+} from "@/lib/delivery";
+
+type DeliveryStatus = keyof typeof deliveryStatusMeta;
 
 export function DeliveryEditor({
   orderNumber,
-  status,
+  serviceId,
+  paymentStatus,
+  deliveryStatus: initialStatus,
   deliveryDescription: initialDescription,
-  deliveryInvitationCode: initialInvitationCode,
-  deliveryStoreNumber: initialStoreNumber,
+  deliveryData: initialData,
   deliveryFileName: initialFileName,
-  deliveryCompletedAt,
-  deliveryVisibleAfterPayment: initialVisibleAfterPayment,
+  deliveryPublishedAt,
+  deliveryConfirmedAt,
+  deliveryRevisionNote,
+  deliveryEvents,
 }: {
   orderNumber: string;
-  status: string;
+  serviceId: string;
+  paymentStatus: string;
+  deliveryStatus: DeliveryStatus;
   deliveryDescription: string | null;
-  deliveryInvitationCode: string | null;
-  deliveryStoreNumber: string | null;
+  deliveryData: Record<string, string>;
   deliveryFileName: string | null;
-  deliveryCompletedAt: string | null;
-  deliveryVisibleAfterPayment: boolean;
+  deliveryPublishedAt: string | null;
+  deliveryConfirmedAt: string | null;
+  deliveryRevisionNote: string | null;
+  deliveryEvents: Array<{
+    type: keyof typeof deliveryEventLabels;
+    note: string | null;
+    createdAt: string;
+  }>;
 }) {
   const router = useRouter();
+  const fields = getDeliveryFields(serviceId);
   const [deliveryDescription, setDeliveryDescription] = useState(
     initialDescription ?? "",
   );
-  const [deliveryInvitationCode, setDeliveryInvitationCode] = useState(
-    initialInvitationCode ?? "",
-  );
-  const [deliveryStoreNumber, setDeliveryStoreNumber] = useState(
-    initialStoreNumber ?? "",
-  );
+  const [deliveryData, setDeliveryData] = useState(initialData);
   const [deliveryFileName, setDeliveryFileName] = useState(
     initialFileName ?? "",
   );
-  const [deliveryVisibleAfterPayment, setDeliveryVisibleAfterPayment] =
-    useState(initialVisibleAfterPayment);
   const [isSaving, setIsSaving] = useState(false);
-  const [isConfirming, setIsConfirming] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [publishOpen, setPublishOpen] = useState(false);
   const [feedback, setFeedback] = useState<string>();
+  const isConfirmed = initialStatus === "CONFIRMED";
 
-  const isDelivered = status === "COMPLETED";
-
-  async function saveDelivery(confirm = false) {
+  async function submit(action: "save" | "publish") {
     setFeedback(undefined);
-    if (confirm) {
-      setIsConfirming(true);
-    } else {
+    if (action === "save") {
       setIsSaving(true);
+    } else {
+      setIsPublishing(true);
     }
-
     const response = await fetch(`/api/admin/orders/${orderNumber}/delivery`, {
       method: "PATCH",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
+        action,
         deliveryDescription,
-        deliveryInvitationCode,
-        deliveryStoreNumber,
+        deliveryData,
         deliveryFileName,
-        deliveryVisibleAfterPayment,
-        confirm,
       }),
     });
-
     setIsSaving(false);
-    setIsConfirming(false);
-
+    setIsPublishing(false);
     if (!response.ok) {
       const result = (await response.json().catch(() => null)) as {
         error?: string;
@@ -79,104 +95,109 @@ export function DeliveryEditor({
       setFeedback(result?.error ?? "保存失败，请稍后重试。");
       return;
     }
-
+    setPublishOpen(false);
     setFeedback(
-      confirm ? "已确认交付，订单标记为已完成。" : "交付信息已保存。",
+      action === "publish"
+        ? "交付内容已发布，正在等待客户确认。"
+        : "交付草稿已保存。",
     );
     router.refresh();
   }
 
+  const statusMeta = deliveryStatusMeta[initialStatus];
   return (
     <div className="space-y-5">
-      <div className="flex items-start gap-3 border-b pb-4">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted">
-          <PackageCheck className="size-4 text-muted-foreground" />
-        </span>
+      <div className="flex flex-col gap-4 pb-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex items-center gap-3">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted">
+            <PackageCheck className="size-4 text-muted-foreground" />
+          </span>
+          <div>
+            <h2 className="font-semibold">服务交付</h2>
+          </div>
+        </div>
+        <Badge variant="outline" className={statusMeta.className}>
+          {statusMeta.label}
+        </Badge>
+      </div>
+
+      <div className="grid gap-3 rounded-xl bg-muted/35 p-4 sm:grid-cols-2">
         <div>
-          <h2 className="font-semibold">服务交付</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            填写交付结果并确认完成，客户可在订单详情页查看。
+          <p className="text-xs text-muted-foreground">交付状态</p>
+          <p className="mt-1 text-sm font-medium">{statusMeta.label}</p>
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground">交付时间</p>
+          <p className="mt-1 flex items-center gap-1.5 text-sm font-medium">
+            <Clock3 className="size-3.5 text-muted-foreground" />
+            {deliveryPublishedAt
+              ? new Date(deliveryPublishedAt).toLocaleString("zh-CN")
+              : "尚未发布"}
           </p>
         </div>
       </div>
 
-      <label className="block space-y-2 text-sm font-medium">
+      {deliveryRevisionNote && initialStatus === "REVISION_REQUESTED" && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          <p className="font-medium">客户申请修改</p>
+          <p className="mt-1 whitespace-pre-line">{deliveryRevisionNote}</p>
+        </div>
+      )}
+
+      <label className="block space-y-2 text-sm font-medium ml-1">
         交付结果说明
         <Textarea
           value={deliveryDescription}
           onChange={(event) => setDeliveryDescription(event.target.value)}
           maxLength={2000}
-          placeholder="向客户说明本次服务的交付内容和注意事项。"
-          className="min-h-24"
-          disabled={isDelivered}
+          className="min-h-28 mt-2"
+          disabled={isConfirmed}
         />
       </label>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <label className="space-y-2 text-sm font-medium">
-          邀请码
-          <Input
-            value={deliveryInvitationCode}
-            onChange={(event) => setDeliveryInvitationCode(event.target.value)}
-            maxLength={100}
-            placeholder="如有邀请码请填写"
-            disabled={isDelivered}
-          />
-        </label>
-        <label className="space-y-2 text-sm font-medium">
-          店铺编号
-          <Input
-            value={deliveryStoreNumber}
-            onChange={(event) => setDeliveryStoreNumber(event.target.value)}
-            maxLength={100}
-            placeholder="如有店铺编号请填写"
-            disabled={isDelivered}
-          />
-        </label>
-      </div>
-
-      <label className="block space-y-2 text-sm font-medium">
-        结果文件或截图
+      <label className="block space-y-2 text-sm font-medium  ml-1">
+        交付文件
         <Input
           value={deliveryFileName}
           onChange={(event) => setDeliveryFileName(event.target.value)}
           maxLength={200}
-          placeholder="填写文件名或截图说明"
-          disabled={isDelivered}
+          disabled={isConfirmed}
         />
-        <span className="block text-xs font-normal text-muted-foreground">
-          暂以文件名记录，后续可接入文件上传。
-        </span>
       </label>
 
-      <label className="flex items-start gap-3 rounded-lg border bg-muted/30 px-4 py-3 text-sm">
-        <input
-          type="checkbox"
-          checked={deliveryVisibleAfterPayment}
-          onChange={(event) =>
-            setDeliveryVisibleAfterPayment(event.target.checked)
-          }
-          disabled={isDelivered}
-          className="mt-0.5 size-4 rounded border"
-        />
-        <span>
-          <span className="font-medium">敏感内容仅付款后可见</span>
-          <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
-            开启后，未付款客户无法查看邀请码、店铺编号等交付详情。
-          </span>
-        </span>
-      </label>
-
-      {deliveryCompletedAt && (
+      {deliveryConfirmedAt && (
         <p className="text-xs text-muted-foreground">
-          完成时间：{new Date(deliveryCompletedAt).toLocaleString("zh-CN")}
+          客户确认时间：{new Date(deliveryConfirmedAt).toLocaleString("zh-CN")}
         </p>
       )}
 
+      {deliveryEvents.length > 0 && (
+        <div className="space-y-3 border-t pt-4">
+          <h3 className="text-sm font-medium">交付记录</h3>
+          {deliveryEvents.map((event, index) => (
+            <div
+              key={`${event.type}-${event.createdAt}-${index}`}
+              className="flex items-start justify-between gap-4 text-sm"
+            >
+              <div>
+                <p className="font-medium">{deliveryEventLabels[event.type]}</p>
+                {event.note && (
+                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                    {event.note}
+                  </p>
+                )}
+              </div>
+              <time className="shrink-0 text-xs text-muted-foreground">
+                {new Date(event.createdAt).toLocaleString("zh-CN")}
+              </time>
+            </div>
+          ))}
+        </div>
+      )}
       {feedback && (
         <p
           className={
-            feedback.includes("失败")
+            feedback.includes("失败") || feedback.includes("请先")
               ? "text-sm text-destructive"
               : "text-sm text-muted-foreground"
           }
@@ -185,29 +206,54 @@ export function DeliveryEditor({
         </p>
       )}
 
-      {!isDelivered && (
+      {!isConfirmed && (
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button
             type="button"
             variant="outline"
             className="sm:flex-1"
-            disabled={isSaving || isConfirming}
-            onClick={() => saveDelivery(false)}
+            disabled={isSaving || isPublishing}
+            onClick={() => submit("save")}
           >
             {isSaving && <LoaderCircle className="animate-spin" />}
-            {isSaving ? "正在保存" : "保存交付信息"}
+            {isSaving ? "正在保存" : "保存草稿"}
           </Button>
           <Button
             type="button"
             className="sm:flex-1"
-            disabled={isSaving || isConfirming}
-            onClick={() => saveDelivery(true)}
+            disabled={isSaving || isPublishing}
+            onClick={() => setPublishOpen(true)}
           >
-            {isConfirming && <LoaderCircle className="animate-spin" />}
-            {isConfirming ? "正在确认" : "确认交付"}
+            发布交付
           </Button>
         </div>
       )}
+
+      {paymentStatus !== "PAID" && !isConfirmed && (
+        <p className="text-xs text-amber-700">
+          订单尚未付款，可以保存草稿，但付款成功前无法发布交付。
+        </p>
+      )}
+
+      <Dialog open={publishOpen} onOpenChange={setPublishOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>确认发布交付？</DialogTitle>
+            <DialogDescription>
+              发布后客户将看到交付内容，并可以确认完成或申请修改。
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose render={<Button variant="outline" />}>
+              取消
+            </DialogClose>
+            <Button disabled={isPublishing} onClick={() => submit("publish")}>
+              {isPublishing && <LoaderCircle className="animate-spin" />}
+              {isPublishing ? "正在发布" : "确认发布"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

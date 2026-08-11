@@ -19,7 +19,6 @@ const orderStatusSchema = z.enum([
 const updateOrderSchema = z.object({
   status: orderStatusSchema,
   customerMessage: z.string().trim().max(1000),
-  adminNote: z.string().trim().max(1000),
 });
 
 export async function PATCH(
@@ -57,7 +56,6 @@ export async function PATCH(
     data: {
       status: body.data.status,
       customerMessage: body.data.customerMessage || null,
-      adminNote: body.data.adminNote || null,
     },
   });
 

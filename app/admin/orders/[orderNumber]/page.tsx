@@ -43,7 +43,7 @@ export default async function AdminOrderDetailPage({
       selection: true,
       status: true,
       customerMessage: true,
-      adminNote: true,
+
       amountInCents: true,
       paymentStatus: true,
       paymentChannel: true,
@@ -55,8 +55,16 @@ export default async function AdminOrderDetailPage({
       deliveryInvitationCode: true,
       deliveryStoreNumber: true,
       deliveryFileName: true,
+      deliveryData: true,
+      deliveryStatus: true,
+      deliveryPublishedAt: true,
+      deliveryConfirmedAt: true,
+      deliveryRevisionNote: true,
       deliveryCompletedAt: true,
-      deliveryVisibleAfterPayment: true,
+      deliveryEvents: {
+        orderBy: {createdAt: "desc"},
+        select: {type: true, note: true, createdAt: true},
+      },
       createdAt: true,
       materials: {
         orderBy: {createdAt: "asc"},
@@ -129,6 +137,25 @@ export default async function AdminOrderDetailPage({
     requiredMaterialCount: variantRule?.requiredMaterials?.length ?? 0,
     progressEvents: order.progressEvents,
   });
+  const savedDeliveryData =
+    order.deliveryData &&
+    typeof order.deliveryData === "object" &&
+    !Array.isArray(order.deliveryData)
+      ? Object.fromEntries(
+          Object.entries(order.deliveryData).filter(
+            (entry): entry is [string, string] => typeof entry[1] === "string",
+          ),
+        )
+      : {};
+  const deliveryData: Record<string, string> = {
+    ...savedDeliveryData,
+    ...(savedDeliveryData.invitationCode || !order.deliveryInvitationCode
+      ? {}
+      : {invitationCode: order.deliveryInvitationCode}),
+    ...(savedDeliveryData.storeNumber || !order.deliveryStoreNumber
+      ? {}
+      : {storeNumber: order.deliveryStoreNumber}),
+  };
 
   return (
     <section className="container mx-auto max-w-6xl px-4 py-10 md:py-14">
@@ -169,13 +196,10 @@ export default async function AdminOrderDetailPage({
 
       <Card variant="outline" className="mt-8">
         <CardContent className="p-0">
-          <div className="border-b px-5 py-4">
+          <div className="px-5 py-4">
             <h2 className="font-semibold">办理进度</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              订单全流程节点，更新状态时会同步记录说明并展示给客户。
-            </p>
           </div>
-          <div className="px-5 py-6">
+          <div className="px-5 py-1">
             <OrderProgressTimeline steps={timelineSteps} />
           </div>
         </CardContent>
@@ -214,91 +238,95 @@ export default async function AdminOrderDetailPage({
             <CardContent className="p-5">
               <DeliveryEditor
                 orderNumber={order.orderNumber}
-                status={order.status}
+                serviceId={order.serviceId}
+                paymentStatus={order.paymentStatus}
+                deliveryStatus={order.deliveryStatus}
                 deliveryDescription={order.deliveryDescription}
-                deliveryInvitationCode={order.deliveryInvitationCode}
-                deliveryStoreNumber={order.deliveryStoreNumber}
+                deliveryData={deliveryData}
                 deliveryFileName={order.deliveryFileName}
-                deliveryCompletedAt={
-                  order.deliveryCompletedAt?.toISOString() ?? null
+                deliveryPublishedAt={
+                  order.deliveryPublishedAt?.toISOString() ?? null
                 }
-                deliveryVisibleAfterPayment={order.deliveryVisibleAfterPayment}
+                deliveryConfirmedAt={
+                  order.deliveryConfirmedAt?.toISOString() ?? null
+                }
+                deliveryRevisionNote={order.deliveryRevisionNote}
+                deliveryEvents={order.deliveryEvents.map((event) => ({
+                  ...event,
+                  createdAt: event.createdAt.toISOString(),
+                }))}
               />
             </CardContent>
           </Card>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card variant="outline">
-              <CardContent className="p-0">
-                <div className="border-b px-5 py-4">
-                  <h2 className="text-sm font-semibold text-muted-foreground">
-                    客户信息
-                  </h2>
-                </div>
-                <dl className="space-y-4 px-5 py-5 text-sm">
-                  <div>
-                    <dt className="text-muted-foreground">公司名称</dt>
-                    <dd className="mt-1 font-medium">
-                      {order.user.name || "未设置名称"}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-muted-foreground">邮箱</dt>
-                    <dd className="mt-1 break-all font-medium">
-                      {order.user.email}
-                    </dd>
-                  </div>
-                  {order.user.phoneNumber && (
-                    <div>
-                      <dt className="text-muted-foreground">手机号</dt>
-                      <dd className="mt-1 font-medium">
-                        {order.user.phoneNumber}
-                      </dd>
-                    </div>
-                  )}
-                </dl>
-              </CardContent>
-            </Card>
-
-            <Card variant="outline">
-              <CardContent className="p-0">
-                <div className="border-b px-5 py-4">
-                  <h2 className="text-sm font-semibold text-muted-foreground">
-                    客户所选方案
-                  </h2>
-                </div>
-                <dl className="divide-y px-5">
-                  {selectedOptions.map((item) => (
-                    <div
-                      key={item.title}
-                      className="flex flex-col gap-1 py-3.5 text-sm"
-                    >
-                      <dt className="text-muted-foreground">{item.title}</dt>
-                      <dd className="font-medium">{item.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </CardContent>
-            </Card>
-          </div>
         </div>
 
-        <Card variant="outline" className="h-fit lg:sticky lg:top-24">
-          <CardContent className="p-5">
-            <div className="mb-5 border-b pb-4">
-              <h2 className="font-semibold">处理订单</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                更新办理进度和客户可见说明。
-              </p>
-            </div>
-            <OrderEditor
-              orderNumber={order.orderNumber}
-              status={order.status}
-              customerMessage={order.customerMessage}
-              adminNote={order.adminNote}
-            />
-          </CardContent>
-        </Card>
+        <div className="h-fit lg:sticky lg:top-24 flex flex-col gap-5">
+          <Card variant="outline">
+            <CardContent className="p-0">
+              <div className="px-5 py-4">
+                <h2 className="text-sm font-semibold text-muted-foreground">
+                  客户信息
+                </h2>
+              </div>
+              <dl className="space-y-4 px-5 py-5 text-sm">
+                <div>
+                  <dt className="text-muted-foreground">公司名称</dt>
+                  <dd className="mt-1 font-medium">
+                    {order.user.name || "未设置名称"}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">邮箱</dt>
+                  <dd className="mt-1 break-all font-medium">
+                    {order.user.email}
+                  </dd>
+                </div>
+                {order.user.phoneNumber && (
+                  <div>
+                    <dt className="text-muted-foreground">手机号</dt>
+                    <dd className="mt-1 font-medium">
+                      {order.user.phoneNumber}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            </CardContent>
+          </Card>
+
+          <Card variant="outline">
+            <CardContent className="p-0">
+              <div className="px-5 py-4">
+                <h2 className="text-sm font-semibold text-muted-foreground">
+                  客户所选方案
+                </h2>
+              </div>
+              <dl className="divide-y px-5">
+                {selectedOptions.map((item) => (
+                  <div
+                    key={item.title}
+                    className="flex flex-col gap-1 py-3.5 text-sm"
+                  >
+                    <dt className="text-muted-foreground">{item.title}</dt>
+                    <dd className="font-medium">{item.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </CardContent>
+          </Card>
+
+          <Card variant="outline">
+            <CardContent className="p-5">
+              <div className="mb-2 pb-4">
+                <h2 className="font-semibold">处理订单</h2>
+              </div>
+              <OrderEditor
+                orderNumber={order.orderNumber}
+                status={order.status}
+                customerMessage={order.customerMessage}
+              />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </section>
   );

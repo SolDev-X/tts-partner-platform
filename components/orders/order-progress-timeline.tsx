@@ -1,5 +1,4 @@
 import {Check, Circle} from "lucide-react";
-
 import {cn} from "@/lib/utils";
 import type {TimelineStep} from "@/lib/order-progress";
 
