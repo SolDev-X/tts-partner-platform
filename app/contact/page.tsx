@@ -1,7 +1,7 @@
 "use client";
 
 import {zodResolver} from "@hookform/resolvers/zod";
-import {LoaderIcon, MailIcon, PhoneIcon} from "lucide-react";
+import {ExternalLinkIcon, LoaderIcon, MailIcon} from "lucide-react";
 import {useState} from "react";
 import {Controller, useForm} from "react-hook-form";
 import {z} from "zod";
@@ -17,7 +17,6 @@ import {cn} from "@/lib/utils";
 interface ContactFormDetailsProps {
   title: string;
   description: string;
-  phone: string;
   email: string;
   formSubheading: string;
   formHeading: string;
@@ -36,7 +35,6 @@ const defaultProps: ContactProps = {
   title: "联系我们",
   description:
     "专注跨境电商店铺入驻与权限代办服务，如有任何疑问，欢迎随时与我们联系。",
-  phone: "+86 15534046728",
   email: "wenyao.dev@gmail.com",
   formSubheading: "我们通常会在当天内回复您。",
   formHeading: "留下您的需求",
@@ -58,7 +56,6 @@ const Contact = (props: Props) => {
   const {
     title,
     description,
-    phone,
     email,
     formHeading,
     formSubheading,
@@ -117,27 +114,71 @@ const Contact = (props: Props) => {
                 {description}
               </p>
             </div>
-            <div className="flex flex-col gap-6">
-              <a
-                href={`tel:${phone}`}
-                className="group flex items-center gap-3"
-              >
-                <PhoneIcon className="size-5 text-muted-foreground" />
-                <span className="group-hover:underline">{phone}</span>
-              </a>
-              <a
-                href={`mailto:${email}`}
-                className="group flex items-center gap-3"
-              >
-                <MailIcon className="size-5 text-muted-foreground" />
-                <span className="group-hover:underline">{email}</span>
-              </a>
-              <Image
-                src="/QRcode/wechatQRcode.jpg"
-                alt="微信"
-                width={160}
-                height={160}
-              />
+            <div>
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <h2 className="font-semibold">企业微信咨询</h2>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    扫码添加服务顾问
+                  </p>
+                  <div className="mt-4 w-fit rounded-lg border bg-white p-2">
+                    <Image
+                      src="/QRcode/wechatQRcode.jpg"
+                      alt="企业微信咨询二维码"
+                      width={148}
+                      height={148}
+                      className="size-[148px]"
+                    />
+                  </div>
+                  <p className="mt-3 text-xs leading-5 text-muted-foreground">
+                    通常当天回复
+                  </p>
+                </div>
+
+                <div>
+                  <h2 className="font-semibold">闲鱼平台下单</h2>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    查看服务并通过平台交易
+                  </p>
+                  <div className="mt-4 w-fit rounded-lg border bg-white">
+                    <Image
+                      src="/QRcode/xianyuQRcode.jpg"
+                      alt="闲鱼主页二维码"
+                      width={148}
+                      height={148}
+                      className="size-[148px]"
+                    />
+                  </div>
+                  <Button
+                    variant="link"
+                    className="mt-2 h-auto p-0 text-sm"
+                    nativeButton={false}
+                    render={
+                      <a
+                        href="https://m.tb.cn/h.8STM0HG?tk=y9twTZcE8jl"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      />
+                    }
+                  >
+                    前往闲鱼下单
+                    <ExternalLinkIcon aria-hidden />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="mt-7 border-t pt-5">
+                <a
+                  href={`mailto:${email}`}
+                  className="group inline-flex items-center gap-3 text-sm"
+                >
+                  <MailIcon className="size-5 text-muted-foreground" />
+                  <span className="font-medium">邮件联系</span>
+                  <span className="text-muted-foreground group-hover:underline">
+                    {email}
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
           <div className="flex-1">

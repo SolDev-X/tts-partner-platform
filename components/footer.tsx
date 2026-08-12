@@ -104,51 +104,96 @@ export default function Footer() {
           <span className="text-muted-foreground order-last block text-center text-[12px] md:order-first">
             © {2026} 跨境服务. 所有资料需真实有效，结果以平台最终审核为准。
           </span>
-          <div className="order-first flex flex-wrap justify-center gap-4 text-sm md:order-last items-center text-center">
-            <HoverCard>
-              <HoverCardTrigger>
+          <div className="order-first flex items-center justify-center gap-3 text-sm md:order-last">
+            <div className="flex items-center gap-1.5">
+              <HoverCard>
+                <HoverCardTrigger className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted">
+                  <Image
+                    src="/icons/WeCom.svg"
+                    alt="企业微信"
+                    width={24}
+                    height={24}
+                  />
+                </HoverCardTrigger>
+                <HoverCardContent className="w-auto p-1">
+                  <Image
+                    src="/QRcode/wechatQRcode.jpg"
+                    alt="微信"
+                    width={160}
+                    height={160}
+                  />
+                </HoverCardContent>
+              </HoverCard>
+              <a
+                href="https://m.tb.cn/h.8STM0HG?tk=y9twTZcE8jl"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="前往闲鱼主页"
+                title="闲鱼"
+                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted"
+              >
                 <Image
-                  src="/icons/WeCom.svg"
-                  alt="企业微信"
-                  width={24}
-                  height={24}
+                  src="/icons/a-xianyu_huaban1.svg"
+                  alt=""
+                  width={20}
+                  height={20}
                 />
-              </HoverCardTrigger>
-              <HoverCardContent className="w-auto p-1">
+              </a>
+              <span
+                aria-label="小红书"
+                title="小红书"
+                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted"
+              >
                 <Image
-                  src="/QRcode/wechatQRcode.jpg"
-                  alt="微信"
-                  width={160}
-                  height={160}
+                  src="/icons/xiaohongshu.svg"
+                  alt=""
+                  width={20}
+                  height={20}
                 />
-              </HoverCardContent>
-            </HoverCard>
-            <HoverCard>
-              <HoverCardTrigger>
+              </span>
+              <span
+                aria-label="抖音"
+                title="抖音"
+                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted"
+              >
+                <Image src="/icons/douyin3.svg" alt="" width={20} height={20} />
+              </span>
+            </div>
+
+            <span className="h-5 w-px bg-border" aria-hidden />
+
+            <div className="flex items-center gap-1.5">
+              <HoverCard>
+                <HoverCardTrigger className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted">
+                  <Image
+                    src="/icons/Feishu.svg"
+                    alt="飞书"
+                    width={20}
+                    height={20}
+                  />
+                </HoverCardTrigger>
+                <HoverCardContent className="w-auto p-1">
+                  <Image
+                    src="/QRcode/feishuQRcode.jpg"
+                    alt="飞书"
+                    width={160}
+                    height={160}
+                  />
+                </HoverCardContent>
+              </HoverCard>
+              <Link
+                href="mailto:wenyao.dev@gmail.com"
+                aria-label="发送邮件"
+                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted"
+              >
                 <Image
-                  src="/icons/feishu.svg"
-                  alt="飞书"
-                  width={22}
-                  height={22}
+                  src="/icons/gmail.svg"
+                  alt="gmail"
+                  width={20}
+                  height={20}
                 />
-              </HoverCardTrigger>
-              <HoverCardContent className="w-auto p-1">
-                <Image
-                  src="/QRcode/feishuQRcode.jpg"
-                  alt="飞书"
-                  width={160}
-                  height={160}
-                />
-              </HoverCardContent>
-            </HoverCard>
-            <Link href="wenyao.dev@gmail.com">
-              <Image
-                src="/icons/gmail.svg"
-                alt="gmail"
-                width={20}
-                height={20}
-              />
-            </Link>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
