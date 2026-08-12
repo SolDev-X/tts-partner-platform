@@ -2,7 +2,7 @@ import type {Metadata} from "next";
 import {headers} from "next/headers";
 import Link from "next/link";
 import {notFound, redirect} from "next/navigation";
-import {Lock} from "lucide-react";
+import {Download, Lock} from "lucide-react";
 
 import {OrderProgressTimeline} from "@/components/orders/order-progress-timeline";
 import {Badge} from "@/components/ui/badge";
@@ -48,6 +48,8 @@ export default async function OrderDetailPage({
       deliveryInvitationCode: true,
       deliveryStoreNumber: true,
       deliveryFileName: true,
+      deliveryFilePathname: true,
+      deliveryFileSize: true,
       deliveryData: true,
       deliveryStatus: true,
       deliveryPublishedAt: true,
@@ -224,10 +226,27 @@ export default async function OrderDetailPage({
                       ))}
                     </dl>
                   )}
-                  {order.deliveryFileName && (
-                    <p className="text-muted-foreground">
-                      结果文件：{order.deliveryFileName}
-                    </p>
+                  {order.deliveryFileName && order.deliveryFilePathname && (
+                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3">
+                      <div>
+                        <p className="font-medium">{order.deliveryFileName}</p>
+                        {order.deliveryFileSize !== null && (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {(order.deliveryFileSize / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        nativeButton={false}
+                        render={
+                          <a href={`/api/orders/${order.orderNumber}/delivery/file`} />
+                        }
+                      >
+                        <Download /> 下载交付文件
+                      </Button>
+                    </div>
                   )}
                   {(order.deliveryConfirmedAt ?? order.deliveryPublishedAt) && (
                     <p className="text-xs text-muted-foreground">

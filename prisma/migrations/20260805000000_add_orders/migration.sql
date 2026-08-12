@@ -18,6 +18,7 @@ CREATE TABLE "Order" (
     "selection" JSONB NOT NULL,
     "status" "OrderStatus" NOT NULL DEFAULT 'PENDING_CONFIRMATION',
     "customerNote" TEXT,
+    "adminNote" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

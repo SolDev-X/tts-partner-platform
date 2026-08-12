@@ -108,6 +108,9 @@ model Order {
   deliveryInvitationCode      String?
   deliveryStoreNumber         String?
   deliveryFileName            String?
+  deliveryFilePathname        String?
+  deliveryFileMimeType        String?
+  deliveryFileSize            Int?
   deliveryData                Json?
   deliveryStatus              DeliveryStatus       @default(DRAFT)
   deliveryPublishedAt         DateTime?

@@ -1,8 +1,9 @@
 "use client";
 
-import {Clock3, LoaderCircle, PackageCheck} from "lucide-react";
+import {upload} from "@vercel/blob/client";
+import {Clock3, Download, FileUp, LoaderCircle, PackageCheck} from "lucide-react";
 import {useRouter} from "next/navigation";
-import {useState} from "react";
+import {useRef, useState} from "react";
 
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
@@ -20,31 +21,32 @@ import {Textarea} from "@/components/ui/textarea";
 import {
   deliveryEventLabels,
   deliveryStatusMeta,
-  getDeliveryFields,
 } from "@/lib/delivery";
 
 type DeliveryStatus = keyof typeof deliveryStatusMeta;
 
 export function DeliveryEditor({
   orderNumber,
-  serviceId,
   paymentStatus,
   deliveryStatus: initialStatus,
   deliveryDescription: initialDescription,
   deliveryData: initialData,
   deliveryFileName: initialFileName,
+  deliveryFilePathname,
+  deliveryFileSize: initialFileSize,
   deliveryPublishedAt,
   deliveryConfirmedAt,
   deliveryRevisionNote,
   deliveryEvents,
 }: {
   orderNumber: string;
-  serviceId: string;
   paymentStatus: string;
   deliveryStatus: DeliveryStatus;
   deliveryDescription: string | null;
   deliveryData: Record<string, string>;
   deliveryFileName: string | null;
+  deliveryFilePathname: string | null;
+  deliveryFileSize: number | null;
   deliveryPublishedAt: string | null;
   deliveryConfirmedAt: string | null;
   deliveryRevisionNote: string | null;
@@ -55,19 +57,54 @@ export function DeliveryEditor({
   }>;
 }) {
   const router = useRouter();
-  const fields = getDeliveryFields(serviceId);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [deliveryDescription, setDeliveryDescription] = useState(
     initialDescription ?? "",
   );
-  const [deliveryData, setDeliveryData] = useState(initialData);
+  const deliveryData = initialData;
   const [deliveryFileName, setDeliveryFileName] = useState(
     initialFileName ?? "",
   );
+  const [deliveryFileSize, setDeliveryFileSize] = useState(initialFileSize);
+  const [uploadProgress, setUploadProgress] = useState<number>();
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishOpen, setPublishOpen] = useState(false);
   const [feedback, setFeedback] = useState<string>();
   const isConfirmed = initialStatus === "CONFIRMED";
+
+  async function uploadFile(file: File) {
+    setFeedback(undefined);
+    if (file.size > 20 * 1024 * 1024) {
+      setFeedback("上传失败：文件不能超过 20 MB。");
+      return;
+    }
+
+    setUploadProgress(0);
+    try {
+      await upload(`orders/${orderNumber}/delivery/${file.name}`, file, {
+        access: "private",
+        handleUploadUrl: `/api/admin/orders/${orderNumber}/delivery/upload`,
+        clientPayload: JSON.stringify({
+          orderNumber,
+          fileName: file.name,
+          size: file.size,
+        }),
+        onUploadProgress: ({percentage}) => setUploadProgress(percentage),
+      });
+      setDeliveryFileName(file.name);
+      setDeliveryFileSize(file.size);
+      setFeedback("文件上传成功。");
+      router.refresh();
+    } catch (error) {
+      setFeedback(
+        `上传失败：${error instanceof Error ? error.message : "请稍后重试。"}`,
+      );
+    } finally {
+      setUploadProgress(undefined);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
 
   async function submit(action: "save" | "publish") {
     setFeedback(undefined);
@@ -83,7 +120,6 @@ export function DeliveryEditor({
         action,
         deliveryDescription,
         deliveryData,
-        deliveryFileName,
       }),
     });
     setIsSaving(false);
@@ -155,15 +191,57 @@ export function DeliveryEditor({
         />
       </label>
 
-      <label className="block space-y-2 text-sm font-medium  ml-1">
-        交付文件
+      <div className="ml-1 space-y-2">
+        <p className="text-sm font-medium">交付文件</p>
         <Input
-          value={deliveryFileName}
-          onChange={(event) => setDeliveryFileName(event.target.value)}
-          maxLength={200}
-          disabled={isConfirmed}
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.zip,.docx,.xlsx,.png,.jpg,.jpeg"
+          disabled={isConfirmed || uploadProgress !== undefined}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) void uploadFile(file);
+          }}
         />
-      </label>
+        <p className="text-xs text-muted-foreground">
+          支持 PDF、ZIP、DOCX、XLSX、PNG、JPG，最大 20 MB。
+        </p>
+        {uploadProgress !== undefined && (
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <LoaderCircle className="size-4 animate-spin" />
+            正在上传 {Math.round(uploadProgress)}%
+          </p>
+        )}
+        {deliveryFileName && uploadProgress === undefined && (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/30 p-3 text-sm">
+            <span className="flex min-w-0 items-center gap-2">
+              <FileUp className="size-4 shrink-0 text-muted-foreground" />
+              <span className="truncate">{deliveryFileName}</span>
+              {deliveryFileSize !== null && (
+                <span className="shrink-0 text-xs text-muted-foreground">
+                  {(deliveryFileSize / 1024 / 1024).toFixed(2)} MB
+                </span>
+              )}
+            </span>
+            {deliveryFilePathname && (
+              <Button
+                variant="ghost"
+                size="sm"
+                nativeButton={false}
+                render={
+                  <a
+                    href={`/api/orders/${orderNumber}/delivery/file`}
+                    target="_blank"
+                    rel="noreferrer"
+                  />
+                }
+              >
+                <Download /> 下载
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
 
       {deliveryConfirmedAt && (
         <p className="text-xs text-muted-foreground">
@@ -212,7 +290,7 @@ export function DeliveryEditor({
             type="button"
             variant="outline"
             className="sm:flex-1"
-            disabled={isSaving || isPublishing}
+            disabled={isSaving || isPublishing || uploadProgress !== undefined}
             onClick={() => submit("save")}
           >
             {isSaving && <LoaderCircle className="animate-spin" />}
@@ -221,7 +299,7 @@ export function DeliveryEditor({
           <Button
             type="button"
             className="sm:flex-1"
-            disabled={isSaving || isPublishing}
+            disabled={isSaving || isPublishing || uploadProgress !== undefined}
             onClick={() => setPublishOpen(true)}
           >
             发布交付

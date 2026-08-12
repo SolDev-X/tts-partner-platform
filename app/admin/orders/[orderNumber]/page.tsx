@@ -55,6 +55,8 @@ export default async function AdminOrderDetailPage({
       deliveryInvitationCode: true,
       deliveryStoreNumber: true,
       deliveryFileName: true,
+      deliveryFilePathname: true,
+      deliveryFileSize: true,
       deliveryData: true,
       deliveryStatus: true,
       deliveryPublishedAt: true,
@@ -238,12 +240,13 @@ export default async function AdminOrderDetailPage({
             <CardContent className="p-5">
               <DeliveryEditor
                 orderNumber={order.orderNumber}
-                serviceId={order.serviceId}
                 paymentStatus={order.paymentStatus}
                 deliveryStatus={order.deliveryStatus}
                 deliveryDescription={order.deliveryDescription}
                 deliveryData={deliveryData}
                 deliveryFileName={order.deliveryFileName}
+                deliveryFilePathname={order.deliveryFilePathname}
+                deliveryFileSize={order.deliveryFileSize}
                 deliveryPublishedAt={
                   order.deliveryPublishedAt?.toISOString() ?? null
                 }
