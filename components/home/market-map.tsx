@@ -43,6 +43,15 @@ const markets = [
 
 type Market = (typeof markets)[number];
 
+const marketGeoJson: GeoJSON.FeatureCollection<GeoJSON.Point> = {
+  type: "FeatureCollection",
+  features: markets.map((market) => ({
+    type: "Feature",
+    geometry: {type: "Point", coordinates: market.coordinates},
+    properties: {id: market.id},
+  })),
+};
+
 export default function MarketMap() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapboxMap | null>(null);
@@ -56,12 +65,53 @@ export default function MarketMap() {
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
+    const container = containerRef.current;
     const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
     if (!accessToken) return;
 
+    let animationFrame: number | undefined;
+    let resumeTimer: ReturnType<typeof setTimeout> | undefined;
+    let lastFrameTime: number | undefined;
+    let isPointerOver = false;
+    let isInteracting = false;
+    let isCardOpen = false;
+    let isVisible = true;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    const canRotate = () =>
+      !reducedMotion.matches &&
+      !document.hidden &&
+      isVisible &&
+      !isPointerOver &&
+      !isInteracting &&
+      !isCardOpen;
+
+    const rotate = (time: number) => {
+      if (canRotate()) {
+        const elapsed = lastFrameTime ? Math.min(time - lastFrameTime, 50) : 0;
+        const center = map.getCenter();
+        map.setCenter([center.lng - (elapsed * 360) / 60000, center.lat]);
+      }
+      lastFrameTime = time;
+      animationFrame = requestAnimationFrame(rotate);
+    };
+
+    const pauseRotation = () => {
+      if (resumeTimer) clearTimeout(resumeTimer);
+      lastFrameTime = undefined;
+    };
+
+    const resumeRotationAfterDelay = () => {
+      pauseRotation();
+      resumeTimer = setTimeout(() => {
+        isInteracting = false;
+        lastFrameTime = undefined;
+      }, 2000);
+    };
+
     mapboxgl.accessToken = accessToken;
     const map = new mapboxgl.Map({
-      container: containerRef.current,
+      container,
       center: [20, 25],
       zoom: 0.8,
       minZoom: 0.6,
@@ -80,55 +130,124 @@ export default function MarketMap() {
         }
       });
 
-      markets.forEach((market) => {
-        const marker = document.createElement("button");
-        marker.type = "button";
-        marker.title = market.label;
-        marker.setAttribute("aria-label", `查看${market.label}服务`);
-        marker.className =
-          "group relative flex size-7 items-center justify-center rounded-full bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black";
-        marker.innerHTML =
-          '<span class="market-marker-pulse"></span><span class="relative size-2.5 rounded-full bg-black ring-4 ring-black/15 transition-transform group-hover:scale-125"></span>';
-        marker.addEventListener("click", (event) => {
-          event.stopPropagation();
-          setActiveMarket(null);
-          setCardPosition(null);
+      map.addSource("markets", {type: "geojson", data: marketGeoJson});
+      map.addLayer({
+        id: "market-points",
+        type: "circle",
+        source: "markets",
+        paint: {
+          "circle-radius": 6,
+          "circle-color": "#000000",
+          "circle-stroke-width": 5,
+          "circle-stroke-color": "rgba(0, 0, 0, 0.15)",
+        },
+      });
 
-          map.flyTo({
-            center: market.coordinates,
-            zoom: Math.max(map.getZoom(), 0.9),
-            duration: 900,
-            essential: true,
-          });
+      map.on("mouseenter", "market-points", () => {
+        map.getCanvas().style.cursor = "pointer";
+      });
+      map.on("mouseleave", "market-points", () => {
+        map.getCanvas().style.cursor = "";
+      });
+      map.on("click", "market-points", (event) => {
+        const id = event.features?.[0]?.properties?.id;
+        const market = markets.find((item) => item.id === id);
+        if (!market) return;
 
-          map.once("moveend", () => {
-            const point = map.project(market.coordinates);
-            const mapWidth = containerRef.current?.clientWidth ?? 0;
-            const mapHeight = containerRef.current?.clientHeight ?? 0;
+        event.originalEvent.stopPropagation();
+        isCardOpen = true;
+        isInteracting = false;
+        pauseRotation();
+        setActiveMarket(null);
+        setCardPosition(null);
 
-            setActiveMarket(market);
-            setCardPosition({
-              left: Math.min(point.x + 16, Math.max(16, mapWidth - 240)),
-              top: Math.min(point.y + 16, Math.max(16, mapHeight - 64)),
-            });
-          });
+        map.flyTo({
+          center: market.coordinates,
+          zoom: Math.max(map.getZoom(), 0.9),
+          duration: 900,
+          essential: true,
         });
 
-        new mapboxgl.Marker({element: marker, anchor: "center"})
-          .setLngLat(market.coordinates)
-          .addTo(map);
+        map.once("moveend", () => {
+          const point = map.project(market.coordinates);
+          const mapWidth = containerRef.current?.clientWidth ?? 0;
+          const mapHeight = containerRef.current?.clientHeight ?? 0;
+
+          setActiveMarket(market);
+          setCardPosition({
+            left: Math.min(point.x + 16, Math.max(16, mapWidth - 240)),
+            top: Math.min(point.y + 16, Math.max(16, mapHeight - 64)),
+          });
+        });
       });
 
       setMapReady(true);
+      animationFrame = requestAnimationFrame(rotate);
     });
 
-    map.on("click", () => {
+    map.on("click", (event) => {
+      if (
+        map.getLayer("market-points") &&
+        map.queryRenderedFeatures(event.point, {layers: ["market-points"]})
+          .length > 0
+      ) {
+        return;
+      }
+
+      isCardOpen = false;
       setActiveMarket(null);
       setCardPosition(null);
+      resumeRotationAfterDelay();
     });
+
+    map.on("dragstart", () => {
+      isInteracting = true;
+      pauseRotation();
+    });
+    map.on("dragend", resumeRotationAfterDelay);
+    map.on("zoomstart", () => {
+      isInteracting = true;
+      pauseRotation();
+    });
+    map.on("zoomend", resumeRotationAfterDelay);
+
+    const handlePointerEnter = () => {
+      isPointerOver = true;
+      pauseRotation();
+    };
+    const handlePointerLeave = () => {
+      isPointerOver = false;
+      lastFrameTime = undefined;
+    };
+    const handleVisibilityChange = () => {
+      lastFrameTime = undefined;
+    };
+    const handleMotionPreferenceChange = () => {
+      lastFrameTime = undefined;
+    };
+    container.addEventListener("pointerenter", handlePointerEnter);
+    container.addEventListener("pointerleave", handlePointerLeave);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    reducedMotion.addEventListener("change", handleMotionPreferenceChange);
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        lastFrameTime = undefined;
+      },
+      {threshold: 0.1},
+    );
+    observer.observe(container);
 
     mapRef.current = map;
     return () => {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      if (resumeTimer) clearTimeout(resumeTimer);
+      observer.disconnect();
+      container.removeEventListener("pointerenter", handlePointerEnter);
+      container.removeEventListener("pointerleave", handlePointerLeave);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      reducedMotion.removeEventListener("change", handleMotionPreferenceChange);
       map.remove();
       mapRef.current = null;
     };
