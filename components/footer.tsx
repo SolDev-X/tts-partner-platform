@@ -108,7 +108,7 @@ export default function Footer() {
             <HoverCard>
               <HoverCardTrigger>
                 <Image
-                  src="/icons/Wecom.svg"
+                  src="/icons/WeCom.svg"
                   alt="企业微信"
                   width={24}
                   height={24}
