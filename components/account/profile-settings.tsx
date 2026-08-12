@@ -264,13 +264,13 @@ export function ProfileSettings({
           </CardHeader>
           <CardContent>
             {hasBindingRisk && (
-              <div className="mb-6 flex items-start gap-3 rounded-xl border border-destructive/45 bg-destructive/10 px-4 py-3.5 text-sm text-destructive">
+              <div className="mb-6 flex items-start gap-3 rounded-xl border border-destructive/45 bg-destructive/10 px-4 py-2 text-sm text-destructive">
                 <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-background text-destructive shadow-sm">
                   <ShieldAlert className="size-4" aria-hidden="true" />
                 </span>
                 <div>
-                  <p className="font-medium">建议完善登录方式</p>
-                  <p className="mt-0.5 text-destructive/85">
+                  <p className="font-base">建议完善登录方式</p>
+                  <p className="mt-0.5 text-destructive/85 text-xs">
                     仅绑定一种登录方式时，遗失该联系方式可能无法找回账户。
                   </p>
                 </div>
