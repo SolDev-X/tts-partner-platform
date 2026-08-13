@@ -24,24 +24,17 @@ export async function GET(request: Request) {
     return NextResponse.json({error: "Unauthorized"}, {status: 401});
   }
 
-  const [credentialAccount, account] = await Promise.all([
-    prisma.account.findFirst({
-      where: {
-        userId: user.id,
-        providerId: "credential",
-        password: {not: null},
-      },
-      select: {id: true},
-    }),
-    prisma.user.findUnique({
-      where: {id: user.id},
-      select: {onboardingRequired: true},
-    }),
-  ]);
+  const credentialAccount = await prisma.account.findFirst({
+    where: {
+      userId: user.id,
+      providerId: "credential",
+      password: {not: null},
+    },
+    select: {id: true},
+  });
 
   return NextResponse.json({
     hasPassword: Boolean(credentialAccount),
-    needsOnboarding: Boolean(account?.onboardingRequired),
   });
 }
 
@@ -66,12 +59,7 @@ export async function POST(request: Request) {
     select: {id: true},
   });
 
-  const account = await prisma.user.findUnique({
-    where: {id: user.id},
-    select: {onboardingRequired: true},
-  });
-
-  if (credentialAccount || !account?.onboardingRequired) {
+  if (credentialAccount) {
     return NextResponse.json({error: "Password already set"}, {status: 409});
   }
 
@@ -85,7 +73,6 @@ export async function POST(request: Request) {
       where: {id: user.id},
       data: {
         name: parsedBody.data.companyName,
-        onboardingRequired: false,
       },
     });
 

@@ -4,7 +4,6 @@ import {redirect} from "next/navigation";
 
 import {LoginForm} from "@/components/auth/login-form";
 import {auth} from "@/lib/auth";
-import {prisma} from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "登录 | 跨境服务平台",
@@ -15,14 +14,7 @@ export default async function LoginPage() {
   const session = await auth.api.getSession({headers: await headers()});
 
   if (session?.user.role === "ADMIN") redirect("/admin/orders");
-  if (session?.user.role === "CUSTOMER") {
-    const account = await prisma.user.findUnique({
-      where: {id: session.user.id},
-      select: {onboardingRequired: true},
-    });
-
-    if (!account?.onboardingRequired) redirect("/account/orders");
-  }
+  if (session?.user.role === "CUSTOMER") redirect("/account/orders");
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">

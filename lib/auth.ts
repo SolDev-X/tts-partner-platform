@@ -106,18 +106,6 @@ export const auth = betterAuth({
       },
     },
   },
-  databaseHooks: {
-    user: {
-      create: {
-        after: async (user) => {
-          await prisma.user.update({
-            where: {id: user.id},
-            data: {onboardingRequired: true},
-          });
-        },
-      },
-    },
-  },
   plugins: [
     emailOTP({
       otpLength: 6,

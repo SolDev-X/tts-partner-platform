@@ -25,6 +25,7 @@ import {authClient} from "@/lib/auth-client";
 
 export function SignupForm({className, ...props}: React.ComponentProps<"div">) {
   const router = useRouter();
+  const [companyName, setCompanyName] = useState("");
   const [email, setEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [password, setPassword] = useState("");
@@ -77,7 +78,13 @@ export function SignupForm({className, ...props}: React.ComponentProps<"div">) {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    const normalizedCompanyName = companyName.trim();
     const normalizedEmail = normalizeEmail();
+    if (normalizedCompanyName.length < 2 || normalizedCompanyName.length > 80) {
+      setError("公司或店铺名称长度需要为 2 至 80 个字符。");
+      return;
+    }
+
     if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
       setError("请输入有效的邮箱地址。");
       return;
@@ -109,7 +116,7 @@ export function SignupForm({className, ...props}: React.ComponentProps<"div">) {
     const {error: verifyError} = await authClient.signIn.emailOtp({
       email: normalizedEmail,
       otp: verificationCode,
-      name: "新客户",
+      name: normalizedCompanyName,
     });
 
     if (verifyError) {
@@ -132,10 +139,10 @@ export function SignupForm({className, ...props}: React.ComponentProps<"div">) {
 
     const passwordStatusResponse = await fetch("/api/account/password");
     const passwordStatus = passwordStatusResponse.ok
-      ? ((await passwordStatusResponse.json()) as {needsOnboarding?: boolean})
+      ? ((await passwordStatusResponse.json()) as {hasPassword?: boolean})
       : undefined;
 
-    if (!passwordStatus?.needsOnboarding) {
+    if (!passwordStatus || passwordStatus.hasPassword) {
       await authClient.signOut();
       setIsSubmitting(false);
       setError("该邮箱已注册，请直接登录。");
@@ -145,7 +152,7 @@ export function SignupForm({className, ...props}: React.ComponentProps<"div">) {
     const passwordResponse = await fetch("/api/account/password", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({password, companyName: "新客户"}),
+      body: JSON.stringify({password, companyName: normalizedCompanyName}),
     });
 
     if (!passwordResponse.ok) {
@@ -175,6 +182,27 @@ export function SignupForm({className, ...props}: React.ComponentProps<"div">) {
                   输入邮箱以创建您的账户
                 </p>
               </div>
+              <Field>
+                <FieldLabel htmlFor="company-name" className="text-sm">
+                  公司/店铺名称
+                </FieldLabel>
+                <Input
+                  id="company-name"
+                  type="text"
+                  placeholder="请输入公司或店铺名称"
+                  className="h-10 px-3"
+                  autoComplete="organization"
+                  minLength={2}
+                  maxLength={80}
+                  value={companyName}
+                  aria-invalid={Boolean(error)}
+                  onChange={(event) => {
+                    setCompanyName(event.target.value);
+                    setError(undefined);
+                  }}
+                  required
+                />
+              </Field>
               <Field>
                 <FieldLabel htmlFor="email" className="text-sm">
                   邮箱

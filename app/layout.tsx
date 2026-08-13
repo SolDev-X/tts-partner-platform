@@ -1,6 +1,5 @@
 import type {Metadata} from "next";
 import "./globals.css";
-import {AccountOnboardingGuard} from "@/components/auth/account-onboarding-guard";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 
@@ -19,7 +18,6 @@ export default function RootLayout({
     <html lang="zh-CN" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <Header />
-        <AccountOnboardingGuard />
         <main className="flex-1 relative">{children}</main>
         <Footer />
       </body>
