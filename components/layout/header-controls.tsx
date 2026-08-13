@@ -5,6 +5,7 @@ import {useRouter} from "next/navigation";
 import {useState} from "react";
 import {
   ChevronDown,
+  LayoutDashboard,
   LoaderCircle,
   LogOut,
   Menu,
@@ -140,6 +141,20 @@ export function HeaderControls() {
                     </p>
                   </div>
                 </div>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  nativeButton={false}
+                  render={
+                    <Link
+                      href="/account/orders"
+                      onClick={() => setOpen(false)}
+                    />
+                  }
+                >
+                  <ShoppingBag />
+                  控制台
+                </Button>
                 {isAdmin ? (
                   <Button
                     variant="outline"
@@ -209,7 +224,9 @@ export function HeaderControls() {
                 <Button
                   className="w-full"
                   nativeButton={false}
-                  render={<Link href="/signup" onClick={() => setOpen(false)} />}
+                  render={
+                    <Link href="/signup" onClick={() => setOpen(false)} />
+                  }
                 >
                   注册
                 </Button>
@@ -299,6 +316,13 @@ function AccountMenu({
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
+        <DropdownMenuItem
+          render={<Link href="/dashboard" />}
+          className="px-2 py-1.5"
+        >
+          <LayoutDashboard />
+          控制台
+        </DropdownMenuItem>
         {isAdmin ? (
           <DropdownMenuItem
             render={<Link href="/admin/orders" />}

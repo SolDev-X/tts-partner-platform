@@ -78,7 +78,7 @@ const About = ({
   ],
 }: AboutProps) => {
   return (
-    <section className={cn("py-32", className)}>
+    <section className={cn("py-18", className)}>
       <div className="container mx-auto">
         <div className="mb-14 flex flex-col gap-5 lg:w-2/3">
           <h1 className="text-5xl font-semibold tracking-tighter lg:text-6xl">

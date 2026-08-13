@@ -37,14 +37,14 @@ const Process = ({className}: ProcessProps) => {
   ];
 
   return (
-    <section className={cn("py-32", className)}>
+    <section className={cn("py-18", className)}>
       <div className="container mx-auto items-center">
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-6 lg:gap-20 ">
           <div className="top-10 col-span-2 h-fit w-fit gap-3 space-y-7 py-8 lg:sticky">
             <div className="relative w-fit text-5xl font-semibold tracking-tight lg:text-7xl">
               {" "}
               <h1 className="w-fit">服务流程</h1>
-              <Asterisk className="absolute -top-2 -right-2 size-5 text-orange-500 md:size-10 lg:-right-14" />
+              <Asterisk className="absolute -top-2 -right-2 size-5 text-[#1f6feb] md:size-10 lg:-right-14" />
             </div>
             <p className="text-base text-foreground/50">
               从需求评估到权限拓展，让入驻与合规流程清晰可控，减少反复沟通与等待的时间成本。
@@ -56,7 +56,7 @@ const Process = ({className}: ProcessProps) => {
               className="flex items-center justify-start gap-2"
               render={<a href="/contact" />}
             >
-              <CornerDownRight className="text-orange-500" />
+              <CornerDownRight className="text-[#1f6feb]" />
               立即咨询
             </Button>
           </div>
@@ -68,8 +68,6 @@ const Process = ({className}: ProcessProps) => {
                   key={index}
                   className="relative flex flex-col justify-between gap-10 border-t py-8 md:flex-row lg:py-10"
                 >
-                  <Illustration className="absolute top-4 right-0" />
-
                   <div className="flex size-12 items-center justify-center bg-muted px-4 py-1 tracking-tighter">
                     0{index + 1}
                   </div>
@@ -92,33 +90,3 @@ const Process = ({className}: ProcessProps) => {
 };
 
 export default Process;
-
-const Illustration = (props: React.SVGProps<SVGSVGElement>) => {
-  return (
-    <svg
-      width="22"
-      height="20"
-      viewBox="0 0 22 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <line
-        x1="0.607422"
-        y1="2.57422"
-        x2="21.5762"
-        y2="2.57422"
-        stroke="#FF0000"
-        strokeWidth="4"
-      />
-      <line
-        x1="19.5762"
-        y1="19.624"
-        x2="19.5762"
-        y2="4.57422"
-        stroke="#FF0000"
-        strokeWidth="4"
-      />
-    </svg>
-  );
-};

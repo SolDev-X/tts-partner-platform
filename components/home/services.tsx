@@ -8,7 +8,7 @@ interface ServicesProps {
 
 const Services = ({className}: ServicesProps) => {
   return (
-    <section className={cn("py-32", className)} id="services">
+    <section className={cn("py-18", className)} id="services">
       <div className="container mx-auto items-center">
         <div className="mx-auto max-w-6xl space-y-12">
           <div className="space-y-4 text-center">

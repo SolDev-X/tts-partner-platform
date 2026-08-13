@@ -111,8 +111,9 @@ export default function Footer() {
                   <Image
                     src="/icons/WeCom.svg"
                     alt="企业微信"
-                    width={24}
-                    height={24}
+                    width={20}
+                    height={20}
+                    className="size-5 object-contain grayscale opacity-90"
                   />
                 </HoverCardTrigger>
                 <HoverCardContent className="w-auto p-1">
@@ -124,45 +125,7 @@ export default function Footer() {
                   />
                 </HoverCardContent>
               </HoverCard>
-              <a
-                href="https://m.tb.cn/h.8STM0HG?tk=y9twTZcE8jl"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="前往闲鱼主页"
-                title="闲鱼"
-                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted"
-              >
-                <Image
-                  src="/icons/a-xianyu_huaban1.svg"
-                  alt=""
-                  width={20}
-                  height={20}
-                />
-              </a>
-              <span
-                aria-label="小红书"
-                title="小红书"
-                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted"
-              >
-                <Image
-                  src="/icons/xiaohongshu.svg"
-                  alt=""
-                  width={20}
-                  height={20}
-                />
-              </span>
-              <span
-                aria-label="抖音"
-                title="抖音"
-                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted"
-              >
-                <Image src="/icons/douyin3.svg" alt="" width={20} height={20} />
-              </span>
-            </div>
 
-            <span className="h-5 w-px bg-border" aria-hidden />
-
-            <div className="flex items-center gap-1.5">
               <HoverCard>
                 <HoverCardTrigger className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted">
                   <Image
@@ -170,6 +133,7 @@ export default function Footer() {
                     alt="飞书"
                     width={20}
                     height={20}
+                    className="size-5 object-contain grayscale opacity-90"
                   />
                 </HoverCardTrigger>
                 <HoverCardContent className="w-auto p-1">
@@ -181,18 +145,48 @@ export default function Footer() {
                   />
                 </HoverCardContent>
               </HoverCard>
-              <Link
-                href="mailto:wenyao.dev@gmail.com"
-                aria-label="发送邮件"
-                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted"
+              <a
+                href="https://m.tb.cn/h.8STM0HG?tk=y9twTZcE8jl"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="前往闲鱼主页"
+                title="闲鱼"
+                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted grayscale opacity-90"
               >
                 <Image
-                  src="/icons/gmail.svg"
-                  alt="gmail"
+                  src="/icons/xianyu.svg"
+                  alt=""
                   width={20}
                   height={20}
+                  className="size-[18px] object-contain rounded-[4px]"
                 />
-              </Link>
+              </a>
+              <span
+                aria-label="小红书"
+                title="小红书"
+                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted grayscale opacity-90"
+              >
+                <Image
+                  src="/icons/xiaohongshu.svg"
+                  alt=""
+                  width={20}
+                  height={20}
+                  className="size-[18px] object-contain rounded-[4px]"
+                />
+              </span>
+              <span
+                aria-label="抖音"
+                title="抖音"
+                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted grayscale opacity-90"
+              >
+                <Image
+                  src="/icons/douyin.svg"
+                  alt=""
+                  width={20}
+                  height={20}
+                  className="size-[18px] object-contain rounded-[4px]"
+                />
+              </span>
             </div>
           </div>
         </div>

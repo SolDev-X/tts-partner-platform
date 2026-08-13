@@ -19,8 +19,8 @@ const Testimonial = ({
   className,
   quote = "入驻流程比想象中顺利很多,资料一次就通过了,省了不少时间,团队响应也很及时。",
   author = {
-    name: "广州某 3C 类目卖家",
-    role: "类目报白 · TikTok Shop 美区",
+    name: "深圳某 3C 类目卖家",
+    role: "定邀直邮 · TikTok Shop 欧盟",
     avatar: {
       src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-1.webp",
       alt: "Customer Name",
@@ -28,7 +28,7 @@ const Testimonial = ({
   },
 }: TestimonialProps) => {
   return (
-    <section className={cn("py-32", className)}>
+    <section className={cn("py-18", className)}>
       <div className="container mx-auto">
         <div className="flex flex-col items-center text-center">
           <p className="mb-16 max-w-4xl px-8 font-medium lg:text-3xl">
