@@ -34,7 +34,7 @@ export type CombinationRule = {
   disable: Record<string, string[]>;
 };
 
-export type ServiceVariantMatch = {
+type ServiceVariantMatch = {
   sites?: string | string[];
   shopType?: string;
   onboardingType?: string;

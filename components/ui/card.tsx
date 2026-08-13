@@ -1,75 +1,69 @@
-import * as React from 'react'
-import { cva, type VariantProps } from 'class-variance-authority'
-import { cn } from '@/lib/utils'
+import * as React from "react"
 
-const cardVariants = cva('text-card-foreground rounded-2xl', {
-    variants: {
-        variant: {
-            default: 'bg-card ring-1 ring-foreground/6.5 shadow-lg shadow-foreground/5',
-            soft: 'bg-muted',
-            mixed: 'bg-muted border',
-            outline: 'bg-card ring-1 ring-border',
-        },
-    },
-    defaultVariants: {
-        variant: 'default',
-    },
-})
+import { cn } from "@/lib/utils"
 
-export interface CardProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof cardVariants> {}
-
-const Card = React.forwardRef<HTMLDivElement, CardProps>(({ className, variant, ...props }, ref) => (
+function Card({
+  className,
+  size = "default",
+  variant,
+  ...props
+}: React.ComponentProps<"div"> & {
+  size?: "default" | "sm";
+  variant?: "default" | "outline" | "soft" | "mixed";
+}) {
+  return (
     <div
-        ref={ref}
-        className={cn(cardVariants({ variant, className }))}
-        {...props}
+      data-slot="card"
+      data-size={size}
+      data-variant={variant}
+      className={cn(
+        "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
+        className
+      )}
+      {...props}
     />
-))
-Card.displayName = 'Card'
+  )
+}
 
-const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
+function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
+  return (
     <div
-        ref={ref}
-        className={cn('flex flex-col space-y-1.5 p-6', className)}
-        {...props}
+      data-slot="card-header"
+      className={cn(
+        "group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-(--card-spacing) has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-(--card-spacing)",
+        className
+      )}
+      {...props}
     />
-))
-CardHeader.displayName = 'CardHeader'
+  )
+}
 
-const CardTitle = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
+function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
+  return (
     <div
-        ref={ref}
-        className={cn('font-semibold leading-none tracking-tight', className)}
-        {...props}
+      data-slot="card-title"
+      className={cn(
+        "font-heading text-base leading-snug font-medium group-data-[size=sm]/card:text-sm",
+        className
+      )}
+      {...props}
     />
-))
-CardTitle.displayName = 'CardTitle'
+  )
+}
 
-const CardDescription = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
+function CardContent({ className, ...props }: React.ComponentProps<"div">) {
+  return (
     <div
-        ref={ref}
-        className={cn('text-muted-foreground text-sm', className)}
-        {...props}
+      data-slot="card-content"
+      className={cn("px-(--card-spacing)", className)}
+      {...props}
     />
-))
-CardDescription.displayName = 'CardDescription'
+  )
+}
 
-const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
-    <div
-        ref={ref}
-        className={cn('p-6 pt-0', className)}
-        {...props}
-    />
-))
-CardContent.displayName = 'CardContent'
-
-const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
-    <div
-        ref={ref}
-        className={cn('flex items-center p-6 pt-0', className)}
-        {...props}
-    />
-))
-CardFooter.displayName = 'CardFooter'
-
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+export {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+}

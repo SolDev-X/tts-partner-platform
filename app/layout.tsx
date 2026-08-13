@@ -1,8 +1,8 @@
 import type {Metadata} from "next";
 import "./globals.css";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
-import {AccountOnboardingGuard} from "@/components/account-onboarding-guard";
+import {AccountOnboardingGuard} from "@/components/auth/account-onboarding-guard";
+import Footer from "@/components/layout/footer";
+import Header from "@/components/layout/header";
 
 export const metadata: Metadata = {
   title: "跨境服务平台",

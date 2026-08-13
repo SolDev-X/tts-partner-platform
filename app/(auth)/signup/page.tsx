@@ -1,0 +1,34 @@
+import type {Metadata} from "next";
+import {headers} from "next/headers";
+import {redirect} from "next/navigation";
+
+import {SignupForm} from "@/components/auth/signup-form";
+import {auth} from "@/lib/auth";
+import {prisma} from "@/lib/prisma";
+
+export const metadata: Metadata = {
+  title: "注册 | 跨境服务平台",
+  description: "注册跨境服务平台账户。",
+};
+
+export default async function SignupPage() {
+  const session = await auth.api.getSession({headers: await headers()});
+
+  if (session?.user.role === "ADMIN") redirect("/admin/orders");
+  if (session?.user.role === "CUSTOMER") {
+    const account = await prisma.user.findUnique({
+      where: {id: session.user.id},
+      select: {onboardingRequired: true},
+    });
+
+    if (!account?.onboardingRequired) redirect("/account/orders");
+  }
+
+  return (
+    <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
+      <div className="w-full max-w-sm md:max-w-4xl">
+        <SignupForm />
+      </div>
+    </div>
+  );
+}

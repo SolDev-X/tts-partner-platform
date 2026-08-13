@@ -6,7 +6,7 @@ import {ChevronDown} from "lucide-react";
 import {useEffect, useRef, useState} from "react";
 
 import {services} from "@/lib/data";
-import {HeaderControls} from "@/components/header-controls";
+import {HeaderControls} from "@/components/layout/header-controls";
 
 const navLinks = [
   {href: "/about", label: "关于我们"},

@@ -5,7 +5,7 @@ import type {
   ProgressStep,
 } from "@/lib/generated/prisma";
 
-export const progressStepMeta: Record<
+const progressStepMeta: Record<
   ProgressStep,
   {label: string; order: number}
 > = {
@@ -16,7 +16,7 @@ export const progressStepMeta: Record<
   COMPLETED: {label: "已完成", order: 4},
 };
 
-export const progressStepOrder: ProgressStep[] = [
+const progressStepOrder: ProgressStep[] = [
   "ORDER_CREATED",
   "PAYMENT_SUCCESS",
   "MATERIALS_READY",
@@ -24,7 +24,7 @@ export const progressStepOrder: ProgressStep[] = [
   "COMPLETED",
 ];
 
-export type TimelineStepState = "completed" | "current" | "pending";
+type TimelineStepState = "completed" | "current" | "pending";
 
 export type TimelineStep = {
   step: ProgressStep;

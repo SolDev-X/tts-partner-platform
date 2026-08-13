@@ -1,389 +1,38 @@
 "use client";
 
-import {zodResolver} from "@hookform/resolvers/zod";
-import {Eye, EyeOff, LoaderCircle, TriangleAlert} from "lucide-react";
+import {useState} from "react";
+import {LoaderCircle, MessageCircle, Smartphone, TriangleAlert} from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
-import {useEffect, useState} from "react";
-import {useForm} from "react-hook-form";
-import {z} from "zod";
 
+import {cn} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent} from "@/components/ui/card";
-import {Field, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldSeparator,
+} from "@/components/ui/field";
 import {Input} from "@/components/ui/input";
-import {Separator} from "@/components/ui/separator";
 import {authClient} from "@/lib/auth-client";
 
-const passwordLoginSchema = z.object({
-  identifier: z.string().trim().min(1, "请输入邮箱或手机号"),
-  password: z
-    .string()
-    .min(8, "密码至少需要 8 位")
-    .max(128, "密码不能超过 128 位"),
-});
-
-const phoneSchema = z.string().regex(/^1[3-9]\d{9}$/, "请输入有效的手机号");
-const emailSchema = z.string().trim().toLowerCase().email();
-const otpSchema = z.string().regex(/^\d{6}$/, "请输入 6 位数字验证码");
-
-type PasswordLoginValues = z.infer<typeof passwordLoginSchema>;
-type LoginMethod = "otp" | "password";
-type LoginIdentity = "customer" | "admin";
-type OtpIdentifier = {
-  type: "phone" | "email";
-  value: string;
-  display: string;
-};
-
-interface LoginFormProps {
-  phoneAuthEnabled?: boolean;
-  emailOtpEnabled?: boolean;
-  googleAuthEnabled?: boolean;
-  initialAccountSetup?: boolean;
-}
-
-async function signInWithPhonePassword(phone: string, password: string) {
-  try {
-    const response = await fetch("/api/auth/phone-password", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({phone, password}),
-    });
-
-    return response.ok ? undefined : new Error("Invalid credentials");
-  } catch {
-    return new Error("Unable to sign in");
-  }
-}
-
-export function LoginForm({
-  phoneAuthEnabled = false,
-  emailOtpEnabled = false,
-  googleAuthEnabled = false,
-  initialAccountSetup = false,
-}: LoginFormProps) {
-  const otpAuthEnabled = phoneAuthEnabled || emailOtpEnabled;
-  const [identity, setIdentity] = useState<LoginIdentity>("customer");
-  const [method, setMethod] = useState<LoginMethod>(
-    otpAuthEnabled ? "otp" : "password",
-  );
-  const [isGooglePending, setIsGooglePending] = useState(false);
-  const [googleError, setGoogleError] = useState<string>();
-
-  async function signInWithGoogle() {
-    setGoogleError(undefined);
-    setIsGooglePending(true);
-
-    const {error} = await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/",
-    });
-
-    if (error) {
-      setGoogleError("Google 登录暂时不可用，请稍后重试。");
-      setIsGooglePending(false);
-    }
-  }
-
-  return (
-    <div className="mx-auto w-full max-w-md">
-      <div className="text-center">
-        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          {identity === "admin" ? "管理员登录" : "登录或注册"}
-        </h1>
-      </div>
-
-      <Card className="mt-8" variant="default">
-        <CardContent className="space-y-6 px-6 py-7 sm:px-8 sm:py-8">
-          {!initialAccountSetup && (
-            <div className="grid grid-cols-2 rounded-lg bg-muted p-1">
-              <Button
-                type="button"
-                variant={identity === "customer" ? "default" : "ghost"}
-                className="w-full"
-                onClick={() => setIdentity("customer")}
-              >
-                客户登录
-              </Button>
-              <Button
-                type="button"
-                variant={identity === "admin" ? "default" : "ghost"}
-                className="w-full"
-                onClick={() => setIdentity("admin")}
-              >
-                管理员登录
-              </Button>
-            </div>
-          )}
-
-          {!initialAccountSetup && identity === "customer" && googleAuthEnabled && (
-            <>
-              <Button
-                type="button"
-                variant="outline"
-                size="lg"
-                className="w-full"
-                disabled={isGooglePending}
-                onClick={signInWithGoogle}
-              >
-                {isGooglePending ? (
-                  <LoaderCircle className="animate-spin" aria-hidden="true" />
-                ) : (
-                  <span
-                    className="flex size-5 items-center justify-center rounded-full border text-xs font-semibold"
-                    aria-hidden="true"
-                  >
-                    G
-                  </span>
-                )}
-                {isGooglePending ? "正在前往 Google" : "使用 Google 继续"}
-              </Button>
-
-              <FieldError>{googleError}</FieldError>
-
-              <div className="flex items-center gap-4" aria-hidden="true">
-                <Separator className="flex-1" />
-                <span className="text-xs text-muted-foreground">或</span>
-                <Separator className="flex-1" />
-              </div>
-            </>
-          )}
-
-          {initialAccountSetup ? (
-            <IdentifierOtpFields
-              phoneAuthEnabled={phoneAuthEnabled}
-              emailOtpEnabled={emailOtpEnabled}
-              initialNeedsPassword
-            />
-          ) : identity === "admin" ? (
-            <PasswordLoginFields expectedRole="ADMIN" />
-          ) : method === "otp" && otpAuthEnabled ? (
-            <IdentifierOtpFields
-              phoneAuthEnabled={phoneAuthEnabled}
-              emailOtpEnabled={emailOtpEnabled}
-            />
-          ) : (
-            <PasswordLoginFields
-              expectedRole="CUSTOMER"
-              onUseOtp={() => setMethod("otp")}
-            />
-          )}
-
-          {!initialAccountSetup && identity === "customer" && (
-            <div className="space-y-3 text-center text-sm">
-              {otpAuthEnabled && (
-                <Button
-                  type="button"
-                  variant="link"
-                  className="h-auto p-0 text-muted-foreground"
-                  onClick={() =>
-                    setMethod(method === "otp" ? "password" : "otp")
-                  }
-                >
-                  {method === "otp" ? "密码登录" : "验证码登录"}
-                </Button>
-              )}
-            </div>
-          )}
-
-          {!initialAccountSetup && identity === "admin" && (
-            <p className="text-center text-xs leading-5 text-muted-foreground">
-              管理员账号由平台指定，不提供注册或验证码登录。
-            </p>
-          )}
-
-          <p className="text-center text-xs leading-5 text-muted-foreground">
-            继续即表示您已阅读并同意
-            <Link
-              href="/privacy"
-              className="underline underline-offset-4 hover:text-foreground"
-            >
-              隐私政策
-            </Link>
-            。
-          </p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function parseOtpIdentifier(identifier: string): OtpIdentifier | undefined {
-  const normalizedIdentifier = identifier.trim();
-
-  if (phoneSchema.safeParse(normalizedIdentifier).success) {
-    return {
-      type: "phone",
-      value: `+86${normalizedIdentifier}`,
-      display: normalizedIdentifier,
-    };
-  }
-
-  const emailResult = emailSchema.safeParse(normalizedIdentifier);
-  if (emailResult.success) {
-    return {
-      type: "email",
-      value: emailResult.data,
-      display: emailResult.data,
-    };
-  }
-}
-
-interface IdentifierOtpFieldsProps {
-  phoneAuthEnabled: boolean;
-  emailOtpEnabled: boolean;
-  initialNeedsPassword?: boolean;
-}
-
-function IdentifierOtpFields({
-  phoneAuthEnabled,
-  emailOtpEnabled,
-  initialNeedsPassword = false,
-}: IdentifierOtpFieldsProps) {
+export function LoginForm({className, ...props}: React.ComponentProps<"div">) {
   const router = useRouter();
-  const [identifier, setIdentifier] = useState("");
-  const [sentIdentifier, setSentIdentifier] = useState<OtpIdentifier>();
-  const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [countdown, setCountdown] = useState(0);
-  const [isSending, setIsSending] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [needsPassword, setNeedsPassword] = useState(initialNeedsPassword);
-  const [companyName, setCompanyName] = useState("");
+  const [loginType, setLoginType] = useState<"customer" | "admin">("customer");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [isSettingPassword, setIsSettingPassword] = useState(false);
   const [error, setError] = useState<string>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (countdown <= 0) return;
-
-    const timer = window.setTimeout(() => {
-      setCountdown((value) => value - 1);
-    }, 1000);
-
-    return () => window.clearTimeout(timer);
-  }, [countdown]);
-
-  async function sendOtp() {
-    const parsedIdentifier = parseOtpIdentifier(identifier);
-    if (!parsedIdentifier) {
-      setError("请输入有效的手机号或邮箱地址。");
-      return;
-    }
-
-    if (parsedIdentifier.type === "phone" && !phoneAuthEnabled) {
-      setError("手机号验证码暂未开放，请使用邮箱继续。");
-      return;
-    }
-
-    if (parsedIdentifier.type === "email" && !emailOtpEnabled) {
-      setError("邮箱验证码暂未开放，请使用手机号继续。");
-      return;
-    }
-
-    setError(undefined);
-    setIsSending(true);
-    const {error: sendError} =
-      parsedIdentifier.type === "phone"
-        ? await authClient.phoneNumber.sendOtp({
-            phoneNumber: parsedIdentifier.value,
-          })
-        : await authClient.emailOtp.sendVerificationOtp({
-            email: parsedIdentifier.value,
-            type: "sign-in",
-          });
-    setIsSending(false);
-
-    if (sendError) {
-      setError("验证码发送失败，请稍后重试。");
-      return;
-    }
-
-    setSentIdentifier(parsedIdentifier);
-    setOtpSent(true);
-    setCountdown(60);
-  }
-
-  async function verifyOtp(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const result = otpSchema.safeParse(otp);
-    if (!result.success) {
-      setError(result.error.issues[0]?.message);
-      return;
-    }
-
-    if (!sentIdentifier) {
-      setError("请先获取验证码。");
-      return;
-    }
-
-    setError(undefined);
-    setIsVerifying(true);
-    const {error: verifyError} =
-      sentIdentifier.type === "phone"
-        ? await authClient.phoneNumber.verify({
-            phoneNumber: sentIdentifier.value,
-            code: otp,
-            disableSession: false,
-            updatePhoneNumber: false,
-          })
-        : await authClient.signIn.emailOtp({
-            email: sentIdentifier.value,
-            otp,
-          });
-    if (verifyError) {
-      setIsVerifying(false);
-      setError("验证码无效或已过期，请重新获取。");
-      return;
-    }
-
-    const roleResponse = await fetch("/api/account/role");
-    if (!roleResponse.ok) {
-      await authClient.signOut();
-      setIsVerifying(false);
-      setError("账户状态检查失败，请重新登录后再试。");
-      return;
-    }
-
-    const roleResult = (await roleResponse.json()) as {role?: string};
-
-    if (roleResult?.role !== "CUSTOMER") {
-      await authClient.signOut();
-      setIsVerifying(false);
-      setError("该账号为管理员，请使用管理员登录入口。");
-      return;
-    }
-
-    const passwordStatusResponse = await fetch("/api/account/password");
-    if (!passwordStatusResponse.ok) {
-      setIsVerifying(false);
-      setError("账户状态检查失败，请重新登录后再试。");
-      return;
-    }
-
-    const passwordStatus = (await passwordStatusResponse.json()) as {
-      needsOnboarding: boolean;
-    };
-    setIsVerifying(false);
-
-    if (!passwordStatus.needsOnboarding) {
-      router.push("/");
-      router.refresh();
-      return;
-    }
-
-    setNeedsPassword(true);
-    setError(undefined);
-  }
-
-  async function submitPassword(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    if (companyName.trim().length < 2 || companyName.trim().length > 80) {
-      setError("请输入 2 至 80 个字符的公司名称。");
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
+      setError("请输入有效的邮箱地址。");
       return;
     }
 
@@ -393,273 +42,17 @@ function IdentifierOtpFields({
     }
 
     setError(undefined);
-    setIsSettingPassword(true);
-    const response = await fetch("/api/account/password", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({password, companyName: companyName.trim()}),
+    setIsSubmitting(true);
+
+    const {error: signInError} = await authClient.signIn.email({
+      email: normalizedEmail,
+      password,
+      rememberMe: true,
     });
-    setIsSettingPassword(false);
 
-    if (!response.ok) {
-      setError("密码设置失败，请稍后重试。");
-      return;
-    }
-
-    router.push("/");
-    router.refresh();
-  }
-
-  function changeIdentifier() {
-    setOtpSent(false);
-    setSentIdentifier(undefined);
-    setOtp("");
-    setCountdown(0);
-    setNeedsPassword(false);
-    setCompanyName("");
-    setPassword("");
-    setError(undefined);
-  }
-
-  if (needsPassword) {
-    return (
-      <form onSubmit={submitPassword} noValidate>
-        <FieldGroup>
-          <div className="space-y-1">
-            <h2 className="text-lg font-semibold">完善账户信息</h2>
-            <p className="text-sm leading-6 text-muted-foreground">
-              验证码已通过，请填写公司名称并设置登录密码。
-            </p>
-          </div>
-
-          <Field data-invalid={Boolean(error)}>
-            <FieldLabel htmlFor="company-name">公司名称</FieldLabel>
-            <Input
-              id="company-name"
-              autoComplete="organization"
-              maxLength={80}
-              placeholder="请输入公司名称"
-              value={companyName}
-              aria-invalid={Boolean(error)}
-              onChange={(event) => setCompanyName(event.target.value)}
-            />
-          </Field>
-
-          <Field data-invalid={Boolean(error)}>
-            <FieldLabel htmlFor="new-password">密码</FieldLabel>
-            <div className="relative">
-              <Input
-                id="new-password"
-                type={showPassword ? "text" : "password"}
-                autoComplete="new-password"
-                minLength={8}
-                maxLength={128}
-                placeholder="至少 8 位字符"
-                className="pr-11"
-                value={password}
-                aria-invalid={Boolean(error)}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                className="absolute top-1/2 right-1 -translate-y-1/2 text-muted-foreground"
-                aria-label={showPassword ? "隐藏密码" : "显示密码"}
-                onClick={() => setShowPassword((value) => !value)}
-              >
-                {showPassword ? (
-                  <EyeOff aria-hidden="true" />
-                ) : (
-                  <Eye aria-hidden="true" />
-                )}
-              </Button>
-            </div>
-          </Field>
-
-          <FieldError>{error}</FieldError>
-
-          <Button
-            type="submit"
-            size="lg"
-            className="w-full"
-            disabled={isSettingPassword}
-          >
-            {isSettingPassword && (
-              <LoaderCircle className="animate-spin" aria-hidden="true" />
-            )}
-            {isSettingPassword ? "正在保存" : "完成并继续"}
-          </Button>
-        </FieldGroup>
-      </form>
-    );
-  }
-
-  if (otpSent && sentIdentifier) {
-    return (
-      <form onSubmit={verifyOtp} noValidate>
-        <FieldGroup>
-          <div className="text-center text-sm leading-6 text-muted-foreground sm:text-base">
-            <p>请输入发送至以下账号的验证码</p>
-            <p className="break-all font-medium text-foreground">
-              {sentIdentifier.display}
-            </p>
-          </div>
-
-          <Field data-invalid={Boolean(error)}>
-            <FieldLabel htmlFor="otp" className="sr-only">
-              验证码
-            </FieldLabel>
-            <Input
-              id="otp"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              maxLength={6}
-              autoFocus
-              placeholder="请输入验证码"
-              className="h-14 text-center text-lg tracking-[0.18em] sm:text-xl"
-              value={otp}
-              aria-invalid={Boolean(error)}
-              onChange={(event) =>
-                setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))
-              }
-            />
-          </Field>
-
-          <FieldError>{error}</FieldError>
-
-          <Button
-            type="submit"
-            size="lg"
-            className="w-full"
-            disabled={isVerifying}
-          >
-            {isVerifying && (
-              <LoaderCircle className="animate-spin" aria-hidden="true" />
-            )}
-            {isVerifying ? "正在验证" : "验证并继续"}
-          </Button>
-
-          <div className="space-y-1 text-center text-sm text-muted-foreground">
-            <p>
-              没有收到验证码？{" "}
-              <Button
-                type="button"
-                variant="link"
-                className="h-auto p-0 text-current"
-                disabled={countdown > 0 || isSending}
-                onClick={sendOtp}
-              >
-                {isSending
-                  ? "正在发送"
-                  : countdown > 0
-                    ? `${countdown} 秒后重新发送`
-                    : "重新发送"}
-              </Button>
-            </p>
-            <p>
-              账号有误？{" "}
-              <Button
-                type="button"
-                variant="link"
-                className="h-auto p-0 text-current"
-                onClick={changeIdentifier}
-              >
-                更换手机号或邮箱
-              </Button>
-            </p>
-          </div>
-        </FieldGroup>
-      </form>
-    );
-  }
-
-  return (
-    <>
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          void sendOtp();
-        }}
-        noValidate
-      >
-        <FieldGroup>
-          <Field data-invalid={Boolean(error)}>
-            <FieldLabel htmlFor="identifier">手机号或邮箱</FieldLabel>
-            <Input
-              id="identifier"
-              type="text"
-              inputMode="email"
-              autoComplete="username"
-              autoCapitalize="none"
-              spellCheck={false}
-              placeholder="请输入手机号或邮箱"
-              value={identifier}
-              aria-invalid={Boolean(error)}
-              onChange={(event) => setIdentifier(event.target.value)}
-            />
-          </Field>
-
-          <FieldError>{error}</FieldError>
-
-          <Button
-            type="submit"
-            size="lg"
-            className="w-full"
-            disabled={isSending}
-          >
-            {isSending && (
-              <LoaderCircle className="animate-spin" aria-hidden="true" />
-            )}
-            {isSending ? "正在发送" : "发送验证码"}
-          </Button>
-        </FieldGroup>
-      </form>
-
-      <p className="mt-6 text-center text-xs text-muted-foreground">
-        未注册的手机号或邮箱验证后将自动创建账户。
-      </p>
-    </>
-  );
-}
-
-function PasswordLoginFields({
-  expectedRole,
-  onUseOtp,
-}: {
-  expectedRole: "CUSTOMER" | "ADMIN";
-  onUseOtp?: () => void;
-}) {
-  const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
-  const form = useForm<PasswordLoginValues>({
-    resolver: zodResolver(passwordLoginSchema),
-    defaultValues: {
-      identifier: "",
-      password: "",
-    },
-  });
-
-  async function onSubmit(values: PasswordLoginValues) {
-    form.clearErrors("root");
-
-    const identifier = values.identifier.trim();
-    const isPhone = phoneSchema.safeParse(identifier).success;
-
-    const error = isPhone
-      ? await signInWithPhonePassword(identifier, values.password)
-      : (
-          await authClient.signIn.email({
-            email: identifier,
-            password: values.password,
-            rememberMe: true,
-          })
-        ).error;
-
-    if (error) {
-      form.setError("root", {
-        message: "邮箱、手机号或密码错误，请重新检查。",
-      });
+    if (signInError) {
+      setIsSubmitting(false);
+      setError("邮箱或密码错误，请重新检查。");
       return;
     }
 
@@ -667,128 +60,170 @@ function PasswordLoginFields({
     const roleResult = roleResponse.ok
       ? ((await roleResponse.json()) as {role?: string})
       : undefined;
+    const expectedRole = loginType === "admin" ? "ADMIN" : "CUSTOMER";
 
     if (roleResult?.role !== expectedRole) {
       await authClient.signOut();
-      form.setError("root", {
-        message:
-          expectedRole === "ADMIN"
-            ? "该账号不是管理员，请使用客户登录。"
-            : "该账号为管理员，请使用管理员登录入口。",
-      });
+      setIsSubmitting(false);
+      setError(
+        loginType === "admin"
+          ? "该账号不是管理员，请使用客户登录。"
+          : "该账号为管理员，请使用管理员登录入口。",
+      );
       return;
     }
 
-    router.push(expectedRole === "ADMIN" ? "/admin/orders" : "/");
+    router.push(loginType === "admin" ? "/admin/orders" : "/");
     router.refresh();
   }
 
+  function changeLoginType(type: "customer" | "admin") {
+    setLoginType(type);
+    setError(undefined);
+  }
+
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-      <FieldGroup>
-        <Field data-invalid={Boolean(form.formState.errors.identifier)}>
-          <FieldLabel htmlFor="login-identifier">
-            {expectedRole === "ADMIN" ? "邮箱" : "邮箱或手机号"}
-          </FieldLabel>
-          <Input
-            id="login-identifier"
-            type="text"
-            inputMode={expectedRole === "ADMIN" ? "email" : "text"}
-            autoComplete="username"
-            autoCapitalize="none"
-            spellCheck={false}
-            placeholder={
-              expectedRole === "ADMIN"
-                ? "name@example.com"
-                : "请输入手机号或邮箱"
-            }
-            aria-invalid={Boolean(form.formState.errors.identifier)}
-            {...form.register("identifier")}
-          />
-          <FieldError errors={[form.formState.errors.identifier]} />
-        </Field>
-
-        <Field data-invalid={Boolean(form.formState.errors.password)}>
-          <FieldLabel htmlFor="password">密码</FieldLabel>
-          <div className="relative">
-            <Input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              autoComplete="current-password"
-              placeholder="请输入密码"
-              className="pr-11"
-              aria-invalid={Boolean(form.formState.errors.password)}
-              {...form.register("password")}
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              className="absolute top-1/2 right-1 -translate-y-1/2 text-muted-foreground"
-              aria-label={showPassword ? "隐藏密码" : "显示密码"}
-              onClick={() => setShowPassword((value) => !value)}
-            >
-              {showPassword ? (
-                <EyeOff aria-hidden="true" />
-              ) : (
-                <Eye aria-hidden="true" />
-              )}
-            </Button>
-          </div>
-          <FieldError errors={[form.formState.errors.password]} />
-        </Field>
-
-        {form.formState.errors.root && (
-          <div
-            role="alert"
-            className="flex items-start gap-3 rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive"
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <Card className="overflow-hidden p-0 md:min-h-[34rem]">
+        <CardContent className="grid h-full p-0 md:grid-cols-2">
+          <form
+            className="flex h-full items-center p-6 md:p-10"
+            onSubmit={handleSubmit}
+            noValidate
           >
-            <TriangleAlert
-              className="mt-0.5 size-5 shrink-0"
-              aria-hidden="true"
-            />
-            <div className="space-y-1 leading-4">
-              <p>{form.formState.errors.root.message}</p>
-              {expectedRole === "CUSTOMER" && (
-                <p>
-                  未注册的手机号或邮箱请使用验证码继续，验证后将自动创建账户。{" "}
-                  {onUseOtp && (
-                    <Button
-                      type="button"
-                      variant="link"
-                      className="h-auto p-0 font-medium text-destructive underline underline-offset-4"
-                      onClick={onUseOtp}
-                    >
-                      使用验证码继续
-                    </Button>
-                  )}
+            <FieldGroup className="gap-6">
+              <div className="grid grid-cols-2 rounded-lg bg-muted p-1">
+                <Button
+                  type="button"
+                  variant={loginType === "customer" ? "default" : "ghost"}
+                  className="h-7 w-full text-xs"
+                  onClick={() => changeLoginType("customer")}
+                  disabled={isSubmitting}
+                >
+                  客户登录
+                </Button>
+                <Button
+                  type="button"
+                  variant={loginType === "admin" ? "default" : "ghost"}
+                  className="h-7 w-full text-xs"
+                  onClick={() => changeLoginType("admin")}
+                  disabled={isSubmitting}
+                >
+                  管理员登录
+                </Button>
+              </div>
+              <div className="flex flex-col items-center gap-2 text-center">
+                <h1 className="text-2xl font-bold">
+                  {loginType === "admin" ? "管理员登录" : "欢迎回来"}
+                </h1>
+                <p className="text-balance text-muted-foreground">
+                  {loginType === "admin"
+                    ? "登录平台管理后台"
+                    : "登录您的跨境服务平台账户"}
                 </p>
+              </div>
+              <Field>
+                <FieldLabel htmlFor="email" className="text-sm">
+                  邮箱
+                </FieldLabel>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="请输入邮箱"
+                  className="h-10 px-3"
+                  autoComplete="email"
+                  value={email}
+                  aria-invalid={Boolean(error)}
+                  onChange={(event) => setEmail(event.target.value)}
+                  required
+                />
+              </Field>
+              <Field>
+                <div className="flex items-center">
+                  <FieldLabel htmlFor="password" className="text-sm">
+                    密码
+                  </FieldLabel>
+                  <Link
+                    href="/forgot-password"
+                    className="ml-auto text-xs underline-offset-2 hover:underline"
+                  >
+                    忘记密码？
+                  </Link>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  className="h-10 px-3"
+                  autoComplete="current-password"
+                  value={password}
+                  aria-invalid={Boolean(error)}
+                  onChange={(event) => setPassword(event.target.value)}
+                  required
+                />
+              </Field>
+              {error && (
+                <div
+                  role="alert"
+                  className="flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive"
+                >
+                  <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                  <p>{error}</p>
+                </div>
               )}
-            </div>
+              <Field>
+                <Button type="submit" className="h-10" disabled={isSubmitting}>
+                  {isSubmitting && (
+                    <LoaderCircle className="animate-spin" aria-hidden="true" />
+                  )}
+                  {isSubmitting
+                    ? "正在登录"
+                    : loginType === "admin"
+                      ? "管理员登录"
+                      : "登录"}
+                </Button>
+              </Field>
+              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card text-xs">
+                或使用以下方式继续
+              </FieldSeparator>
+              <Field className="grid grid-cols-3 gap-4">
+                <Button variant="outline" type="button" className="h-10">
+                  <MessageCircle aria-hidden="true" />
+                  <span className="sr-only">使用微信登录</span>
+                </Button>
+                <Button variant="outline" type="button" className="h-10">
+                  <Smartphone aria-hidden="true" />
+                  <span className="sr-only">使用手机号登录</span>
+                </Button>
+                <Button variant="outline" type="button" className="h-10">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path
+                      d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  <span className="sr-only">使用 Google 登录</span>
+                </Button>
+              </Field>
+              <FieldDescription className="text-center text-xs">
+                还没有账户？<Link href="/signup">立即注册</Link>
+              </FieldDescription>
+            </FieldGroup>
+          </form>
+          <div className="relative hidden bg-muted md:block">
+            <Image
+              src="/placeholder.png"
+              alt="登录页面配图"
+              fill
+              sizes="(min-width: 768px) 50vw, 0px"
+              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+            />
           </div>
-        )}
-
-        <Button
-          type="submit"
-          size="lg"
-          className="w-full"
-          disabled={form.formState.isSubmitting}
-        >
-          {form.formState.isSubmitting && (
-            <LoaderCircle className="animate-spin" aria-hidden="true" />
-          )}
-          {form.formState.isSubmitting ? "正在登录" : "登录"}
-        </Button>
-
-        <div className="text-center">
-          <Link
-            href="/forgot-password"
-            className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
-          >
-            忘记密码？
-          </Link>
-        </div>
-      </FieldGroup>
-    </form>
+        </CardContent>
+      </Card>
+      <FieldDescription className="px-6 text-center text-xs">
+        继续即表示您同意我们的<a href="#">服务条款</a>和
+        <Link href="/privacy">隐私政策</Link>。
+      </FieldDescription>
+    </div>
   );
 }
