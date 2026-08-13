@@ -35,12 +35,7 @@ export default function Header() {
     <header className="mx-auto flex w-full max-w-6xl items-center justify-between p-4">
       <h1>
         <Link href="/" className="flex items-center gap-1.5">
-          <Image
-            src="/vercel.svg"
-            alt="跨境服务平台"
-            width={20}
-            height={20}
-          />
+          <Image src="/vercel.svg" alt="跨境服务平台" width={20} height={20} />
           <span className="text-base font-bold lg:text-xl">跨境服务平台</span>
         </Link>
       </h1>
