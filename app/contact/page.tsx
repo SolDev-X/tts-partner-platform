@@ -102,8 +102,8 @@ const Contact = (props: Props) => {
   };
 
   return (
-    <section className={cn("py-18", className)}>
-      <div className="container mx-auto">
+    <section className={cn("py-68", className)}>
+      <div className="container mx-auto items-center">
         <div className="flex flex-col gap-16 lg:flex-row lg:gap-24">
           <div className="flex flex-1 flex-col gap-10">
             <div className="flex flex-col gap-4">

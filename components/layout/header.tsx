@@ -32,7 +32,7 @@ export default function Header() {
   }, [servicesOpen]);
 
   return (
-    <header className="bg-white  rounded-b-4xl">
+    <header className="bg-white  rounded-b-2xl">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between p-4 ">
         <h1>
           <Link href="/" className="flex items-center gap-1.5">
