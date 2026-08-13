@@ -15,7 +15,6 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -54,7 +53,6 @@ export function HeaderControls() {
             isAdmin={isAdmin}
             isSigningOut={isSigningOut}
             onSignOut={handleSignOut}
-            compact
           />
         </div>
       )}
@@ -95,7 +93,6 @@ type AccountMenuProps = {
   isAdmin: boolean;
   isSigningOut: boolean;
   onSignOut: () => Promise<void>;
-  compact?: boolean;
 };
 
 function AccountMenu({user, onSignOut}: AccountMenuProps) {
@@ -110,7 +107,7 @@ function AccountMenu({user, onSignOut}: AccountMenuProps) {
         }
       >
         <Avatar className="hidden sm:flex">
-          <AvatarImage src={user.email} alt={user.name} />
+          <AvatarImage src={user.name} alt={user.name} />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div className="grid flex-1 text-left text-sm leading-tight">
