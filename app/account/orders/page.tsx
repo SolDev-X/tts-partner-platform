@@ -373,7 +373,7 @@ export default async function OrdersPage({
                     className="shrink-0"
                     nativeButton={false}
                     render={
-                      <Link href={`/account/orders/${order.orderNumber}`} />
+                      <Link href={`/dashboard/orders/${order.orderNumber}`} />
                     }
                   >
                     {orderView.action}

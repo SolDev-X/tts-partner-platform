@@ -12,7 +12,11 @@ import {CancelOrderButton} from "@/components/orders/cancel-order-button";
 import {DeliveryActions} from "@/components/orders/delivery-actions";
 import {auth} from "@/lib/auth";
 import {services} from "@/lib/data";
-import {deliveryEventLabels, deliveryStatusMeta, getDeliveryFields} from "@/lib/delivery";
+import {
+  deliveryEventLabels,
+  deliveryStatusMeta,
+  getDeliveryFields,
+} from "@/lib/delivery";
 import {getOrderDisplayTitle, isStringSelection} from "@/lib/order-display";
 import {buildOrderTimeline} from "@/lib/order-progress";
 import {orderStatusMeta} from "@/lib/order-status";
@@ -125,7 +129,8 @@ export default async function OrderDetailPage({
     (field) => deliveryData[field.key],
   );
   const deliveryIsPublished =
-    order.deliveryStatus === "PUBLISHED" || order.deliveryStatus === "CONFIRMED";
+    order.deliveryStatus === "PUBLISHED" ||
+    order.deliveryStatus === "CONFIRMED";
   const deliveryLocked = order.paymentStatus !== "PAID";
 
   return (
@@ -134,7 +139,7 @@ export default async function OrderDetailPage({
         variant="ghost"
         className="-ml-3"
         nativeButton={false}
-        render={<Link href="/account/orders" />}
+        render={<Link href="/dashboard/orders" />}
       >
         返回我的订单
       </Button>
@@ -220,8 +225,12 @@ export default async function OrderDetailPage({
                     <dl className="grid gap-3 rounded-lg bg-muted/40 p-4 sm:grid-cols-2">
                       {deliveryFields.map((field) => (
                         <div key={field.key}>
-                          <dt className="text-muted-foreground">{field.label}</dt>
-                          <dd className="mt-1 break-all font-medium">{deliveryData[field.key]}</dd>
+                          <dt className="text-muted-foreground">
+                            {field.label}
+                          </dt>
+                          <dd className="mt-1 break-all font-medium">
+                            {deliveryData[field.key]}
+                          </dd>
                         </div>
                       ))}
                     </dl>
@@ -232,7 +241,8 @@ export default async function OrderDetailPage({
                         <p className="font-medium">{order.deliveryFileName}</p>
                         {order.deliveryFileSize !== null && (
                           <p className="mt-1 text-xs text-muted-foreground">
-                            {(order.deliveryFileSize / 1024 / 1024).toFixed(2)} MB
+                            {(order.deliveryFileSize / 1024 / 1024).toFixed(2)}{" "}
+                            MB
                           </p>
                         )}
                       </div>
@@ -241,7 +251,9 @@ export default async function OrderDetailPage({
                         size="sm"
                         nativeButton={false}
                         render={
-                          <a href={`/api/orders/${order.orderNumber}/delivery/file`} />
+                          <a
+                            href={`/api/orders/${order.orderNumber}/delivery/file`}
+                          />
                         }
                       >
                         <Download /> 下载交付文件
@@ -251,19 +263,31 @@ export default async function OrderDetailPage({
                   {(order.deliveryConfirmedAt ?? order.deliveryPublishedAt) && (
                     <p className="text-xs text-muted-foreground">
                       {order.deliveryConfirmedAt ? "确认时间" : "发布时间"}：
-                      {(order.deliveryConfirmedAt ?? order.deliveryPublishedAt)?.toLocaleString("zh-CN")}
+                      {(
+                        order.deliveryConfirmedAt ?? order.deliveryPublishedAt
+                      )?.toLocaleString("zh-CN")}
                     </p>
                   )}
                   {order.deliveryEvents.length > 0 && (
                     <div className="space-y-2 border-t pt-4">
                       <p className="font-medium">交付记录</p>
                       {order.deliveryEvents.map((event, index) => (
-                        <div key={`${event.type}-${event.createdAt.toISOString()}-${index}`} className="flex items-start justify-between gap-4 text-xs text-muted-foreground">
+                        <div
+                          key={`${event.type}-${event.createdAt.toISOString()}-${index}`}
+                          className="flex items-start justify-between gap-4 text-xs text-muted-foreground"
+                        >
                           <div>
                             <p>{deliveryEventLabels[event.type]}</p>
-                            {event.type === "REVISION_REQUESTED" && event.note && <p className="mt-1 whitespace-pre-line">{event.note}</p>}
+                            {event.type === "REVISION_REQUESTED" &&
+                              event.note && (
+                                <p className="mt-1 whitespace-pre-line">
+                                  {event.note}
+                                </p>
+                              )}
                           </div>
-                          <time className="shrink-0">{event.createdAt.toLocaleString("zh-CN")}</time>
+                          <time className="shrink-0">
+                            {event.createdAt.toLocaleString("zh-CN")}
+                          </time>
                         </div>
                       ))}
                     </div>

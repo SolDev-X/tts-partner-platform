@@ -17,16 +17,19 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import {LayoutDashboard, ShoppingBag} from "lucide-react";
+import {LayoutDashboard, Package} from "lucide-react";
 
-// TODO: user 先用占位数据，接入真实登录用户后替换成 session 里的 name/email/image
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
+type OrderCounts = {
+  actionRequired: number;
+  processing: number;
+};
+
+type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
+  orderCounts: OrderCounts;
+};
+
+export function AppSidebar({orderCounts, ...props}: AppSidebarProps) {
+  const navMain = [
     {
       title: "概览",
       url: "/dashboard",
@@ -35,21 +38,30 @@ const data = {
     {
       title: "我的订单",
       url: "/dashboard/orders",
-      icon: <ShoppingBag />,
-      isActive: true,
-      // 订单筛选做成子菜单，对应 /dashboard/orders 页面里的状态筛选
+      icon: <Package />,
       items: [
-        {title: "全部", url: "/dashboard/orders"},
-        {title: "待我处理", url: "/dashboard/orders?status=pending"},
-        {title: "办理中", url: "/dashboard/orders?status=processing"},
-        {title: "已完成", url: "/dashboard/orders?status=done"},
-        {title: "已取消", url: "/dashboard/orders?status=cancelled"},
+        {
+          title: "待我处理",
+          url: "/dashboard/orders?view=action-required",
+          count: orderCounts.actionRequired,
+        },
+        {
+          title: "办理中",
+          url: "/dashboard/orders?view=processing",
+          count: orderCounts.processing,
+        },
+        {
+          title: "已完成",
+          url: "/dashboard/orders?view=completed",
+        },
+        {
+          title: "已取消",
+          url: "/dashboard/orders?view=cancelled",
+        },
       ],
     },
-  ],
-};
+  ];
 
-export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -75,12 +87,15 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navMain} />
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import {ChevronDown} from "lucide-react";
+import {ChevronDown, Menu, X} from "lucide-react";
 import {useEffect, useRef, useState} from "react";
 
 import {services} from "@/lib/data";
@@ -15,7 +15,11 @@ const navLinks = [
 
 export default function Header() {
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
+
   const servicesMenuRef = useRef<HTMLDetailsElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!servicesOpen) return;
@@ -31,22 +35,56 @@ export default function Header() {
       document.removeEventListener("pointerdown", closeOnOutsidePointerDown);
   }, [servicesOpen]);
 
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    function closeOnOutsidePointerDown(event: PointerEvent) {
+      if (!mobileMenuRef.current?.contains(event.target as Node)) {
+        setMobileMenuOpen(false);
+        setMobileServicesOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", closeOnOutsidePointerDown);
+    return () =>
+      document.removeEventListener("pointerdown", closeOnOutsidePointerDown);
+  }, [mobileMenuOpen]);
+
+  function closeMobileMenu() {
+    setMobileMenuOpen(false);
+    setMobileServicesOpen(false);
+  }
+
   return (
-    <header className="bg-white  rounded-b-2xl">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between p-4 ">
-        <h1>
-          <Link href="/" className="flex items-center gap-1.5">
+    <header className="relative rounded-b-2xl bg-background">
+      <div className="mx-auto flex min-h-14 w-full max-w-6xl items-center gap-2 px-3 py-2 sm:min-h-16 sm:gap-3 sm:px-4 lg:px-6">
+        <h1 className="min-w-0 shrink-0">
+          <Link
+            href="/"
+            className="flex min-w-0 items-center gap-1.5"
+            aria-label="返回首页"
+          >
             <Image
               src="/vercel.svg"
-              alt="跨境服务平台"
+              alt=""
               width={20}
               height={20}
+              className="shrink-0"
+              priority
             />
-            <span className="text-base font-bold lg:text-xl">跨境服务平台</span>
+
+            <span className="whitespace-nowrap text-sm font-bold sm:text-base lg:text-xl">
+              <span className="sm:hidden">跨境服务</span>
+              <span className="hidden sm:inline">跨境服务平台</span>
+            </span>
           </Link>
         </h1>
 
-        <nav className="hidden items-center gap-14 lg:flex" aria-label="主导航">
+        {/* 桌面端主导航 */}
+        <nav
+          className="hidden flex-1 items-center justify-center gap-8 xl:gap-14 lg:flex"
+          aria-label="主导航"
+        >
           <details
             ref={servicesMenuRef}
             className="group relative"
@@ -57,6 +95,7 @@ export default function Header() {
               服务
               <ChevronDown className="ml-1 size-3 transition-transform group-open:rotate-180" />
             </summary>
+
             <ul className="absolute left-0 top-full z-50 mt-2 grid w-[300px] gap-1 rounded-lg bg-popover p-1 text-popover-foreground shadow ring-1 ring-foreground/10">
               {services.map((service) => (
                 <li key={service.id}>
@@ -76,14 +115,79 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-[14px] font-medium hover:opacity-70"
+              className="whitespace-nowrap text-[14px] font-medium hover:opacity-70"
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        <HeaderControls />
+        <div
+          ref={mobileMenuRef}
+          className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2"
+        >
+          {/* 手机 / 平板端导航入口 */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((value) => !value)}
+            className="inline-flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:hidden"
+            aria-label={mobileMenuOpen ? "关闭导航菜单" : "打开导航菜单"}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? (
+              <X className="size-4.5" />
+            ) : (
+              <Menu className="size-4.5" />
+            )}
+          </button>
+
+          <HeaderControls />
+
+          {/* 手机 / 平板端二级导航面板 */}
+          {mobileMenuOpen && (
+            <div className="absolute left-3 right-3 top-full z-50 mt-2 rounded-xl border bg-popover p-2 text-popover-foreground shadow-lg sm:left-auto sm:right-4 sm:w-80 lg:hidden">
+              <button
+                type="button"
+                onClick={() => setMobileServicesOpen((value) => !value)}
+                className="flex h-10 w-full items-center rounded-lg px-3 text-left text-sm font-medium transition-colors hover:bg-muted"
+                aria-expanded={mobileServicesOpen}
+              >
+                <span>服务</span>
+                <ChevronDown
+                  className={`ml-auto size-4 transition-transform ${
+                    mobileServicesOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {mobileServicesOpen && (
+                <div className="mb-1 ml-2 border-l pl-2">
+                  {services.map((service) => (
+                    <Link
+                      key={service.id}
+                      href={`/services/${service.id}`}
+                      onClick={closeMobileMenu}
+                      className="block rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    >
+                      {service.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={closeMobileMenu}
+                  className="flex h-10 items-center rounded-lg px-3 text-sm font-medium transition-colors hover:bg-muted"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

@@ -4,10 +4,11 @@ import Link from "next/link";
 import {useRouter} from "next/navigation";
 import {useState} from "react";
 import {
-  LogOutIcon,
-  LayoutDashboardIcon,
   ChevronsUpDownIcon,
+  LayoutDashboardIcon,
+  LogOutIcon,
 } from "lucide-react";
+
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Button} from "@/components/ui/button";
 import {
@@ -24,7 +25,6 @@ import {authClient} from "@/lib/auth-client";
 export function HeaderControls() {
   const router = useRouter();
   const {data: session, isPending} = authClient.useSession();
-  const [open, setOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const user = session?.user;
@@ -37,52 +37,52 @@ export function HeaderControls() {
   async function handleSignOut() {
     setIsSigningOut(true);
     await authClient.signOut();
-    setOpen(false);
     setIsSigningOut(false);
     router.push("/");
     router.refresh();
   }
 
-  return (
-    <div className="flex items-center gap-2">
-      {!isPending && user && (
-        <div className="lg:hidden">
-          <AccountMenu
-            user={user}
-            initials={initials}
-            isAdmin={isAdmin}
-            isSigningOut={isSigningOut}
-            onSignOut={handleSignOut}
-          />
-        </div>
-      )}
+  if (isPending) {
+    return (
+      <div
+        className="size-9 rounded-full bg-muted sm:h-9 sm:w-24 sm:rounded-lg lg:w-44"
+        aria-hidden="true"
+      />
+    );
+  }
 
-      <div className="hidden items-center gap-1 lg:flex">
-        {isPending ? (
-          <div className="h-8 w-28" aria-hidden="true" />
-        ) : user ? (
-          <AccountMenu
-            user={user}
-            initials={initials}
-            isAdmin={isAdmin}
-            isSigningOut={isSigningOut}
-            onSignOut={handleSignOut}
-          />
-        ) : (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              nativeButton={false}
-              render={<Link href="/login" />}
-            >
-              登录
-            </Button>
-            <Button nativeButton={false} render={<Link href="/signup" />}>
-              注册
-            </Button>
-          </div>
-        )}
-      </div>
+  if (user) {
+    return (
+      <AccountMenu
+        user={user}
+        initials={initials}
+        isAdmin={isAdmin}
+        isSigningOut={isSigningOut}
+        onSignOut={handleSignOut}
+      />
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-1 sm:gap-2">
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-9 px-2.5 sm:px-3"
+        nativeButton={false}
+        render={<Link href="/login" />}
+      >
+        登录
+      </Button>
+
+      <Button
+        size="sm"
+        className="h-9 px-2.5 sm:px-3"
+        nativeButton={false}
+        render={<Link href="/signup" />}
+      >
+        注册
+      </Button>
     </div>
   );
 }
@@ -95,40 +95,74 @@ type AccountMenuProps = {
   onSignOut: () => Promise<void>;
 };
 
-function AccountMenu({user, onSignOut}: AccountMenuProps) {
+function AccountMenu({
+  user,
+  initials,
+  isAdmin,
+  isSigningOut,
+  onSignOut,
+}: AccountMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
           <Button
             variant="ghost"
-            className="h-auto w-auto gap-2 px-2 py-1.5 aria-expanded:bg-muted"
+            className="h-9 max-w-9 gap-2 px-0 aria-expanded:bg-muted sm:max-w-44 sm:px-2 lg:max-w-64"
+            aria-label="打开账户菜单"
           />
         }
       >
-        <Avatar className="hidden sm:flex">
+        <Avatar className="size-8 shrink-0">
           {user.image && <AvatarImage src={user.image} alt={user.name} />}
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarFallback>{initials}</AvatarFallback>
         </Avatar>
-        <div className="grid flex-1 text-left text-sm leading-tight">
-          <span className="truncate font-medium">{user.name}</span>
-          <span className="truncate text-xs">{user.email}</span>
+
+        {/* 平板开始显示名称，桌面再显示邮箱 */}
+        <div className="hidden min-w-0 flex-1 text-left text-sm leading-tight sm:grid">
+          <span className="truncate font-medium">
+            {user.name || "未设置名称"}
+          </span>
+          <span className="hidden truncate text-xs text-muted-foreground lg:block">
+            {user.email}
+          </span>
         </div>
-        <ChevronsUpDownIcon className="ml-auto size-4" />
+
+        <ChevronsUpDownIcon className="ml-auto hidden size-4 shrink-0 sm:block" />
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" sideOffset={4}>
+      <DropdownMenuContent align="end" sideOffset={6} className="w-56 sm:w-64">
+        <div className="px-2 py-1.5 sm:hidden">
+          <p className="truncate text-sm font-medium">
+            {user.name || "未设置名称"}
+          </p>
+          <p className="mt-0.5 truncate text-xs text-muted-foreground">
+            {user.email}
+          </p>
+        </div>
+
         <DropdownMenuGroup>
           <DropdownMenuItem render={<Link href="/dashboard" />}>
             <LayoutDashboardIcon />
             控制台
           </DropdownMenuItem>
+
+          {isAdmin && (
+            <DropdownMenuItem render={<Link href="/admin/orders" />}>
+              <LayoutDashboardIcon />
+              管理后台
+            </DropdownMenuItem>
+          )}
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onSignOut}>
+
+        <DropdownMenuItem
+          disabled={isSigningOut}
+          onClick={() => void onSignOut()}
+        >
           <LogOutIcon />
-          登出
+          {isSigningOut ? "正在登出..." : "登出"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
