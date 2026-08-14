@@ -107,7 +107,7 @@ function AccountMenu({user, onSignOut}: AccountMenuProps) {
         }
       >
         <Avatar className="hidden sm:flex">
-          <AvatarImage src={user.name} alt={user.name} />
+          {user.image && <AvatarImage src={user.image} alt={user.name} />}
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div className="grid flex-1 text-left text-sm leading-tight">
