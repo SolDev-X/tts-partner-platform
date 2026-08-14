@@ -58,15 +58,17 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton
               size="lg"
               render={<Link href="/" />}
-              className="flex items-center gap-1.5"
+              className="flex items-center gap-1.5 group-data-[collapsible=icon]:justify-center"
             >
               <Image
                 src="/vercel.svg"
                 alt="跨境服务平台"
                 width={20}
                 height={20}
+                className="shrink-0"
               />
-              <span className="text-base font-bold lg:text-xl">
+
+              <span className="truncate text-base font-bold lg:text-xl group-data-[collapsible=icon]:hidden">
                 跨境服务平台
               </span>
             </SidebarMenuButton>
