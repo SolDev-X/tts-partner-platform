@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "orderInfo": "美国 · 家居用品 · 普招入驻",
+    "currentStatus": "待付款",
+    "pendingAction": "完成付款",
+    "amount": "¥1,280.00",
+    "createdAt": "2026/8/14",
+    "updatedAt": "2026/8/16"
+  },
+  {
+    "id": 2,
+    "orderInfo": "日本 · 美妆用品 · 类目申报",
+    "currentStatus": "办理中",
+    "pendingAction": "无需处理",
+    "amount": "¥680.00",
+    "createdAt": "2026/8/12",
+    "updatedAt": "2026/8/16"
+  },
+  {
+    "id": 3,
+    "orderInfo": "美国 · 电子产品 · 一品多仓",
+    "currentStatus": "待补资料",
+    "pendingAction": "补充资料",
+    "amount": "¥2,300.00",
+    "createdAt": "2026/8/10",
+    "updatedAt": "2026/8/15"
+  },
+  {
+    "id": 4,
+    "orderInfo": "英国 · 家居用品 · 普招入驻",
+    "currentStatus": "已完成",
+    "pendingAction": "无需处理",
+    "amount": "¥1,580.00",
+    "createdAt": "2026/8/06",
+    "updatedAt": "2026/8/14"
+  },
+  {
+    "id": 5,
+    "orderInfo": "德国 · 户外用品 · 店铺入驻",
+    "currentStatus": "待确认",
+    "pendingAction": "等待平台确认",
+    "amount": "¥980.00",
+    "createdAt": "2026/8/16",
+    "updatedAt": "2026/8/16"
+  }
+]
