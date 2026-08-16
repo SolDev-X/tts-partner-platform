@@ -7,7 +7,7 @@ import {DeliveryEditor} from "@/components/admin/delivery-editor";
 import {OrderEditor} from "@/components/admin/order-editor";
 import {MaterialReview} from "@/components/admin/material-review";
 import {PaymentEditor} from "@/components/admin/payment-editor";
-import {OrderProgressTimeline} from "@/components/orders/order-progress-timeline";
+import {OrderProgressTimeline} from "@/components/orders/shared/order-progress-timeline";
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent} from "@/components/ui/card";
