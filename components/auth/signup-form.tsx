@@ -59,11 +59,10 @@ export function SignupForm({className, ...props}: React.ComponentProps<"div">) {
 
     setError(undefined);
     setIsSending(true);
-    const {error: sendError} =
-      await authClient.emailOtp.sendVerificationOtp({
-        email: normalizedEmail,
-        type: "sign-in",
-      });
+    const {error: sendError} = await authClient.emailOtp.sendVerificationOtp({
+      email: normalizedEmail,
+      type: "sign-in",
+    });
     setIsSending(false);
 
     if (sendError) {
@@ -168,7 +167,7 @@ export function SignupForm({className, ...props}: React.ComponentProps<"div">) {
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="overflow-hidden p-0 md:min-h-[34rem]">
+      <Card className="overflow-hidden p-0 md:min-h-136">
         <CardContent className="grid h-full p-0 md:grid-cols-2">
           <form
             className="flex h-full items-center p-6 md:p-10"
@@ -250,7 +249,10 @@ export function SignupForm({className, ...props}: React.ComponentProps<"div">) {
                     onClick={sendVerificationCode}
                   >
                     {isSending && (
-                      <LoaderCircle className="animate-spin" aria-hidden="true" />
+                      <LoaderCircle
+                        className="animate-spin"
+                        aria-hidden="true"
+                      />
                     )}
                     {isSending
                       ? "正在发送"
@@ -288,7 +290,9 @@ export function SignupForm({className, ...props}: React.ComponentProps<"div">) {
                       autoComplete="new-password"
                       value={confirmPassword}
                       aria-invalid={Boolean(error)}
-                      onChange={(event) => setConfirmPassword(event.target.value)}
+                      onChange={(event) =>
+                        setConfirmPassword(event.target.value)
+                      }
                       required
                     />
                   </Field>

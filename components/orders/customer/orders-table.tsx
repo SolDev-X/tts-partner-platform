@@ -31,7 +31,7 @@ import {
   IconGripVertical,
   IconLayoutColumns,
   IconLoader,
-  IconPlus,
+  IconArrowUpRight,
   IconTrendingUp,
 } from "@tabler/icons-react";
 import {
@@ -101,7 +101,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import Link from "next/link";
 
 // New in v9: declare the features this table uses — anything you don't
 // register is tree-shaken out of the bundle.
@@ -278,6 +279,14 @@ const columns = columnHelper.columns([
   }),
 ]);
 
+const columnLabels: Record<string, string> = {
+  orderId: "订单编号",
+  currentStatus: "当前状态",
+  amount: "订单金额",
+  createdAt: "创建时间",
+  updatedAt: "更新时间",
+};
+
 function DraggableRow({
   row,
 }: {
@@ -324,6 +333,15 @@ export function DataTable({
     pageIndex: 0,
     pageSize: 10,
   });
+  const [statusFilter, setStatusFilter] = React.useState("all");
+
+  const filteredData = React.useMemo(
+    () =>
+      statusFilter === "all"
+        ? data
+        : data.filter((item) => item.currentStatus === statusFilter),
+    [data, statusFilter],
+  );
 
   const sortableId = React.useId();
 
@@ -334,13 +352,13 @@ export function DataTable({
   );
 
   const dataIds = React.useMemo<UniqueIdentifier[]>(
-    () => data?.map(({id}) => id) || [],
-    [data],
+    () => filteredData?.map(({id}) => id) || [],
+    [filteredData],
   );
 
   const table = useTable({
     features,
-    data,
+    data: filteredData,
     columns,
     state: {
       sorting,
@@ -358,22 +376,35 @@ export function DataTable({
     onPaginationChange: setPagination,
   });
 
+  function handleStatusFilterChange(value: string | null) {
+    if (!value) return;
+
+    setStatusFilter(value);
+    setPagination((current) => ({
+      ...current,
+      pageIndex: 0,
+    }));
+  }
+
   function handleDragEnd(event: DragEndEvent) {
     const {active, over} = event;
 
     if (active && over && active.id !== over.id) {
-      setData((data) => {
-        const oldIndex = dataIds.indexOf(active.id);
-        const newIndex = dataIds.indexOf(over.id);
+      setData((currentData) => {
+        const oldIndex = currentData.findIndex((item) => item.id === active.id);
+        const newIndex = currentData.findIndex((item) => item.id === over.id);
 
-        return arrayMove(data, oldIndex, newIndex);
+        if (oldIndex === -1 || newIndex === -1) return currentData;
+
+        return arrayMove(currentData, oldIndex, newIndex);
       });
     }
   }
 
   return (
     <Tabs
-      defaultValue="outline"
+      value={statusFilter}
+      onValueChange={handleStatusFilterChange}
       className="w-full flex-col justify-start gap-6"
     >
       <div className="flex items-center justify-between px-4 lg:px-6">
@@ -381,37 +412,34 @@ export function DataTable({
           View
         </Label>
 
-        <Select defaultValue="outline">
+        <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
           <SelectTrigger
             className="flex w-fit @4xl/main:hidden"
             size="sm"
             id="view-selector"
           >
-            <SelectValue placeholder="Select a view" />
+            <SelectValue placeholder="选择订单状态" />
           </SelectTrigger>
 
           <SelectContent>
-            <SelectItem value="outline">Outline</SelectItem>
-            <SelectItem value="past-performance">Past Performance</SelectItem>
-            <SelectItem value="key-personnel">Key Personnel</SelectItem>
-            <SelectItem value="focus-documents">Focus Documents</SelectItem>
+            <SelectItem value="all">全部订单</SelectItem>
+            <SelectItem value="待确认">待确认</SelectItem>
+            <SelectItem value="待付款">待付款</SelectItem>
+            <SelectItem value="待补资料">待补资料</SelectItem>
+            <SelectItem value="办理中">办理中</SelectItem>
+            <SelectItem value="已完成">已完成</SelectItem>
+            <SelectItem value="已取消">已取消</SelectItem>
           </SelectContent>
         </Select>
 
-        <TabsList className="hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:bg-muted-foreground/30 **:data-[slot=badge]:px-1 @4xl/main:flex">
-          <TabsTrigger value="outline">Outline</TabsTrigger>
-
-          <TabsTrigger value="past-performance">
-            Past Performance
-            <Badge variant="secondary">3</Badge>
-          </TabsTrigger>
-
-          <TabsTrigger value="key-personnel">
-            Key Personnel
-            <Badge variant="secondary">2</Badge>
-          </TabsTrigger>
-
-          <TabsTrigger value="focus-documents">Focus Documents</TabsTrigger>
+        <TabsList className="hidden @4xl/main:flex">
+          <TabsTrigger value="all">全部订单</TabsTrigger>
+          <TabsTrigger value="待确认">待确认</TabsTrigger>
+          <TabsTrigger value="待付款">待付款</TabsTrigger>
+          <TabsTrigger value="待补资料">待补资料</TabsTrigger>
+          <TabsTrigger value="办理中">办理中</TabsTrigger>
+          <TabsTrigger value="已完成">已完成</TabsTrigger>
+          <TabsTrigger value="已取消">已取消</TabsTrigger>
         </TabsList>
 
         <div className="flex items-center gap-2">
@@ -420,8 +448,8 @@ export function DataTable({
               render={<Button variant="outline" size="sm" />}
             >
               <IconLayoutColumns />
-              <span className="hidden lg:inline">Customize Columns</span>
-              <span className="lg:hidden">Columns</span>
+              <span className="hidden lg:inline">列设置</span>
+              <span className="lg:hidden">列</span>
               <IconChevronDown />
             </DropdownMenuTrigger>
 
@@ -443,24 +471,26 @@ export function DataTable({
                         column.toggleVisibility(!!value)
                       }
                     >
-                      {column.id}
+                      {columnLabels[column.id] ?? column.id}
                     </DropdownMenuCheckboxItem>
                   );
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="outline" size="sm">
-            <IconPlus />
-            <span className="hidden lg:inline">Add Section</span>
+          <Button
+            variant="outline"
+            size="sm"
+            nativeButton={false}
+            render={<Link href="/services" />}
+          >
+            <IconArrowUpRight />
+            <span className="hidden lg:inline">浏览服务</span>
           </Button>
         </div>
       </div>
 
-      <TabsContent
-        value="outline"
-        className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
-      >
+      <div className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
         <div className="overflow-hidden rounded-lg border">
           <DndContext
             collisionDetection={closestCenter}
@@ -594,25 +624,7 @@ export function DataTable({
             </div>
           </div>
         </div>
-      </TabsContent>
-
-      <TabsContent
-        value="past-performance"
-        className="flex flex-col px-4 lg:px-6"
-      >
-        <div className="aspect-video w-full flex-1 rounded-lg border border-dashed" />
-      </TabsContent>
-
-      <TabsContent value="key-personnel" className="flex flex-col px-4 lg:px-6">
-        <div className="aspect-video w-full flex-1 rounded-lg border border-dashed" />
-      </TabsContent>
-
-      <TabsContent
-        value="focus-documents"
-        className="flex flex-col px-4 lg:px-6"
-      >
-        <div className="aspect-video w-full flex-1 rounded-lg border border-dashed" />
-      </TabsContent>
+      </div>
     </Tabs>
   );
 }

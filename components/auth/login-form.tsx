@@ -1,7 +1,12 @@
 "use client";
 
 import {useState} from "react";
-import {LoaderCircle, MessageCircle, Smartphone, TriangleAlert} from "lucide-react";
+import {
+  LoaderCircle,
+  MessageCircle,
+  Smartphone,
+  TriangleAlert,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
@@ -84,7 +89,7 @@ export function LoginForm({className, ...props}: React.ComponentProps<"div">) {
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="overflow-hidden p-0 md:min-h-[34rem]">
+      <Card className="overflow-hidden p-0 md:min-h-136">
         <CardContent className="grid h-full p-0 md:grid-cols-2">
           <form
             className="flex h-full items-center p-6 md:p-10"
@@ -166,7 +171,10 @@ export function LoginForm({className, ...props}: React.ComponentProps<"div">) {
                   role="alert"
                   className="flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive"
                 >
-                  <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                  <TriangleAlert
+                    className="mt-0.5 size-4 shrink-0"
+                    aria-hidden="true"
+                  />
                   <p>{error}</p>
                 </div>
               )}
