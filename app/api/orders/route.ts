@@ -50,10 +50,13 @@ function isSelectionSupported(
 }
 
 function createOrderNumber() {
-  const date = new Date().toISOString().slice(0, 10).replaceAll("-", "");
-  const suffix = crypto.randomUUID().slice(0, 8).toUpperCase();
+  const timestamp = Date.now().toString();
 
-  return `CB${date}-${suffix}`;
+  const random = Math.floor(Math.random() * 100000)
+    .toString()
+    .padStart(5, "0");
+
+  return `${timestamp}${random}`;
 }
 
 export async function POST(request: Request) {
@@ -69,7 +72,10 @@ export async function POST(request: Request) {
 
   const service = services.find((item) => item.id === body.data.serviceId);
   if (!service || !isSelectionSupported(service, body.data.selection)) {
-    return NextResponse.json({error: "Unsupported service selection"}, {status: 422});
+    return NextResponse.json(
+      {error: "Unsupported service selection"},
+      {status: 422},
+    );
   }
 
   const selection = Object.fromEntries(
@@ -91,7 +97,7 @@ export async function POST(request: Request) {
       serviceId: service.id,
       serviceLabel: service.label,
       selection,
-      status: "PENDING_PAYMENT",
+      status: "PENDING_CONFIRMATION",
       materials: {
         create: (variantRule.requiredMaterials ?? []).map((label, index) => ({
           key: `material-${index + 1}`,

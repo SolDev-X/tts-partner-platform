@@ -122,7 +122,7 @@ const columnHelper = createColumnHelper<
 >();
 
 export const schema = z.object({
-  id: z.number(),
+  id: z.string(),
   orderInfo: z.string(),
   orderId: z.string(),
   currentStatus: z.string(),
@@ -132,7 +132,7 @@ export const schema = z.object({
 });
 
 // Create a separate component for the drag handle
-function DragHandle({id}: {id: number}) {
+function DragHandle({id}: {id: string}) {
   const {attributes, listeners} = useSortable({
     id,
   });

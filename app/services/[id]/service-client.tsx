@@ -251,7 +251,7 @@ const CreateOrderCard = ({
       return;
     }
 
-    router.push("/account/orders");
+    router.push("/dashboard/orders");
     router.refresh();
   }
 
@@ -273,7 +273,9 @@ const CreateOrderCard = ({
         disabled={isSubmitting}
         onClick={createOrder}
       >
-        {isSubmitting && <LoaderCircle className="animate-spin" aria-hidden="true" />}
+        {isSubmitting && (
+          <LoaderCircle className="animate-spin" aria-hidden="true" />
+        )}
         {isSubmitting ? "正在创建订单" : "确认方案并创建订单"}
       </Button>
     </div>

@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/sidebar";
 
 import {auth} from "@/lib/auth";
-import {prisma} from "@/lib/prisma";
 
 export default async function DashboardLayout({
   children,
@@ -35,41 +34,9 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  const [actionRequired, processing] = await Promise.all([
-    prisma.order.count({
-      where: {
-        user: {
-          is: {
-            id: session.user.id,
-          },
-        },
-        status: {
-          in: ["PENDING_PAYMENT", "WAITING_FOR_CUSTOMER"],
-        },
-      },
-    }),
-    prisma.order.count({
-      where: {
-        user: {
-          is: {
-            id: session.user.id,
-          },
-        },
-        status: {
-          in: ["PENDING_CONFIRMATION", "PROCESSING", "REFUNDING"],
-        },
-      },
-    }),
-  ]);
-
   return (
     <SidebarProvider>
-      <AppSidebar
-        orderCounts={{
-          actionRequired,
-          processing,
-        }}
-      />
+      <AppSidebar />
 
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">

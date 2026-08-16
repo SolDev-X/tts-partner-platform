@@ -19,16 +19,9 @@ import {
 } from "@/components/ui/sidebar";
 import {LayoutDashboard, Package} from "lucide-react";
 
-type OrderCounts = {
-  actionRequired: number;
-  processing: number;
-};
+type AppSidebarProps = React.ComponentProps<typeof Sidebar>;
 
-type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
-  orderCounts: OrderCounts;
-};
-
-export function AppSidebar({orderCounts, ...props}: AppSidebarProps) {
+export function AppSidebar(props: AppSidebarProps) {
   const navMain = [
     {
       title: "概览",
@@ -39,26 +32,6 @@ export function AppSidebar({orderCounts, ...props}: AppSidebarProps) {
       title: "我的订单",
       url: "/dashboard/orders",
       icon: <Package />,
-      items: [
-        {
-          title: "待我处理",
-          url: "/dashboard/orders?view=action-required",
-          count: orderCounts.actionRequired,
-        },
-        {
-          title: "办理中",
-          url: "/dashboard/orders?view=processing",
-          count: orderCounts.processing,
-        },
-        {
-          title: "已完成",
-          url: "/dashboard/orders?view=completed",
-        },
-        {
-          title: "已取消",
-          url: "/dashboard/orders?view=cancelled",
-        },
-      ],
     },
   ];
 
