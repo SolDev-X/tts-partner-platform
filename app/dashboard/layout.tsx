@@ -4,14 +4,7 @@ import {redirect} from "next/navigation";
 
 import {AppSidebar} from "@/components/dashboard/app-sidebar";
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import {DashboardBreadcrumb} from "@/components/dashboard/dashboard-breadcrumb";
 
 import {Separator} from "@/components/ui/separator";
 
@@ -48,19 +41,7 @@ export default async function DashboardLayout({
               className="mr-2 data-vertical:h-4 data-vertical:self-auto"
             />
 
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/dashboard">控制台</BreadcrumbLink>
-                </BreadcrumbItem>
-
-                <BreadcrumbSeparator className="hidden md:block" />
-
-                <BreadcrumbItem>
-                  <BreadcrumbPage>概览</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            <DashboardBreadcrumb />
           </div>
         </header>
 

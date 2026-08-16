@@ -268,11 +268,11 @@ const columns = columnHelper.columns([
           <span className="sr-only">Open menu</span>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem>Make a copy</DropdownMenuItem>
-          <DropdownMenuItem>Favorite</DropdownMenuItem>
+          <DropdownMenuItem>查看详情</DropdownMenuItem>
+
           <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+
+          <DropdownMenuItem variant="destructive">取消订单</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     ),
@@ -543,14 +543,14 @@ export function DataTable({
 
         <div className="flex items-center justify-between px-4">
           <div className="hidden flex-1 text-sm text-muted-foreground lg:flex">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
+            已选择 {table.getFilteredSelectedRowModel().rows.length} /{" "}
+            {table.getFilteredRowModel().rows.length} 个订单
           </div>
 
           <div className="flex w-full items-center gap-8 lg:w-fit">
             <div className="hidden items-center gap-2 lg:flex">
               <Label htmlFor="rows-per-page" className="text-sm font-medium">
-                Rows per page
+                每页显示
               </Label>
 
               <Select
@@ -574,8 +574,8 @@ export function DataTable({
             </div>
 
             <div className="flex w-fit items-center justify-center text-sm font-medium">
-              Page {table.state.pagination.pageIndex + 1} of{" "}
-              {table.getPageCount()}
+              第 {table.state.pagination.pageIndex + 1} 页，共{" "}
+              {table.getPageCount()} 页
             </div>
 
             <div className="ml-auto flex items-center gap-2 lg:ml-0">
