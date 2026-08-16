@@ -53,7 +53,6 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 import {Area, AreaChart, CartesianGrid, XAxis} from "recharts";
-import {toast} from "sonner";
 import {z} from "zod";
 
 import {useIsMobile} from "@/hooks/use-mobile";
@@ -125,8 +124,8 @@ const columnHelper = createColumnHelper<
 export const schema = z.object({
   id: z.number(),
   orderInfo: z.string(),
+  orderId: z.string(),
   currentStatus: z.string(),
-  pendingAction: z.string(),
   amount: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
@@ -192,6 +191,17 @@ const columns = columnHelper.columns([
     },
     enableHiding: false,
   }),
+
+  columnHelper.accessor("orderId", {
+    header: () => (
+      <div className="w-full whitespace-nowrap text-start">订单编号</div>
+    ),
+    cell: ({row}) => (
+      <div className="w-full whitespace-nowrap text-start">
+        {row.original.orderId}
+      </div>
+    ),
+  }),
   columnHelper.accessor("currentStatus", {
     header: "当前状态",
     cell: ({row}) => (
@@ -207,19 +217,7 @@ const columns = columnHelper.columns([
       </div>
     ),
   }),
-  columnHelper.accessor("pendingAction", {
-    header: "待处理",
-    cell: ({row}) => (
-      <Badge variant="outline" className="px-1.5 text-muted-foreground">
-        {row.original.pendingAction === "无需处理" ? (
-          <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
-        ) : (
-          <IconLoader />
-        )}
-        {row.original.pendingAction}
-      </Badge>
-    ),
-  }),
+
   columnHelper.accessor("amount", {
     header: () => (
       <div className="w-full whitespace-nowrap text-start">订单金额</div>
@@ -780,7 +778,7 @@ function TableCellViewer({item}: {item: z.infer<typeof schema>}) {
               <div className="flex flex-col gap-3">
                 <Label htmlFor="pendingAction">待处理</Label>
 
-                <Select defaultValue={item.pendingAction}>
+                <Select defaultValue={item.orderId}>
                   <SelectTrigger id="pendingAction" className="w-full">
                     <SelectValue placeholder="选择待处理事项" />
                   </SelectTrigger>
