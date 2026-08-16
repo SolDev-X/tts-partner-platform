@@ -24,7 +24,7 @@ export async function DELETE(
 
   if (result.count === 0) {
     return NextResponse.json(
-      {error: "Order cannot be cancelled"},
+      {error: "订单当前状态无法取消，请刷新后重试。"},
       {status: 409},
     );
   }

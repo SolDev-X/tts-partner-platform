@@ -17,7 +17,6 @@ import {
   WalletCards,
 } from "lucide-react";
 
-import {CancelOrderButton} from "@/components/orders/customer/cancel-order-button";
 import {DeliveryActions} from "@/components/orders/customer/delivery-actions";
 import {OrderProgressTimeline} from "@/components/orders/shared/order-progress-timeline";
 import {Badge} from "@/components/ui/badge";
@@ -302,7 +301,7 @@ export default async function OrderDetailPage({
     (material) => material.status === "APPROVED",
   ).length;
   const rejectedMaterialCount = materials.filter(
-    (material) => material.status === "REJECTED",
+    (material) => String(material.status) === "REJECTED",
   ).length;
 
   const timelineSteps = buildOrderTimeline({
@@ -350,10 +349,6 @@ export default async function OrderDetailPage({
 
   const deliveryLocked = order.paymentStatus !== "PAID";
 
-  const canCancel =
-    order.status === "PENDING_PAYMENT" ||
-    order.status === "PENDING_CONFIRMATION";
-
   return (
     <section className="w-full px-4 py-6 sm:px-6 sm:py-8 xl:px-8">
       <div className="mx-auto w-full max-w-6xl">
@@ -395,16 +390,10 @@ export default async function OrderDetailPage({
               </span>
             </div>
           </div>
-
-          {canCancel && (
-            <div className="shrink-0">
-              <CancelOrderButton orderNumber={order.orderNumber} />
-            </div>
-          )}
         </div>
 
         {/* 当前阶段：客户打开页面第一眼就知道现在轮到谁处理 */}
-        <Card variant="outline" className="mt-6 sm:mt-8">
+        <Card className="mt-6 sm:mt-8">
           <CardContent className="p-5 sm:p-6">
             <div className="flex items-start gap-4">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
@@ -434,7 +423,7 @@ export default async function OrderDetailPage({
         </Card>
 
         {/* 全局进度：由管理员更新的付款、审核、办理、交付状态共同驱动 */}
-        <Card variant="outline" className="mt-4">
+        <Card className="mt-4">
           <CardContent className="p-5 sm:p-6">
             <div>
               <h2 className="font-semibold">服务进度</h2>
@@ -453,7 +442,7 @@ export default async function OrderDetailPage({
           {/* 主流程 */}
           <div className="min-w-0 space-y-4">
             {/* 付款 */}
-            <Card variant="outline">
+            <Card>
               <CardContent className="p-5 sm:p-6">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
@@ -494,7 +483,7 @@ export default async function OrderDetailPage({
 
             {/* 材料 */}
             {materials.length > 0 && (
-              <Card variant="outline">
+              <Card>
                 <CardContent className="p-5 sm:p-6">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
@@ -566,7 +555,7 @@ export default async function OrderDetailPage({
 
             {/* 服务交付 */}
             {deliveryIsPublished && (
-              <Card variant="outline">
+              <Card>
                 <CardContent className="p-5 sm:p-6">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
@@ -706,7 +695,7 @@ export default async function OrderDetailPage({
 
           {/* 右侧摘要：桌面 sticky，移动端自然排在主流程之后 */}
           <aside className="space-y-4 xl:sticky xl:top-20">
-            <Card variant="outline">
+            <Card>
               <CardContent className="p-5">
                 <div className="flex items-center gap-2">
                   <ReceiptText className="size-4 text-muted-foreground" />
@@ -730,7 +719,7 @@ export default async function OrderDetailPage({
               </CardContent>
             </Card>
 
-            <Card variant="outline">
+            <Card>
               <CardContent className="p-5">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="size-4 text-muted-foreground" />
@@ -760,7 +749,7 @@ export default async function OrderDetailPage({
               </CardContent>
             </Card>
 
-            <Card variant="outline">
+            <Card>
               <CardContent className="p-5">
                 <h2 className="font-semibold">需要帮助？</h2>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">

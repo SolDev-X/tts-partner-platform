@@ -104,9 +104,19 @@ import {
 import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import Link from "next/link";
 import {CancelOrderDialog} from "@/components/orders/customer/cancel-order-button";
+import {useRouter} from "next/navigation";
 
-function OrderActions({orderNumber}: {orderNumber: string}) {
+function OrderActions({
+  orderNumber,
+  currentStatus,
+}: {
+  orderNumber: string;
+  currentStatus: string;
+}) {
+  const router = useRouter();
   const [cancelOpen, setCancelOpen] = React.useState(false);
+
+  const canCancel = currentStatus === "待确认" || currentStatus === "待付款";
 
   return (
     <>
@@ -125,24 +135,34 @@ function OrderActions({orderNumber}: {orderNumber: string}) {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>查看详情</DropdownMenuItem>
-
-          <DropdownMenuSeparator />
-
           <DropdownMenuItem
-            variant="destructive"
-            onClick={() => setCancelOpen(true)}
+            onClick={() => router.push(`/dashboard/orders/${orderNumber}`)}
           >
-            取消订单
+            查看详情
           </DropdownMenuItem>
+
+          {canCancel && (
+            <>
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => setCancelOpen(true)}
+              >
+                取消订单
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <CancelOrderDialog
-        orderNumber={orderNumber}
-        open={cancelOpen}
-        onOpenChange={setCancelOpen}
-      />
+      {canCancel && (
+        <CancelOrderDialog
+          orderNumber={orderNumber}
+          open={cancelOpen}
+          onOpenChange={setCancelOpen}
+        />
+      )}
     </>
   );
 }
@@ -294,7 +314,12 @@ const columns = columnHelper.columns([
   }),
   columnHelper.display({
     id: "actions",
-    cell: ({row}) => <OrderActions orderNumber={row.original.orderId} />,
+    cell: ({row}) => (
+      <OrderActions
+        orderNumber={row.original.orderId}
+        currentStatus={row.original.currentStatus}
+      />
+    ),
   }),
 ]);
 
@@ -341,6 +366,15 @@ export function DataTable({
   data: z.infer<typeof schema>[];
 }) {
   const [data, setData] = React.useState(() => initialData);
+
+  const [previousInitialData, setPreviousInitialData] =
+    React.useState(initialData);
+
+  if (initialData !== previousInitialData) {
+    setPreviousInitialData(initialData);
+    setData(initialData);
+  }
+
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<ColumnVisibilityState>({});
