@@ -103,9 +103,50 @@ import {
 } from "@/components/ui/table";
 import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import Link from "next/link";
+import {CancelOrderDialog} from "@/components/orders/customer/cancel-order-button";
 
-// New in v9: declare the features this table uses — anything you don't
-// register is tree-shaken out of the bundle.
+function OrderActions({orderNumber}: {orderNumber: string}) {
+  const [cancelOpen, setCancelOpen] = React.useState(false);
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              variant="ghost"
+              className="flex size-8 text-muted-foreground data-[state=open]:bg-muted"
+              size="icon"
+            />
+          }
+        >
+          <IconDotsVertical />
+          <span className="sr-only">Open menu</span>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="end" className="w-32">
+          <DropdownMenuItem>查看详情</DropdownMenuItem>
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem
+            variant="destructive"
+            onClick={() => setCancelOpen(true)}
+          >
+            取消订单
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <CancelOrderDialog
+        orderNumber={orderNumber}
+        open={cancelOpen}
+        onOpenChange={setCancelOpen}
+      />
+    </>
+  );
+}
+
 const features = tableFeatures({
   columnFilteringFeature,
   columnVisibilityFeature,
@@ -253,29 +294,7 @@ const columns = columnHelper.columns([
   }),
   columnHelper.display({
     id: "actions",
-    cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button
-              variant="ghost"
-              className="flex size-8 text-muted-foreground data-[state=open]:bg-muted"
-              size="icon"
-            />
-          }
-        >
-          <IconDotsVertical />
-          <span className="sr-only">Open menu</span>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>查看详情</DropdownMenuItem>
-
-          <DropdownMenuSeparator />
-
-          <DropdownMenuItem variant="destructive">取消订单</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
+    cell: ({row}) => <OrderActions orderNumber={row.original.orderId} />,
   }),
 ]);
 
