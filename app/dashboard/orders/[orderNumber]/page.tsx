@@ -34,6 +34,7 @@ import {buildOrderTimeline} from "@/lib/order-progress";
 import {orderStatusMeta} from "@/lib/order-status";
 import {prisma} from "@/lib/prisma";
 import {matchVariantRule} from "@/lib/utils";
+import {OrderStatusBadge} from "@/components/orders/shared/order-status-badge";
 
 export const metadata: Metadata = {
   title: "订单详情 | 跨境服务平台",
@@ -375,9 +376,7 @@ export default async function OrderDetailPage({
                 )}
               </h1>
 
-              <Badge variant="outline" className={status.badgeClassName}>
-                {status.label}
-              </Badge>
+              <OrderStatusBadge status={order.status} />
             </div>
 
             <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">

@@ -46,6 +46,7 @@ export default async function OrdersPage() {
     id: order.id,
     orderInfo: order.serviceLabel,
     orderId: order.orderNumber,
+    status: order.status,
     currentStatus: getOrderStatusLabel(order.status),
     amount: order.amountInCents
       ? `${(order.amountInCents / 100).toFixed(2)} ${order.currency}`

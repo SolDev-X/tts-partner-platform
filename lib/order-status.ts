@@ -1,47 +1,52 @@
 import type {OrderStatus} from "@/lib/generated/prisma";
 
-export const orderStatusMeta: Record<
-  OrderStatus,
-  {label: string; nextStep: string; badgeClassName: string}
-> = {
-  PENDING_PAYMENT: {
-    label: "待付款",
-    nextStep: "请完成订单支付，支付成功后平台将确认材料并开始办理。",
-    badgeClassName: "border-amber-200 bg-amber-50 text-amber-800",
-  },
+export type OrderStatusMeta = {
+  label: string;
+  nextStep: string;
+};
+
+export const orderStatusMeta = {
   PENDING_CONFIRMATION: {
     label: "待确认",
-    nextStep: "我们将在 1 个工作日内确认材料要求与后续安排。",
-    badgeClassName: "border-sky-200 bg-sky-50 text-sky-800",
+    nextStep: "平台正在确认订单信息与服务内容，确认后将更新订单金额。",
   },
+
+  PENDING_PAYMENT: {
+    label: "待付款",
+    nextStep: "订单金额已确认，请完成付款，付款后平台将开始办理。",
+  },
+
+  WAITING_FOR_CUSTOMER: {
+    label: "待补资料",
+    nextStep: "请根据平台要求补充所需资料，以便继续办理。",
+  },
+
   PROCESSING: {
     label: "办理中",
-    nextStep: "顾问正在推进您的服务申请，请留意后续通知。",
-    badgeClassName: "border-blue-200 bg-blue-50 text-blue-800",
+    nextStep: "平台正在推进服务办理，请留意后续通知。",
   },
-  WAITING_FOR_CUSTOMER: {
-    label: "待补充材料",
-    nextStep: "请根据顾问后续说明补充所需材料，以便继续办理。",
-    badgeClassName: "border-orange-200 bg-orange-50 text-orange-800",
-  },
+
   COMPLETED: {
     label: "已完成",
-    nextStep: "本订单已完成。如有后续问题，请通过联系我们获取协助。",
-    badgeClassName: "border-emerald-200 bg-emerald-50 text-emerald-800",
+    nextStep: "订单服务已完成。",
   },
+
   CANCELLED: {
     label: "已取消",
-    nextStep: "本订单已取消。如需重新办理，请重新选择服务方案。",
-    badgeClassName: "border-slate-200 bg-slate-100 text-slate-600",
+    nextStep: "订单已取消。",
   },
+
   REFUNDING: {
     label: "退款中",
-    nextStep: "退款申请正在处理，到账时间以支付渠道为准。",
-    badgeClassName: "border-violet-200 bg-violet-50 text-violet-800",
+    nextStep: "退款正在处理中，到账时间以支付渠道为准。",
   },
+
   REFUNDED: {
     label: "已退款",
-    nextStep: "本订单已完成退款，如有疑问请联系我们。",
-    badgeClassName: "border-slate-200 bg-slate-100 text-slate-600",
+    nextStep: "退款已完成。",
   },
-};
+} satisfies Record<OrderStatus, OrderStatusMeta>;
+
+export function getOrderStatusMeta(status: OrderStatus) {
+  return orderStatusMeta[status];
+}

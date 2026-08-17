@@ -54,7 +54,6 @@ import {
 } from "@tanstack/react-table";
 import {Area, AreaChart, CartesianGrid, XAxis} from "recharts";
 import {z} from "zod";
-
 import {useIsMobile} from "@/hooks/use-mobile";
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
@@ -105,6 +104,7 @@ import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import Link from "next/link";
 import {CancelOrderDialog} from "@/components/orders/customer/cancel-order-button";
 import {useRouter} from "next/navigation";
+import {OrderStatusBadge} from "@/components/orders/shared/order-status-badge";
 
 function OrderActions({
   orderNumber,
@@ -187,6 +187,18 @@ export const schema = z.object({
   id: z.string(),
   orderInfo: z.string(),
   orderId: z.string(),
+
+  status: z.enum([
+    "PENDING_CONFIRMATION",
+    "PENDING_PAYMENT",
+    "WAITING_FOR_CUSTOMER",
+    "PROCESSING",
+    "COMPLETED",
+    "CANCELLED",
+    "REFUNDING",
+    "REFUNDED",
+  ]),
+
   currentStatus: z.string(),
   amount: z.string(),
   createdAt: z.string(),
@@ -268,14 +280,7 @@ const columns = columnHelper.columns([
     header: "当前状态",
     cell: ({row}) => (
       <div className="w-32">
-        <Badge variant="outline" className="px-1.5 text-muted-foreground">
-          {row.original.currentStatus === "已完成" ? (
-            <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
-          ) : (
-            <IconLoader />
-          )}
-          {row.original.currentStatus}
-        </Badge>
+        <OrderStatusBadge status={row.original.status} />
       </div>
     ),
   }),
