@@ -26,11 +26,9 @@ import {
   IconChevronRight,
   IconChevronsLeft,
   IconChevronsRight,
-  IconCircleCheckFilled,
   IconDotsVertical,
   IconGripVertical,
   IconLayoutColumns,
-  IconLoader,
   IconArrowUpRight,
   IconTrendingUp,
 } from "@tabler/icons-react";
@@ -52,17 +50,10 @@ import {
   type Row,
   type SortingState,
 } from "@tanstack/react-table";
-import {Area, AreaChart, CartesianGrid, XAxis} from "recharts";
 import {z} from "zod";
 import {useIsMobile} from "@/hooks/use-mobile";
-import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@/components/ui/chart";
+import {type ChartConfig} from "@/components/ui/chart";
 import {Checkbox} from "@/components/ui/checkbox";
 import {
   Drawer,
@@ -105,6 +96,7 @@ import Link from "next/link";
 import {CancelOrderDialog} from "@/components/orders/customer/cancel-order-button";
 import {useRouter} from "next/navigation";
 import {OrderStatusBadge} from "@/components/orders/shared/order-status-badge";
+import {orderStatusMeta} from "@/lib/order-status";
 
 function OrderActions({
   orderNumber,
@@ -687,52 +679,9 @@ export function DataTable({
   );
 }
 
-const chartData = [
-  {
-    month: "January",
-    desktop: 186,
-    mobile: 80,
-  },
-  {
-    month: "February",
-    desktop: 305,
-    mobile: 200,
-  },
-  {
-    month: "March",
-    desktop: 237,
-    mobile: 120,
-  },
-  {
-    month: "April",
-    desktop: 73,
-    mobile: 190,
-  },
-  {
-    month: "May",
-    desktop: 209,
-    mobile: 130,
-  },
-  {
-    month: "June",
-    desktop: 214,
-    mobile: 140,
-  },
-];
-
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "var(--primary)",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "var(--primary)",
-  },
-} satisfies ChartConfig;
-
 function TableCellViewer({item}: {item: z.infer<typeof schema>}) {
   const isMobile = useIsMobile();
+  const statusMeta = orderStatusMeta[item.status];
 
   return (
     <Drawer swipeDirection={isMobile ? "down" : "right"}>
@@ -748,69 +697,24 @@ function TableCellViewer({item}: {item: z.infer<typeof schema>}) {
       </DrawerTrigger>
 
       <DrawerContent>
-        <DrawerHeader className="gap-1">
+        <DrawerHeader>
           <DrawerTitle>{item.orderInfo}</DrawerTitle>
-
-          <DrawerDescription>查看订单信息与当前处理状态</DrawerDescription>
         </DrawerHeader>
 
         <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
           {!isMobile && (
             <>
-              <ChartContainer config={chartConfig}>
-                <AreaChart
-                  accessibilityLayer
-                  data={chartData}
-                  margin={{
-                    left: 0,
-                    right: 10,
-                  }}
-                >
-                  <CartesianGrid vertical={false} />
-
-                  <XAxis
-                    dataKey="month"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    tickFormatter={(value) => value.slice(0, 3)}
-                    hide
-                  />
-
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent indicator="dot" />}
-                  />
-
-                  <Area
-                    dataKey="mobile"
-                    type="natural"
-                    fill="var(--color-mobile)"
-                    fillOpacity={0.6}
-                    stroke="var(--color-mobile)"
-                    stackId="a"
-                  />
-
-                  <Area
-                    dataKey="desktop"
-                    type="natural"
-                    fill="var(--color-desktop)"
-                    fillOpacity={0.4}
-                    stroke="var(--color-desktop)"
-                    stackId="a"
-                  />
-                </AreaChart>
-              </ChartContainer>
-
               <Separator />
 
               <div className="grid gap-2">
-                <div className="flex gap-2 leading-none font-medium">
-                  订单近期状态更新 <IconTrendingUp className="size-4" />
-                </div>
+                <div className="leading-none font-medium">订单进度</div>
 
-                <div className="text-muted-foreground">
-                  这里暂时保留模板原有的图表区域，后续再接入真实订单数据。
+                <div className="flex items-start gap-2">
+                  <OrderStatusBadge status={item.status} />
+
+                  <div className="text-muted-foreground">
+                    {statusMeta.nextStep}
+                  </div>
                 </div>
               </div>
 
