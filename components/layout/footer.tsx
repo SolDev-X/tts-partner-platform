@@ -106,45 +106,34 @@ export default function Footer() {
           </span>
           <div className="order-first flex items-center justify-center gap-3 text-sm md:order-last">
             <div className="flex items-center gap-1.5">
-              <HoverCard>
-                <HoverCardTrigger className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted">
-                  <Image
-                    src="/icons/WeCom.svg"
-                    alt="企业微信"
-                    width={20}
-                    height={20}
-                    className="size-5 object-contain grayscale opacity-90"
-                  />
-                </HoverCardTrigger>
-                <HoverCardContent className="w-auto p-1">
-                  <Image
-                    src="/QRcode/wechatQRcode.jpg"
-                    alt="微信"
-                    width={160}
-                    height={160}
-                  />
-                </HoverCardContent>
-              </HoverCard>
+              <Link
+                href="https://work.weixin.qq.com/ca/cawcde664a5ec7953c"
+                target="_blank"
+                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted"
+              >
+                <Image
+                  src="/icons/weCom.svg"
+                  alt="企业微信"
+                  width={20}
+                  height={20}
+                  className="size-5 object-contain grayscale opacity-90"
+                />
+              </Link>
 
-              <HoverCard>
-                <HoverCardTrigger className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted">
-                  <Image
-                    src="/icons/Feishu.svg"
-                    alt="飞书"
-                    width={20}
-                    height={20}
-                    className="size-5 object-contain grayscale opacity-90"
-                  />
-                </HoverCardTrigger>
-                <HoverCardContent className="w-auto p-1">
-                  <Image
-                    src="/QRcode/feishuQRcode.jpg"
-                    alt="飞书"
-                    width={160}
-                    height={160}
-                  />
-                </HoverCardContent>
-              </HoverCard>
+              <Link
+                href="https://www.feishu.cn/invitation/page/add_contact/?token=c73r2ead-ef57-4172-8257-be0155e1b7bb&unique_id=mXEFRC3ITaefTiyefK_dYg=="
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted"
+              >
+                <Image
+                  src="/icons/feishu.svg"
+                  alt="飞书"
+                  width={20}
+                  height={20}
+                  className="size-5 object-contain grayscale opacity-90"
+                />
+              </Link>
               <a
                 href="https://m.tb.cn/h.8STM0HG?tk=y9twTZcE8jl"
                 target="_blank"

@@ -26,11 +26,60 @@ import {OrderStatusBadge} from "@/components/orders/shared/order-status-badge";
 import {orderStatusMeta} from "@/lib/order-status";
 import {z} from "zod";
 import {schema} from "./orders-table";
+import type {OrderStatus} from "@/lib/generated/prisma";
+
+const orderActions: Record<
+  OrderStatus,
+  {
+    primary: string | null;
+    secondary: string;
+  }
+> = {
+  PENDING_CONFIRMATION: {
+    primary: null,
+    secondary: "取消订单",
+  },
+
+  PENDING_PAYMENT: {
+    primary: "立即付款",
+    secondary: "取消订单",
+  },
+
+  WAITING_FOR_CUSTOMER: {
+    primary: "提交材料",
+    secondary: "申请退款",
+  },
+
+  PROCESSING: {
+    primary: "查看进度",
+    secondary: "关闭",
+  },
+
+  COMPLETED: {
+    primary: "查看交付",
+    secondary: "关闭",
+  },
+
+  CANCELLED: {
+    primary: null,
+    secondary: "关闭",
+  },
+
+  REFUNDING: {
+    primary: "联系客服",
+    secondary: "关闭",
+  },
+
+  REFUNDED: {
+    primary: null,
+    secondary: "关闭",
+  },
+};
 
 export function OrderDrawer({item}: {item: z.infer<typeof schema>}) {
   const isMobile = useIsMobile();
   const statusMeta = orderStatusMeta[item.status];
-
+  const actions = orderActions[item.status];
   return (
     <Drawer swipeDirection={isMobile ? "down" : "right"}>
       <DrawerTrigger
@@ -149,9 +198,11 @@ export function OrderDrawer({item}: {item: z.infer<typeof schema>}) {
         </div>
 
         <DrawerFooter>
-          <Button>Submit</Button>
+          {actions.primary && <Button>{actions.primary}</Button>}
 
-          <DrawerClose render={<Button variant="outline" />}>Done</DrawerClose>
+          <DrawerClose render={<Button variant="outline" />}>
+            {actions.secondary}
+          </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
