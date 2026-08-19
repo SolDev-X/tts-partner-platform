@@ -79,7 +79,7 @@ import {
 } from "@/components/ui/table";
 import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import Link from "next/link";
-import {CancelOrderDialog} from "@/components/orders/customer/cancel-order-button";
+import {CancelOrderDialog} from "@/components/orders/customer/actions/cancel-order";
 import {useRouter} from "next/navigation";
 import {OrderStatusBadge} from "@/components/orders/shared/order-status-badge";
 

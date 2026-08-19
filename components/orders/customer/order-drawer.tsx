@@ -21,9 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {Separator} from "@/components/ui/separator";
-import {OrderStatusBadge} from "@/components/orders/shared/order-status-badge";
-import {orderStatusMeta} from "@/lib/order-status";
 import {z} from "zod";
 import {schema} from "./orders-table";
 import type {OrderStatus} from "@/lib/generated/prisma";
@@ -78,7 +75,6 @@ const orderActions: Record<
 
 export function OrderDrawer({item}: {item: z.infer<typeof schema>}) {
   const isMobile = useIsMobile();
-  const statusMeta = orderStatusMeta[item.status];
   const actions = orderActions[item.status];
   return (
     <Drawer swipeDirection={isMobile ? "down" : "right"}>
@@ -98,27 +94,7 @@ export function OrderDrawer({item}: {item: z.infer<typeof schema>}) {
           <DrawerTitle>{item.orderInfo}</DrawerTitle>
         </DrawerHeader>
 
-        <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
-          {!isMobile && (
-            <>
-              <Separator />
-
-              <div className="grid gap-2">
-                <div className="leading-none font-medium">订单进度</div>
-
-                <div className="flex items-start gap-2">
-                  <OrderStatusBadge status={item.status} />
-
-                  <div className="text-muted-foreground">
-                    {statusMeta.nextStep}
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-            </>
-          )}
-
+        <div className="mt-4 px-4 text-sm">
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <Label htmlFor="orderInfo">订单信息</Label>
