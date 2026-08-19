@@ -258,7 +258,7 @@ export function ProfileSettings({
       </aside>
 
       {activeSection === "profile" ? (
-        <Card variant="default">
+        <Card>
           <CardHeader>
             <CardTitle>账户信息</CardTitle>
           </CardHeader>
@@ -353,7 +353,7 @@ export function ProfileSettings({
           </CardContent>
         </Card>
       ) : (
-        <Card variant="default">
+        <Card>
           <CardHeader>
             <CardTitle>修改密码</CardTitle>
           </CardHeader>

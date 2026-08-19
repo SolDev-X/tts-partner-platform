@@ -63,12 +63,14 @@ function ResetPasswordForm() {
             </h1>
           </div>
 
-          <Card className="mt-8" variant="default">
+          <Card className="mt-8">
             <CardContent className="px-6 py-7 sm:px-8 sm:py-8">
               {isComplete ? (
                 <div className="space-y-5 text-center">
                   <h2 className="text-xl font-semibold">密码已重置</h2>
-                  <p className="text-sm text-muted-foreground">正在返回登录页。</p>
+                  <p className="text-sm text-muted-foreground">
+                    正在返回登录页。
+                  </p>
                 </div>
               ) : (
                 <form onSubmit={submit} noValidate>
@@ -94,13 +96,27 @@ function ResetPasswordForm() {
                           aria-label={showPassword ? "隐藏密码" : "显示密码"}
                           onClick={() => setShowPassword((value) => !value)}
                         >
-                          {showPassword ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
+                          {showPassword ? (
+                            <EyeOff aria-hidden="true" />
+                          ) : (
+                            <Eye aria-hidden="true" />
+                          )}
                         </Button>
                       </div>
                       <FieldError>{error}</FieldError>
                     </Field>
-                    <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-                      {isSubmitting && <LoaderCircle className="animate-spin" aria-hidden="true" />}
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="w-full"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting && (
+                        <LoaderCircle
+                          className="animate-spin"
+                          aria-hidden="true"
+                        />
+                      )}
                       {isSubmitting ? "正在重置" : "确认重置密码"}
                     </Button>
                     <Button

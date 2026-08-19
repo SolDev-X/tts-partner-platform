@@ -61,15 +61,20 @@ export default function ForgotPasswordPage() {
             </h1>
           </div>
 
-          <Card className="mt-8" variant="default">
+          <Card className="mt-8">
             <CardContent className="px-6 py-7 sm:px-8 sm:py-8">
               {isSent ? (
                 <div className="space-y-5 text-center">
                   <h2 className="text-xl font-semibold">请检查您的邮箱</h2>
                   <p className="text-sm leading-6 text-muted-foreground">
-                    如果该邮箱已注册，我们已发送密码重置链接。链接将在 1 小时后失效。
+                    如果该邮箱已注册，我们已发送密码重置链接。链接将在 1
+                    小时后失效。
                   </p>
-                  <Button className="w-full" size="lg" onClick={() => router.push("/login")}>
+                  <Button
+                    className="w-full"
+                    size="lg"
+                    onClick={() => router.push("/login")}
+                  >
                     返回登录
                   </Button>
                 </div>
@@ -101,7 +106,12 @@ export default function ForgotPasswordPage() {
                       className="w-full"
                       disabled={isSubmitting}
                     >
-                      {isSubmitting && <LoaderCircle className="animate-spin" aria-hidden="true" />}
+                      {isSubmitting && (
+                        <LoaderCircle
+                          className="animate-spin"
+                          aria-hidden="true"
+                        />
+                      )}
                       {isSubmitting ? "正在发送" : "发送重置链接"}
                     </Button>
                   </FieldGroup>
@@ -112,7 +122,10 @@ export default function ForgotPasswordPage() {
 
           {!isSent && (
             <p className="mt-5 flex items-start gap-2 text-center text-xs leading-5 text-muted-foreground">
-              <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+              <TriangleAlert
+                className="mt-0.5 size-4 shrink-0"
+                aria-hidden="true"
+              />
               为保护账号安全，我们不会显示该邮箱是否已注册。
             </p>
           )}
