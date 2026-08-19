@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import {useIsMobile} from "@/hooks/use-mobile";
 import {Button} from "@/components/ui/button";
 import {
@@ -12,18 +11,10 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {z} from "zod";
 import {schema} from "./orders-table";
 import type {OrderStatus} from "@/lib/generated/prisma";
+import {OrderInfo} from "./order-info";
 
 const orderActions: Record<
   OrderStatus,
@@ -93,86 +84,9 @@ export function OrderDrawer({item}: {item: z.infer<typeof schema>}) {
         <DrawerHeader>
           <DrawerTitle>{item.orderInfo}</DrawerTitle>
         </DrawerHeader>
-
         <div className="mt-4 px-4 text-sm">
-          <form className="flex flex-col gap-4">
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="orderInfo">订单信息</Label>
-
-              <Input id="orderInfo" defaultValue={item.orderInfo} />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="currentStatus">当前状态</Label>
-
-                <Select defaultValue={item.currentStatus}>
-                  <SelectTrigger id="currentStatus" className="w-full">
-                    <SelectValue placeholder="选择当前状态" />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <SelectItem value="待确认">待确认</SelectItem>
-                    <SelectItem value="待付款">待付款</SelectItem>
-                    <SelectItem value="待补资料">待补资料</SelectItem>
-                    <SelectItem value="办理中">办理中</SelectItem>
-                    <SelectItem value="已完成">已完成</SelectItem>
-                    <SelectItem value="已取消">已取消</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="pendingAction">待处理</Label>
-
-                <Select defaultValue={item.orderId}>
-                  <SelectTrigger id="pendingAction" className="w-full">
-                    <SelectValue placeholder="选择待处理事项" />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <SelectItem value="等待平台确认">等待平台确认</SelectItem>
-                    <SelectItem value="完成付款">完成付款</SelectItem>
-                    <SelectItem value="补充资料">补充资料</SelectItem>
-                    <SelectItem value="无需处理">无需处理</SelectItem>
-                    <SelectItem value="确认交付">确认交付</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="amount">订单金额</Label>
-
-                <Input id="amount" defaultValue={item.amount} />
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="createdAt">创建时间</Label>
-
-                <Input id="createdAt" defaultValue={item.createdAt} />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="updatedAt">更新时间</Label>
-
-              <Select defaultValue={item.updatedAt}>
-                <SelectTrigger id="updatedAt" className="w-full">
-                  <SelectValue placeholder="选择更新时间" />
-                </SelectTrigger>
-
-                <SelectContent>
-                  <SelectItem value="2026/8/16">2026/8/16</SelectItem>
-                  <SelectItem value="2026/8/15">2026/8/15</SelectItem>
-                  <SelectItem value="2026/8/14">2026/8/14</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </form>
+          <OrderInfo item={item} />
         </div>
-
         <DrawerFooter>
           {actions.primary && <Button>{actions.primary}</Button>}
 
