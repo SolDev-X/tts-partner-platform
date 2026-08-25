@@ -45,7 +45,7 @@ export function OrderInfo({item}: {item: z.infer<typeof schema>}) {
         </div>
 
         <div className="flex flex-col gap-3">
-          <Label htmlFor="updatedAt">更新时间</Label>
+          <Label htmlFor="updatedAt">更新时间.</Label>
           <Input id="updatedAt" value={item.updatedAt} readOnly />
         </div>
       </div>
