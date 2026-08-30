@@ -127,7 +127,7 @@ const Contact = (props: Props) => {
                       alt="企业微信咨询二维码"
                       width={148}
                       height={148}
-                      className="size-[148px]"
+                      className="size-37"
                     />
                   </div>
                   <p className="mt-3 text-xs leading-5 text-muted-foreground">
@@ -146,7 +146,7 @@ const Contact = (props: Props) => {
                       alt="闲鱼主页二维码"
                       width={148}
                       height={148}
-                      className="size-[148px]"
+                      className="size-37"
                     />
                   </div>
                   <Button
@@ -268,14 +268,14 @@ const Contact = (props: Props) => {
                       >
                         <FieldLabel
                           htmlFor="subject-seller"
-                          className="flex items-center gap-2 rounded-lg border p-3 text-sm font-normal cursor-pointer has-[[data-state=checked]]:border-primary"
+                          className="flex items-center gap-2 rounded-lg border p-3 text-sm font-normal cursor-pointer has-data-[state=checked]:border-primary"
                         >
                           <RadioGroupItem value="seller" id="subject-seller" />
                           店铺商家
                         </FieldLabel>
                         <FieldLabel
                           htmlFor="subject-agent"
-                          className="flex items-center gap-2 rounded-lg border p-3 text-sm font-normal cursor-pointer has-[[data-state=checked]]:border-primary"
+                          className="flex items-center gap-2 rounded-lg border p-3 text-sm font-normal cursor-pointer has-data-[state=checked]:border-primary"
                         >
                           <RadioGroupItem value="agent" id="subject-agent" />
                           代理/合作伙伴
