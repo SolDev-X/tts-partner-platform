@@ -117,7 +117,7 @@ const Contact = (props: Props) => {
             <div>
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <h2 className="font-semibold">企业微信咨询</h2>
+                  <h2 className="font-semibold">企业微信咨询.</h2>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
                     扫码添加服务顾问
                   </p>
