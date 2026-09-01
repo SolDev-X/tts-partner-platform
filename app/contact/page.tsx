@@ -136,7 +136,7 @@ const Contact = (props: Props) => {
                 </div>
 
                 <div>
-                  <h2 className="font-semibold">闲鱼平台下单</h2>
+                  <h2 className="font-semibold">闲鱼平台下单.</h2>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
                     查看服务并通过平台交易
                   </p>
