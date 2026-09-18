@@ -143,21 +143,21 @@ function AccountMenu({
         </div>
 
         <DropdownMenuGroup>
-          <DropdownMenuItem render={<Link href="/dashboard" />}>
-            <LayoutDashboardIcon />
-            控制台
-          </DropdownMenuItem>
-          <DropdownMenuItem render={<Link href="/account" />}>
-            <UserRoundIcon />
-            账户
-          </DropdownMenuItem>
-
-          {isAdmin && (
+          {isAdmin ? (
             <DropdownMenuItem render={<Link href="/admin/orders" />}>
               <LayoutDashboardIcon />
               管理后台
             </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem render={<Link href="/dashboard" />}>
+              <LayoutDashboardIcon />
+              控制台
+            </DropdownMenuItem>
           )}
+          <DropdownMenuItem render={<Link href="/account" />}>
+            <UserRoundIcon />
+            账户
+          </DropdownMenuItem>
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
