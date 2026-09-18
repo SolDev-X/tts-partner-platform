@@ -1,14 +1,12 @@
 import type {Metadata} from "next";
 import {CircleAlert, ExternalLink, Mail, ShieldCheck} from "lucide-react";
-
-import {Badge} from "@/components/ui/badge";
 import {Card, CardContent} from "@/components/ui/card";
 import {Separator} from "@/components/ui/separator";
-
+import {BackButton} from "@/components/layout/back-button";
 export const metadata: Metadata = {
   title: "隐私政策",
   description:
-    "了解 SolDev 如何收集、使用、保存和保护您在使用跨境电商服务时提供的信息。",
+    "了解 上海异埠软件有限公司 如何收集、使用、保存和保护您在使用跨境电商服务时提供的信息。",
 };
 
 const sections = [
@@ -104,17 +102,18 @@ function PolicyListItem({children}: {children: React.ReactNode}) {
 
 export default function PrivacyPage() {
   return (
-    <main className="py-24 md:py-32">
+    <main className="py-24 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
         <div className="mx-auto max-w-6xl">
+          <BackButton className="mb-8" />
           <header className="mb-12 max-w-3xl space-y-6 md:mb-16">
-            <Badge variant="secondary">初版</Badge>
             <div className="space-y-4">
               <h1 className="text-4xl font-semibold tracking-tight text-balance md:text-5xl">
                 隐私政策
               </h1>
               <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
-                我们重视您的个人信息与企业资料安全。本政策说明 SolDev
+                我们重视您的个人信息与企业资料安全。本政策说明
+                上海异埠软件有限公司
                 在提供跨境电商咨询及服务过程中，如何收集、使用、保存和保护相关信息。
               </p>
             </div>
@@ -170,7 +169,9 @@ export default function PrivacyPage() {
                 <CardContent className="flex gap-4 p-5 md:p-6">
                   <ShieldCheck className="mt-0.5 size-5 shrink-0 text-primary" />
                   <div className="space-y-1">
-                    <p className="font-medium text-foreground">我们的基本原则</p>
+                    <p className="font-medium text-foreground">
+                      我们的基本原则
+                    </p>
                     <p className="text-sm leading-6 text-muted-foreground">
                       我们仅在提供服务所必需的范围内处理信息，不出售您的个人信息，
                       并通过合理的管理和技术措施保护相关资料。
@@ -179,13 +180,9 @@ export default function PrivacyPage() {
                 </CardContent>
               </Card>
 
-              <PolicySection
-                id="overview"
-                index={1}
-                title="政策说明与适用范围"
-              >
+              <PolicySection id="overview" index={1} title="政策说明与适用范围">
                 <p>
-                  本政策由上海异步软件有限责任公司（旗下品牌“SolDev”，以下称“我们”）制定，
+                  本政策由上海异埠软件有限公司（以下简称“我们”）制定，
                   适用于您访问本网站、提交咨询、注册或使用账户，以及购买或使用我们提供的
                   TikTok Shop 入驻、类目报白、权限开通及其他跨境电商相关服务。
                 </p>
@@ -231,8 +228,12 @@ export default function PrivacyPage() {
                     <table className="w-full min-w-[680px] text-left text-sm">
                       <thead className="bg-muted/70 text-foreground">
                         <tr>
-                          <th className="w-[20%] px-4 py-3 font-medium">使用场景</th>
-                          <th className="w-[45%] px-4 py-3 font-medium">信息类型</th>
+                          <th className="w-[20%] px-4 py-3 font-medium">
+                            使用场景
+                          </th>
+                          <th className="w-[45%] px-4 py-3 font-medium">
+                            信息类型
+                          </th>
                           <th className="px-4 py-3 font-medium">主要用途</th>
                         </tr>
                       </thead>
@@ -281,10 +282,18 @@ export default function PrivacyPage() {
               <PolicySection id="purpose" index={5} title="处理目的与处理依据">
                 <p>我们可能基于以下目的处理必要信息：</p>
                 <PolicyList>
-                  <PolicyListItem>响应咨询、确认需求并向您提供报价或方案；</PolicyListItem>
-                  <PolicyListItem>订立和履行服务约定，推进材料准备、提交与审核；</PolicyListItem>
-                  <PolicyListItem>管理账户、服务进度及售后沟通；</PolicyListItem>
-                  <PolicyListItem>保障网站、账户和业务资料安全，处理争议或投诉；</PolicyListItem>
+                  <PolicyListItem>
+                    响应咨询、确认需求并向您提供报价或方案；
+                  </PolicyListItem>
+                  <PolicyListItem>
+                    订立和履行服务约定，推进材料准备、提交与审核；
+                  </PolicyListItem>
+                  <PolicyListItem>
+                    管理账户、服务进度及售后沟通；
+                  </PolicyListItem>
+                  <PolicyListItem>
+                    保障网站、账户和业务资料安全，处理争议或投诉；
+                  </PolicyListItem>
                   <PolicyListItem>履行法律法规规定的义务。</PolicyListItem>
                 </PolicyList>
                 <p>
@@ -302,9 +311,10 @@ export default function PrivacyPage() {
                 title="TikTok Shop 资料与账号权限"
               >
                 <p>
-                  当您选择 TikTok Shop 相关服务时，我们会在服务范围内整理、核对并协助提交您提供的
-                  企业资质、品牌授权、联系人、店铺及申请资料。最终审核结果由 TikTok Shop
-                  根据其平台规则独立作出。
+                  当您选择 TikTok Shop
+                  相关服务时，我们会在服务范围内整理、核对并协助提交您提供的
+                  企业资质、品牌授权、联系人、店铺及申请资料。最终审核结果由
+                  TikTok Shop 根据其平台规则独立作出。
                 </p>
                 <p>
                   部分类目报白或权限开通服务可能需要您创建官方支持的店铺子账号。
@@ -312,14 +322,19 @@ export default function PrivacyPage() {
                   服务完成后，您可以在平台后台收回权限或关闭子账号。
                 </p>
                 <p>
-                  当资料提交至 TikTok Shop 后，TikTok Shop 将依据其自身规则独立处理相关信息，
+                  当资料提交至 TikTok Shop 后，TikTok Shop
+                  将依据其自身规则独立处理相关信息，
                   建议您同时阅读其届时适用的隐私政策及卖家条款。
                 </p>
               </PolicySection>
 
               <Separator />
 
-              <PolicySection id="sharing" index={7} title="委托处理、共享与披露">
+              <PolicySection
+                id="sharing"
+                index={7}
+                title="委托处理、共享与披露"
+              >
                 <p>
                   我们不会出售或出租您的个人信息。为了提供服务，我们可能在必要范围内委托服务商处理信息，
                   或向下列接收方提供必要资料：
@@ -347,10 +362,15 @@ export default function PrivacyPage() {
 
               <Separator />
 
-              <PolicySection id="cross-border" index={8} title="个人信息跨境传输">
+              <PolicySection
+                id="cross-border"
+                index={8}
+                title="个人信息跨境传输"
+              >
                 <p>
                   本网站的部分服务器或技术服务可能部署在中国香港地区；同时，为完成您委托的跨境电商服务，
-                  部分必要资料可能被提供给位于中国大陆境外的 TikTok Shop 相关运营主体或技术服务商。
+                  部分必要资料可能被提供给位于中国大陆境外的 TikTok Shop
+                  相关运营主体或技术服务商。
                   因此，相关处理可能构成个人信息出境。
                 </p>
                 <p>
@@ -364,7 +384,8 @@ export default function PrivacyPage() {
 
               <PolicySection id="cookies" index={9} title="Cookie 与类似技术">
                 <p>
-                  为保障网站正常运行，我们可能使用必要的 Cookie、本地存储或类似技术，
+                  为保障网站正常运行，我们可能使用必要的
+                  Cookie、本地存储或类似技术，
                   用于维持登录状态、记住界面偏好、防范恶意请求及保持服务稳定。
                 </p>
                 <p>
@@ -397,12 +418,20 @@ export default function PrivacyPage() {
               <PolicySection id="rights" index={11} title="您的个人信息权利">
                 <p>在适用法律规定的范围内，您可以联系我们提出以下请求：</p>
                 <PolicyList>
-                  <PolicyListItem>查阅、复制、更正或补充您的个人信息；</PolicyListItem>
+                  <PolicyListItem>
+                    查阅、复制、更正或补充您的个人信息；
+                  </PolicyListItem>
                   <PolicyListItem>删除符合法定条件的个人信息；</PolicyListItem>
                   <PolicyListItem>撤回基于同意作出的授权；</PolicyListItem>
-                  <PolicyListItem>注销账户，或限制、拒绝特定处理活动；</PolicyListItem>
-                  <PolicyListItem>要求我们对个人信息处理规则作出解释说明；</PolicyListItem>
-                  <PolicyListItem>就个人信息处理活动提出投诉或意见。</PolicyListItem>
+                  <PolicyListItem>
+                    注销账户，或限制、拒绝特定处理活动；
+                  </PolicyListItem>
+                  <PolicyListItem>
+                    要求我们对个人信息处理规则作出解释说明；
+                  </PolicyListItem>
+                  <PolicyListItem>
+                    就个人信息处理活动提出投诉或意见。
+                  </PolicyListItem>
                 </PolicyList>
                 <p>
                   为保障信息安全，我们可能需要先核验您的身份。我们将在收到请求后尽快处理并依法答复。
@@ -436,10 +465,7 @@ export default function PrivacyPage() {
                   <CardContent className="space-y-4 p-5 md:p-6">
                     <div>
                       <p className="font-medium text-foreground">
-                        上海异步软件有限责任公司
-                      </p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        品牌名称：SolDev
+                        上海异埠软件有限公司
                       </p>
                     </div>
                     <p className="text-sm leading-6 text-muted-foreground">

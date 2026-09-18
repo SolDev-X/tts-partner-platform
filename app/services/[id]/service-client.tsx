@@ -17,7 +17,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {Button} from "@/components/ui/button";
-
+import {BackButton} from "@/components/layout/back-button";
 interface ServiceClientProps {
   service: Service;
 }
@@ -51,6 +51,7 @@ const ServiceDetail1 = ({service}: ServiceClientProps) => {
   return (
     <section className={cn("py-32")}>
       <div className="container mx-auto items-center">
+        <BackButton className="mb-8" />
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
           <div className="space-y-8">
             <ServiceImageGallery cases={cases} />

@@ -2,7 +2,7 @@ import Image from "next/image";
 
 import {Button} from "@/components/ui/button";
 import {cn} from "@/lib/utils";
-
+import {BackButton} from "@/components/layout/back-button";
 interface AboutProps {
   className?: string;
   title: string;
@@ -80,6 +80,7 @@ const About = ({
   return (
     <section className={cn("py-18", className)}>
       <div className="container mx-auto">
+        <BackButton className="mb-8" />
         <div className="mb-14 flex flex-col gap-5 lg:w-2/3">
           <h1 className="text-5xl font-semibold tracking-tighter lg:text-6xl">
             {title}

@@ -13,6 +13,7 @@ import {Textarea} from "@/components/ui/textarea";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import Image from "next/image";
 import {cn} from "@/lib/utils";
+import {BackButton} from "@/components/layout/back-button";
 
 interface ContactFormDetailsProps {
   title: string;
@@ -104,6 +105,7 @@ const Contact = (props: Props) => {
   return (
     <section className={cn("py-68", className)}>
       <div className="container mx-auto items-center">
+        <BackButton className="mb-8" />
         <div className="flex flex-col gap-16 lg:flex-row lg:gap-24">
           <div className="flex flex-1 flex-col gap-10">
             <div className="flex flex-col gap-4">
