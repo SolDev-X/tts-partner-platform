@@ -144,7 +144,7 @@ function AccountMenu({
 
         <DropdownMenuGroup>
           {isAdmin ? (
-            <DropdownMenuItem render={<Link href="/admin/orders" />}>
+            <DropdownMenuItem render={<Link href="/admin" />}>
               <LayoutDashboardIcon />
               管理后台
             </DropdownMenuItem>

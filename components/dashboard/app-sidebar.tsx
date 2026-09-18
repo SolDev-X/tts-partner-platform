@@ -19,21 +19,42 @@ import {
 } from "@/components/ui/sidebar";
 import {LayoutDashboard, Package} from "lucide-react";
 
-type AppSidebarProps = React.ComponentProps<typeof Sidebar>;
+import type {WorkspaceVariant} from "@/components/dashboard/workspace-variant";
 
-export function AppSidebar(props: AppSidebarProps) {
-  const navMain = [
-    {
-      title: "概览",
-      url: "/dashboard",
-      icon: <LayoutDashboard />,
-    },
-    {
-      title: "我的订单",
-      url: "/dashboard/orders",
-      icon: <Package />,
-    },
-  ];
+type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
+  workspace?: WorkspaceVariant;
+};
+
+export function AppSidebar({
+  workspace = "customer",
+  ...props
+}: AppSidebarProps) {
+  const navMain =
+    workspace === "admin"
+      ? [
+          {
+            title: "概览",
+            url: "/admin",
+            icon: <LayoutDashboard />,
+          },
+          {
+            title: "订单",
+            url: "/admin/orders",
+            icon: <Package />,
+          },
+        ]
+      : [
+          {
+            title: "概览",
+            url: "/dashboard",
+            icon: <LayoutDashboard />,
+          },
+          {
+            title: "我的订单",
+            url: "/dashboard/orders",
+            icon: <Package />,
+          },
+        ];
 
   return (
     <Sidebar collapsible="icon" {...props}>
