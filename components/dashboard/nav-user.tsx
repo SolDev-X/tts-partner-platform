@@ -114,16 +114,9 @@ export function NavUser() {
             sideOffset={4}
           >
             <DropdownMenuGroup>
-              <DropdownMenuItem render={<Link href="/dashboard/settings" />}>
+              <DropdownMenuItem render={<Link href="/account" />}>
                 <UserRoundIcon />
                 账户
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
-                render={<Link href="/dashboard/notifications" />}
-              >
-                <BellIcon />
-                通知
               </DropdownMenuItem>
             </DropdownMenuGroup>
 

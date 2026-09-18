@@ -5,6 +5,7 @@ import {redirect} from "next/navigation";
 import {ProfileSettings} from "@/components/account/profile-settings";
 import {auth} from "@/lib/auth";
 import {prisma} from "@/lib/prisma";
+import {BackButton} from "@/components/layout/back-button";
 
 export const metadata: Metadata = {
   title: "账户设置 | 跨境服务平台",
@@ -41,6 +42,7 @@ export default async function AccountPage() {
   return (
     <section className="bg-muted/30 py-12 md:py-16">
       <div className="container mx-auto max-w-5xl px-4">
+        <BackButton className="mb-8" />
         <div className="mb-8">
           <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
             账户设置

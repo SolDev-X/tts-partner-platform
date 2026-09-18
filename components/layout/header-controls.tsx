@@ -7,6 +7,7 @@ import {
   ChevronsUpDownIcon,
   LayoutDashboardIcon,
   LogOutIcon,
+  UserRoundIcon,
 } from "lucide-react";
 
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
@@ -145,6 +146,10 @@ function AccountMenu({
           <DropdownMenuItem render={<Link href="/dashboard" />}>
             <LayoutDashboardIcon />
             控制台
+          </DropdownMenuItem>
+          <DropdownMenuItem render={<Link href="/account" />}>
+            <UserRoundIcon />
+            账户
           </DropdownMenuItem>
 
           {isAdmin && (
