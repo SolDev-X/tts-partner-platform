@@ -60,13 +60,13 @@ export default function Footer() {
     <footer className="bg-white border-b pt-10 rounded-t-2xl">
       <div className="mx-auto max-w-6xl px-6">
         <div className="flex flex-col md:flex-row md:m-4 justify-between items-center">
-          <div className="md:col-span-2 flex w-fit flex-col items-center gap-3">
+          <div className="hidden md:flex w-fit flex-col items-center gap-3">
             <Link
               href="#"
               aria-label="go home"
               className="flex size-fit items-center gap-1.5"
             >
-              <h2 className="flex items-center gap-1.5 text-base font-bold md:text-2xl">
+              <h2 className="flex items-center gap-1.5 text-2xl font-bold">
                 <Image
                   src="/vercel.svg"
                   alt="跨境服务平台"
@@ -82,7 +82,6 @@ export default function Footer() {
                 alt="企业微信咨询二维码"
                 width={148}
                 height={148}
-                className="size-32 md:size-37"
               />
               <div className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
                 扫码添加企业微信咨询
