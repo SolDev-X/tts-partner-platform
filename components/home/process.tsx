@@ -1,7 +1,7 @@
 import {Asterisk, CornerDownRight} from "lucide-react";
 import React from "react";
 
-import {Button} from "@/components/ui/button";
+import {ContactDialog} from "@/components/support/contact-dialog";
 import {cn} from "@/lib/utils";
 
 interface ProcessProps {
@@ -50,15 +50,11 @@ const Process = ({className}: ProcessProps) => {
               从需求评估到权限拓展，让入驻与合规流程清晰可控，减少反复沟通与等待的时间成本。
             </p>
 
-            <Button
-              variant="ghost"
-              nativeButton={false}
+            <ContactDialog
+              label="立即咨询"
               className="-ml-3 flex items-center justify-start gap-2 sm:ml-0"
-              render={<a href="/contact" />}
-            >
-              <CornerDownRight className="text-[#1f6feb] hidden lg:block" />
-              立即咨询
-            </Button>
+              icon={<CornerDownRight className="text-[#1f6feb] hidden lg:block" />}
+            />
           </div>
           <ul className="relative col-span-4 w-full lg:pl-10 xl:pl-22">
             {process.map((step, index) => {

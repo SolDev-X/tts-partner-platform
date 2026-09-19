@@ -1,5 +1,6 @@
-import Link from "next/link";
 import {ChevronDown} from "lucide-react";
+
+import {ContactDialog} from "@/components/support/contact-dialog";
 import {homeFAQs} from "@/lib/data";
 
 export default function FAQs() {
@@ -31,12 +32,10 @@ export default function FAQs() {
 
           <p className="text-muted-foreground text-center md:text-[14px] text-[12px]">
             找不到您要找的内容？请联系我们的{" "}
-            <Link
-              href="/contact"
-              className="text-primary font-medium hover:underline"
-            >
-              客户支持团队
-            </Link>
+            <ContactDialog
+              label="客户支持团队"
+              className="h-auto p-0 text-primary font-medium hover:bg-transparent hover:underline"
+            />
           </p>
         </div>
       </div>

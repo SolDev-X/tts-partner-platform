@@ -7,10 +7,10 @@ import {useEffect, useRef, useState} from "react";
 
 import {services} from "@/lib/data";
 import {HeaderControls} from "@/components/layout/header-controls";
+import {ContactDialog} from "@/components/support/contact-dialog";
 
 const navLinks = [
   {href: "/about", label: "关于我们"},
-  {href: "/contact", label: "联系我们"},
 ];
 
 export default function Header() {
@@ -120,6 +120,8 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
+
+          <ContactDialog className="h-auto whitespace-nowrap px-0 py-0 text-[14px] font-medium hover:bg-transparent hover:opacity-70" />
         </nav>
 
         <div
@@ -185,6 +187,11 @@ export default function Header() {
                   {link.label}
                 </Link>
               ))}
+
+              <ContactDialog
+                onClick={closeMobileMenu}
+                className="flex h-10 w-full justify-start rounded-lg px-3 text-sm font-medium hover:bg-muted"
+              />
             </div>
           )}
         </div>
