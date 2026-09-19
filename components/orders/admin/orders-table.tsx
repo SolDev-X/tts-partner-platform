@@ -29,6 +29,7 @@ import {
 } from "@tanstack/react-table";
 import {z} from "zod";
 
+import {AdminOrderDrawer} from "@/components/orders/admin/order-drawer";
 import {OrderStatusBadge} from "@/components/orders/shared/order-status-badge";
 import {Button} from "@/components/ui/button";
 import {Checkbox} from "@/components/ui/checkbox";
@@ -123,14 +124,7 @@ const columns = columnHelper.columns([
   }),
   columnHelper.accessor("orderInfo", {
     header: "订单信息",
-    cell: ({row}) => (
-      <Button
-        variant="link"
-        className="w-fit px-0 text-left text-foreground"
-      >
-        {row.original.orderInfo}
-      </Button>
-    ),
+    cell: ({row}) => <AdminOrderDrawer item={row.original} />,
     enableHiding: false,
   }),
   columnHelper.accessor("orderId", {
