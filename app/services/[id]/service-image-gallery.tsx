@@ -21,7 +21,7 @@ const ServiceImageGallery = ({cases}: ServiceImageGalleryProps) => {
   const active = cases[activeIndex];
 
   return (
-    <div className="flex flex-col-reverse gap-4 md:flex-row">
+    <div className="hidden flex-col-reverse gap-4 md:flex md:flex-row">
       {/* 缩略图列表 */}
       <div className="flex gap-3 overflow-x-auto md:w-20 md:flex-col md:overflow-visible">
         {cases.map((item, index) => (

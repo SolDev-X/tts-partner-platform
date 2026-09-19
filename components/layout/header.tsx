@@ -188,7 +188,6 @@ export default function Header() {
               ))}
 
               <ContactDialog
-                onClick={closeMobileMenu}
                 className="flex h-10 w-full justify-start rounded-lg px-3 text-sm font-medium hover:bg-muted"
               />
             </div>

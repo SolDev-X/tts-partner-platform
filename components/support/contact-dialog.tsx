@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import type {ReactNode} from "react";
+import {useState} from "react";
 import {ExternalLink} from "lucide-react";
 
 import {Button} from "@/components/ui/button";
@@ -30,11 +31,18 @@ export function ContactDialog({
   className,
   onClick,
 }: ContactDialogProps) {
+  const [open, setOpen] = useState(false);
+
+  function handleOpen() {
+    setOpen(true);
+    onClick?.();
+  }
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button variant="ghost" className={className} onClick={onClick} />
+          <Button variant="ghost" className={className} onClick={handleOpen} />
         }
       >
         {icon}

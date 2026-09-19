@@ -50,7 +50,7 @@ const ServiceDetail1 = ({service}: ServiceClientProps) => {
 
   return (
     <section className={cn("py-32")}>
-      <div className="container mx-auto items-center">
+      <div className="container mx-auto items-center px-4 sm:px-6 lg:px-0">
         <BackButton className="mb-8" />
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
           <div className="space-y-8">
@@ -63,7 +63,7 @@ const ServiceDetail1 = ({service}: ServiceClientProps) => {
             <div className="space-y-4">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex-1">
-                  <h1 className="text-4xl font-bold tracking-tight lg:text-5xl">
+                  <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
                     {service.label}
                   </h1>
                 </div>
