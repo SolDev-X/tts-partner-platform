@@ -16,6 +16,7 @@ import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {useIsMobile} from "@/hooks/use-mobile";
 
+import {OrderConfirmation} from "./order-confirmation";
 import {adminOrderSchema} from "./orders-table";
 
 type AdminOrder = z.infer<typeof adminOrderSchema>;
@@ -124,6 +125,10 @@ export function AdminOrderDrawer({item}: {item: AdminOrder}) {
                 readOnly
               />
             </div>
+
+            {item.status === "PENDING_CONFIRMATION" && (
+              <OrderConfirmation orderNumber={item.orderId} />
+            )}
           </div>
         </div>
 

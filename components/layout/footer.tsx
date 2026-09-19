@@ -1,8 +1,3 @@
-import {
-  HoverCard,
-  HoverCardTrigger,
-  HoverCardContent,
-} from "@/components/ui/hover-card";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -65,9 +60,9 @@ export default function Footer() {
     <footer className="bg-white border-b pt-10 rounded-t-2xl">
       <div className="mx-auto max-w-6xl px-6">
         <div className="flex flex-col md:flex-row md:m-4 justify-between items-center">
-          <div className="md:col-span-2 flex flex-col gap-5">
+          <div className="md:col-span-2 flex w-fit flex-col items-center gap-3">
             <Link
-              href="/"
+              href="#"
               aria-label="go home"
               className="block size-fit flex gap-1.5 items-center pl-3"
             >
@@ -81,6 +76,18 @@ export default function Footer() {
                 跨境服务平台
               </h2>
             </Link>
+            <div className="group relative w-fit rounded-lg border bg-white p-2">
+              <Image
+                src="/QRcode/wechatQRcode.jpg"
+                alt="企业微信咨询二维码"
+                width={148}
+                height={148}
+                className="size-37"
+              />
+              <div className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
+                扫码添加企业微信咨询
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-row gap-18 mt-5 text-[14px] md:gap-20">
@@ -104,7 +111,7 @@ export default function Footer() {
           <span className="text-muted-foreground order-last block text-center text-[12px] md:order-first">
             © {2026} 跨境服务. 所有资料需真实有效，结果以平台最终审核为准。
           </span>
-          <div className="order-first flex items-center justify-center gap-3 text-sm md:order-last">
+          {/* <div className="order-first flex items-center justify-center gap-3 text-sm md:order-last">
             <div className="flex items-center gap-1.5">
               <Link
                 href="https://work.weixin.qq.com/ca/cawcde664a5ec7953c"
@@ -150,34 +157,8 @@ export default function Footer() {
                   className="size-[18px] object-contain rounded-[4px]"
                 />
               </a>
-              <span
-                aria-label="小红书"
-                title="小红书"
-                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted grayscale opacity-90"
-              >
-                <Image
-                  src="/icons/xiaohongshu.svg"
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="size-[18px] object-contain rounded-[4px]"
-                />
-              </span>
-              <span
-                aria-label="抖音"
-                title="抖音"
-                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted grayscale opacity-90"
-              >
-                <Image
-                  src="/icons/douyin.svg"
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="size-[18px] object-contain rounded-[4px]"
-                />
-              </span>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>
