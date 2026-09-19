@@ -74,8 +74,7 @@ export default function Header() {
             />
 
             <span className="whitespace-nowrap text-sm font-bold sm:text-base lg:text-xl">
-              <span className="sm:hidden">跨境服务</span>
-              <span className="hidden sm:inline">跨境服务平台</span>
+              跨境服务平台
             </span>
           </Link>
         </h1>

@@ -64,9 +64,9 @@ export default function Footer() {
             <Link
               href="#"
               aria-label="go home"
-              className="block size-fit flex gap-1.5 items-center pl-3"
+              className="flex size-fit items-center gap-1.5"
             >
-              <h2 className="hidden md:flex font-bold text-base md:text-2xl gap-1.5 items-center">
+              <h2 className="flex items-center gap-1.5 text-base font-bold md:text-2xl">
                 <Image
                   src="/vercel.svg"
                   alt="跨境服务平台"
@@ -82,7 +82,7 @@ export default function Footer() {
                 alt="企业微信咨询二维码"
                 width={148}
                 height={148}
-                className="size-37"
+                className="size-32 md:size-37"
               />
               <div className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
                 扫码添加企业微信咨询
@@ -111,54 +111,6 @@ export default function Footer() {
           <span className="text-muted-foreground order-last block text-center text-[12px] md:order-first">
             © {2026} 跨境服务. 所有资料需真实有效，结果以平台最终审核为准。
           </span>
-          {/* <div className="order-first flex items-center justify-center gap-3 text-sm md:order-last">
-            <div className="flex items-center gap-1.5">
-              <Link
-                href="https://work.weixin.qq.com/ca/cawcde664a5ec7953c"
-                target="_blank"
-                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted"
-              >
-                <Image
-                  src="/icons/weCom.svg"
-                  alt="企业微信"
-                  width={20}
-                  height={20}
-                  className="size-5 object-contain grayscale opacity-90"
-                />
-              </Link>
-
-              <Link
-                href="https://www.feishu.cn/invitation/page/add_contact/?token=c73r2ead-ef57-4172-8257-be0155e1b7bb&unique_id=mXEFRC3ITaefTiyefK_dYg=="
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted"
-              >
-                <Image
-                  src="/icons/feishu.svg"
-                  alt="飞书"
-                  width={20}
-                  height={20}
-                  className="size-5 object-contain grayscale opacity-90"
-                />
-              </Link>
-              <a
-                href="https://m.tb.cn/h.8STM0HG?tk=y9twTZcE8jl"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="前往闲鱼主页"
-                title="闲鱼"
-                className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-muted grayscale opacity-90"
-              >
-                <Image
-                  src="/icons/xianyu.svg"
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="size-[18px] object-contain rounded-[4px]"
-                />
-              </a>
-            </div>
-          </div> */}
         </div>
       </div>
     </footer>
